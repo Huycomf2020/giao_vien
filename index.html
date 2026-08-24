@@ -22,13 +22,12 @@
         </div>
       </a>
 
-      <!-- Navigation Tabs -->
+      <!-- Clean Navigation Tabs (Bỏ tab thừa QuizScanner trên thanh điều hướng) -->
       <nav class="nav-tabs">
         <button class="nav-tab-btn active" data-tab="home">🏠 Trang Chủ</button>
         <button class="nav-tab-btn" data-tab="about">🌟 Giới Thiệu</button>
         <button class="nav-tab-btn" data-tab="donghe">🧰 Đồ Nghề Giáo Viên</button>
         <button class="nav-tab-btn" data-tab="hotro">🛠️ Hỗ Trợ Giáo Viên</button>
-        <button class="nav-tab-btn" data-tab="live">🎓 QuizScanner Pro</button>
       </nav>
 
       <div class="author-pill">
@@ -41,7 +40,7 @@
   <main class="main-content">
 
     <!-- ============================================================
-         TAB 0: HOMEPAGE (TRANG CHỦ VỚI CÁC BUTTON DẠNG GƯƠNG)
+         TAB 0: HOMEPAGE (TRANG CHỦ VỚI 3 NÚT DẠNG GƯƠNG)
          ============================================================ -->
     <section id="tab-home" class="tab-view active">
       
@@ -108,7 +107,7 @@
 
       </div>
 
-      <!-- Quick Launch Bar for QuizScanner -->
+      <!-- Quick Launch Bar for QuizScanner Pro (Link trực tiếp sang file độc lập trong cong_cu/) -->
       <div class="glass-panel" style="background: linear-gradient(135deg, rgba(6, 78, 59, 0.4), rgba(2, 44, 30, 0.7)); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div style="display: flex; align-items: center; gap: 16px;">
           <div style="font-size: 2.2rem;">📷</div>
@@ -117,9 +116,9 @@
             <p style="font-size: 0.88rem; color: var(--text-muted);">Quét đồng thời 43+ học sinh giơ thẻ A5 (hướng A, B, C, D) trong 3 giây và tự động thống kê trực tiếp.</p>
           </div>
         </div>
-        <button class="btn btn-primary" onclick="switchTab('live')" style="padding: 12px 24px; font-size: 1rem;">
+        <a href="cong_cu/quizscannerpro.html" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem;">
           🚀 Khởi Động QuizScanner Ngay
-        </button>
+        </a>
       </div>
 
     </section>
@@ -204,7 +203,7 @@
               Hệ thống kế hoạch bài dạy theo định hướng phát triển phẩm chất và năng lực học sinh, cấu trúc 4 hoạt động chuẩn hóa.
             </div>
             <div class="app-item-footer">
-              <span style="font-size: 0.78rem; color: var(--text-dim);">Đang cập nhật thêm</span>
+              <span style="font-size: 0.78rem; color: var(--text-dim);">Sẽ cập nhật sau</span>
               <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem;" onclick="showToast('Mục Giáo Án sẽ liên tục cập nhật theo chương trình mới!')">Xem Chi Tiết</button>
             </div>
           </div>
@@ -222,7 +221,7 @@
               Tích hợp bài tập tương tác, liên kết video thí nghiệm ảo, mã QR học tập và công cụ AI hỗ trợ giảng dạy hiện đại.
             </div>
             <div class="app-item-footer">
-              <span style="font-size: 0.78rem; color: var(--text-dim);">Đang cập nhật thêm</span>
+              <span style="font-size: 0.78rem; color: var(--text-dim);">Sẽ cập nhật sau</span>
               <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem;" onclick="showToast('Mục Giáo Án Tích Hợp Số đang được hoàn thiện!')">Xem Chi Tiết</button>
             </div>
           </div>
@@ -240,7 +239,7 @@
               Thư viện tra cứu nhanh SGK, Sách Giáo Viên các môn học thuộc 3 bộ sách: <em>Kết Nối Tri Thức, Cánh Diều, Chân Trời Sáng Tạo</em>.
             </div>
             <div class="app-item-footer">
-              <span style="font-size: 0.78rem; color: var(--text-dim);">Đang cập nhật thêm</span>
+              <span style="font-size: 0.78rem; color: var(--text-dim);">Sẽ cập nhật sau</span>
               <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem;" onclick="showToast('Đang liên kết dữ liệu Sách Giáo Khoa điện tử!')">Xem Chi Tiết</button>
             </div>
           </div>
@@ -258,7 +257,7 @@
               Tổng hợp ma trận đặc tả đề kiểm tra giữa kỳ, cuối kỳ với 4 cấp độ: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao.
             </div>
             <div class="app-item-footer">
-              <span style="font-size: 0.78rem; color: var(--text-dim);">Sắp ra mắt</span>
+              <span style="font-size: 0.78rem; color: var(--text-dim);">Sẽ cập nhật sau</span>
               <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem;" onclick="showToast('Ngân hàng đề sẽ sớm được bổ sung!')">Xem Chi Tiết</button>
             </div>
           </div>
@@ -283,7 +282,7 @@
         <!-- Apps Grid -->
         <div class="apps-grid" id="hotroAppsGrid">
           
-          <!-- App 1: QuizScanner Pro (Chính) -->
+          <!-- App 1: QuizScanner Pro (Link thẳng vào cong_cu/quizscannerpro.html) -->
           <div class="app-item-card" style="border-color: var(--emerald-400); background: rgba(8, 64, 44, 0.85);" data-title="Quizscanner Pro quét thẻ đáp án camera trắc nghiệm lớp học plickers A B C D" data-desc="Hệ thống quét câu trả lời A B C D bằng camera thời gian thực">
             <div class="app-item-header">
               <div class="app-item-icon" style="background: linear-gradient(135deg, var(--emerald-400), var(--emerald-700));">🎓</div>
@@ -297,7 +296,9 @@
             </div>
             <div class="app-item-footer">
               <span style="font-size: 0.82rem; color: #a7f3d0; font-weight: 700;">★ Khuyên dùng</span>
-              <button class="btn btn-primary" style="padding: 7px 16px; font-size: 0.88rem;" onclick="switchTab('live')">Mở Ứng Dụng Ngay</button>
+              <a href="cong_cu/quizscannerpro.html" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.88rem;">
+                🚀 Mở Ứng Dụng Ngay
+              </a>
             </div>
           </div>
 
@@ -314,8 +315,8 @@
               Hỗ trợ gõ công thức toán học nhanh, chuyển đổi mã LaTeX sang định dạng chuẩn chèn vào Microsoft Word hoặc đề thi trắc nghiệm.
             </div>
             <div class="app-item-footer">
-              <button class="btn btn-secondary" id="copyLatexSampleBtn" style="padding: 6px 12px; font-size: 0.82rem;">Copy Công Thức Mẫu</button>
-              <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.82rem;" onclick="showToast('Công cụ MathType chi tiết sẽ cập nhật thêm trong bản tới!')">Mở Bộ Gõ</button>
+              <span style="font-size: 0.78rem; color: var(--text-dim);">Sẽ cập nhật thêm</span>
+              <button class="btn btn-secondary" id="copyLatexSampleBtn" style="padding: 6px 12px; font-size: 0.82rem;">Copy LaTeX Mẫu</button>
             </div>
           </div>
 
@@ -331,7 +332,7 @@
             <div class="app-item-desc">
               Vòng quay gọi tên học sinh ngẫu nhiên (Lucky Wheel), tạo không khí thi đua sôi nổi trong giờ khởi động và trả lời câu hỏi.
             </div>
-            <div id="luckyStudentResult" style="min-height: 28px; text-align: center;"></div>
+            <div id="luckyStudentResult" style="min-height: 24px; text-align: center;"></div>
             <div class="app-item-footer">
               <button class="btn btn-warning" id="spinLuckyStudentBtn" style="padding: 6px 14px; font-size: 0.82rem; width: 100%;">
                 🎲 Quay Chọn Học Sinh Ngẫu Nhiên
@@ -345,314 +346,23 @@
               <div class="app-item-icon">🤖</div>
               <div>
                 <div class="app-item-title">Trợ Lý Soạn Đề AI</div>
-                <div class="app-tag">Tiết Kiệm Thời Gian</div>
+                <div class="app-tag">Sắp Ra Mắt</div>
               </div>
             </div>
             <div class="app-item-desc">
               Tự động nhận diện định dạng đề thi từ văn bản Word thô, trích xuất câu hỏi, 4 đáp án A-B-C-D và đáp án đúng vào QuizScanner chỉ trong 1 giây.
             </div>
             <div class="app-item-footer">
-              <span style="font-size: 0.78rem; color: var(--text-dim);">Đã tích hợp trong QuizScanner</span>
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem;" onclick="switchTab('questions')">Dán Đề Ngay</button>
+              <span style="font-size: 0.78rem; color: var(--text-dim);">Sẽ cập nhật thêm</span>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem;" onclick="showToast('Tính năng Trợ Lý Soạn Đề AI đang được phát triển!')">Xem Chi Tiết</button>
             </div>
           </div>
 
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================
-         TAB 4: TRÌNH CHIẾU & QUÉT CAMERA (QUIZSCANNER PRO)
-         ============================================================ -->
-    <section id="tab-live" class="tab-view">
-      
-      <!-- Sub-Navigation for QuizScanner Features -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-        <div style="display: flex; gap: 8px;">
-          <button class="btn btn-primary" onclick="switchTab('live')">🎯 Trình Chiếu & Quét</button>
-          <button class="btn btn-secondary" onclick="switchTab('cards')">🖨️ In Thẻ Học Sinh (A5)</button>
-          <button class="btn btn-secondary" onclick="switchTab('questions')">📝 Quản Lý Đề Thi</button>
-          <button class="btn btn-secondary" onclick="switchTab('leaderboard')">📊 Bảng Điểm & Xuất</button>
-        </div>
-        <button class="btn btn-secondary" onclick="switchTab('home')">🏠 Về Trang Chủ</button>
-      </div>
-
-      <div class="live-quiz-grid">
-        
-        <!-- Left: Question Presentation Screen -->
-        <div class="glass-panel question-card">
-          <div class="quiz-header-bar">
-            <div class="q-badge" id="qIndexBadge">CÂU HỎI 1 / 5</div>
-            <div class="quiz-controls-top">
-              <button class="btn btn-secondary" id="resetAnsBtn" title="Xóa dữ liệu đã quét của câu này để học sinh quét lại">🔄 Quét lại câu này</button>
-            </div>
-          </div>
-
-          <div class="question-text-box">
-            <div class="question-text" id="qText">Đang tải câu hỏi...</div>
-          </div>
-
-          <!-- Options Grid -->
-          <div class="options-grid">
-            <div class="option-box opt-a" id="optBoxA">
-              <div class="opt-letter">A</div>
-              <div class="opt-text" id="optTextA">Lựa chọn A</div>
-            </div>
-            <div class="option-box opt-b" id="optBoxB">
-              <div class="opt-letter">B</div>
-              <div class="opt-text" id="optTextB">Lựa chọn B</div>
-            </div>
-            <div class="option-box opt-c" id="optBoxC">
-              <div class="opt-letter">C</div>
-              <div class="opt-text" id="optTextC">Lựa chọn C</div>
-            </div>
-            <div class="option-box opt-d" id="optBoxD">
-              <div class="opt-letter">D</div>
-              <div class="opt-text" id="optTextD">Lựa chọn D</div>
-            </div>
-          </div>
-
-          <!-- Explanation Box -->
-          <div class="explanation-box" id="explanationBox">
-            <strong style="color:#34d399;">💡 Giải thích chi tiết:</strong>
-            <span id="explanationText"></span>
-          </div>
-
-          <!-- Quiz Action Bar -->
-          <div class="quiz-action-bar">
-            <div style="display: flex; gap: 8px;">
-              <button class="btn btn-secondary" id="prevQBtn">⬅ Câu Trước</button>
-              <button class="btn btn-secondary" id="nextQBtn">Câu Sau ➡</button>
-            </div>
-            <button class="btn btn-primary" id="revealAnsBtn" style="font-size: 1.05rem; padding: 10px 24px;">
-              ✨ Công Bố Đáp Án
-            </button>
-          </div>
-        </div>
-
-        <!-- Right: Camera Scanner & Real-time Live Stats -->
-        <div class="scanner-container">
-          
-          <!-- Camera Feed Panel -->
-          <div class="glass-panel" style="padding: 16px;">
-            <div class="camera-preview-wrapper">
-              <video id="cameraVideo" playsinline autoplay muted></video>
-              <canvas id="overlayCanvas"></canvas>
-              <div class="camera-status-overlay" id="cameraStatusOverlay">
-                <span style="font-size: 2.4rem;">📷</span>
-                <span>Camera đang tắt. Nhấn nút bên dưới để bắt đầu quét.</span>
-              </div>
-            </div>
-
-            <div class="camera-controls-bar" style="margin-top: 12px;">
-              <select id="cameraSelect" class="select-styled" style="flex: 1; min-width: 140px;">
-                <option value="">Đang tìm camera...</option>
-              </select>
-              <select id="resolutionSelect" class="select-styled">
-                <option value="720p">HD (720p)</option>
-                <option value="1080p" selected>Full HD (1080p)</option>
-                <option value="480p">SD (480p)</option>
-              </select>
-              <button class="btn btn-primary" id="toggleCameraBtn">📷 Bật Camera</button>
-            </div>
-          </div>
-
-          <!-- Realtime Statistics Chart -->
-          <div class="glass-panel stats-card">
-            <div class="stats-summary-row">
-              <span style="color:#ffffff;">📊 Thống Kê Phản Hồi</span>
-              <span style="color:var(--emerald-400);" id="answeredRatio">0 / 43 em</span>
-            </div>
-
-            <div class="chart-bars-container">
-              <div class="chart-bar-item">
-                <span class="chart-bar-label" style="color:var(--color-a);">A</span>
-                <div class="chart-bar-track">
-                  <div class="chart-bar-fill bar-a" id="barA"></div>
-                </div>
-                <span class="chart-bar-count" id="countA">0 (0%)</span>
-              </div>
-
-              <div class="chart-bar-item">
-                <span class="chart-bar-label" style="color:var(--color-b);">B</span>
-                <div class="chart-bar-track">
-                  <div class="chart-bar-fill bar-b" id="barB"></div>
-                </div>
-                <span class="chart-bar-count" id="countB">0 (0%)</span>
-              </div>
-
-              <div class="chart-bar-item">
-                <span class="chart-bar-label" style="color:var(--color-c);">C</span>
-                <div class="chart-bar-track">
-                  <div class="chart-bar-fill bar-c" id="barC"></div>
-                </div>
-                <span class="chart-bar-count" id="countC">0 (0%)</span>
-              </div>
-
-              <div class="chart-bar-item">
-                <span class="chart-bar-label" style="color:var(--color-d);">D</span>
-                <div class="chart-bar-track">
-                  <div class="chart-bar-fill bar-d" id="barD"></div>
-                </div>
-                <span class="chart-bar-count" id="countD">0 (0%)</span>
-              </div>
-            </div>
-
-            <!-- Student Response Matrix -->
-            <div class="students-roster-status">
-              <div style="font-size: 0.82rem; color: var(--text-dim); margin-bottom: 6px; font-weight: 600;">
-                Danh sách nộp bài (Xanh là đã quét được):
-              </div>
-              <div class="roster-grid" id="rosterGrid"></div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ============================================================
-         TAB 5: IN THẺ HỌC SINH (A5 / A4) - ĐÃ SỬA 100% LỖI IN ẤN
-         ============================================================ -->
-    <section id="tab-cards" class="tab-view">
-      <div class="glass-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-          <h2 class="panel-title" style="margin-bottom: 0; border: none; padding: 0;">🖨️ Trình Sinh Mã & In Thẻ Đáp Án (Chuẩn Khổ A5 / A4)</h2>
-          <button class="btn btn-secondary" onclick="switchTab('live')">🎯 Sang Màn Hình Quét</button>
-        </div>
-
-        <div class="generator-layout">
-          <!-- Left: Config & Student Names -->
-          <div>
-            <div class="form-group">
-              <label class="form-label">Số lượng học sinh trong lớp:</label>
-              <input type="number" id="studentCountInput" class="input-styled" min="1" max="60" value="43">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Danh sách tên học sinh (Mỗi tên 1 dòng, tương ứng thẻ 1, 2, 3...):</label>
-              <textarea id="studentNamesTextarea" class="textarea-styled" rows="8" placeholder="Nhập họ tên từng em học sinh vào đây..."></textarea>
-            </div>
-
-            <div style="display: flex; gap: 10px; flex-direction: column;">
-              <button class="btn btn-secondary" id="applyStudentsBtn">💾 Lưu & Áp Dụng Danh Sách</button>
-              <button class="btn btn-primary" id="printCardsBtn" style="font-size: 1.05rem; padding: 12px;">
-                🖨️ In Toàn Bộ Bộ Thẻ (Đã Fix Lỗi Trang A4/A5)
-              </button>
-            </div>
-            <p style="font-size: 0.82rem; color: var(--emerald-300); margin-top: 10px; line-height: 1.5;">
-              ✓ Hệ thống đã tối ưu: 1 trang A4 chứa đúng 2 thẻ A5 có đường cắt đôi rõ ràng, không bị tràn trang và không bị in dính phần giao diện xem trước.
-            </p>
-          </div>
-
-          <!-- Right: Interactive Card Preview & Rotate Test -->
-          <div class="interactive-preview-box">
-            <div style="font-weight: 700; color: #ffffff; margin-bottom: 12px;">
-              Xem trước Thẻ Học Sinh & Thử Xoay Đáp Án:
-            </div>
-            
-            <div id="previewCardContainer"></div>
-
-            <div class="rotate-controls">
-              <span style="font-size: 0.85rem; color: var(--text-muted); align-self: center; margin-right: 6px;">Thử xoay:</span>
-              <button class="btn btn-secondary btn-test-rotate" data-choice="A">Hướng A lên</button>
-              <button class="btn btn-secondary btn-test-rotate" data-choice="B">Hướng B lên</button>
-              <button class="btn btn-secondary btn-test-rotate" data-choice="C">Hướng C lên</button>
-              <button class="btn btn-secondary btn-test-rotate" data-choice="D">Hướng D lên</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================
-         TAB 6: QUẢN LÝ ĐỀ TRẮC NGHIỆM
-         ============================================================ -->
-    <section id="tab-questions" class="tab-view">
-      <div class="glass-panel">
-        <h2 class="panel-title">📝 Quản Lý & Nhập Đề Trắc Nghiệm Thông Minh</h2>
-
-        <div class="question-manager-grid">
-          <!-- Left: Paste / Import Questions -->
-          <div>
-            <div class="form-group">
-              <label class="form-label">Dán văn bản đề trắc nghiệm (Cực kỳ tự nhiên):</label>
-              <textarea id="importTextarea" class="textarea-styled" rows="12" placeholder="Câu 1: Thủ đô của Việt Nam là gì?
-A. TP. Hồ Chí Minh
-B. Hà Nội
-C. Đà Nẵng
-D. Hải Phòng
-Đáp án: B
-Giải thích: Hà Nội là thủ đô của nước CHXHCN Việt Nam.
-
-Câu 2: Số nguyên tố chẵn duy nhất là:
-A. 0
-B. 2
-C. 4
-D. 6
-Đáp án: B"></textarea>
-            </div>
-
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn btn-primary" id="parseImportBtn">📥 Nhập Đề Này</button>
-              <button class="btn btn-secondary" id="loadSampleBtn">🎲 Nạp 5 Câu Mẫu</button>
-              <button class="btn btn-danger" id="clearQuestionsBtn">🗑 Xóa Hết Câu Hỏi</button>
-            </div>
-          </div>
-
-          <!-- Right: Loaded Questions List -->
-          <div>
-            <label class="form-label">Danh sách câu hỏi hiện có trong đề:</label>
-            <div class="q-list-container" id="questionsListContainer"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================
-         TAB 7: BẢNG ĐIỂM & XUẤT DỮ LIỆU
-         ============================================================ -->
-    <section id="tab-leaderboard" class="tab-view">
-      <div class="glass-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-          <h2 class="panel-title" style="margin-bottom: 0; border: none; padding: 0;">📊 Bảng Tổng Hợp Kết Quả & Điểm Số</h2>
-          <div style="display: flex; gap: 8px;">
-            <button class="btn btn-success" id="exportCsvBtn">📥 Tải File Excel (CSV)</button>
-          </div>
-        </div>
-
-        <!-- Google Sheet Sync Box -->
-        <div style="background: rgba(2, 44, 34, 0.6); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-          <span style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">🔗 Google Sheets Webhook URL:</span>
-          <input type="text" id="googleSheetWebhookInput" class="input-styled" style="flex: 1; min-width: 260px;" placeholder="Dán URL Web App của Google Apps Script vào đây...">
-          <button class="btn btn-primary" id="syncSheetBtn">🚀 Đồng Bộ Lên Google Sheets</button>
-        </div>
-
-        <div class="table-responsive">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th style="width: 80px;">Hạng</th>
-                <th style="width: 100px;">Mã Thẻ</th>
-                <th>Họ Và Tên</th>
-                <th>Số Câu Đúng</th>
-                <th>Số Câu Đã Nộp</th>
-                <th>Tỉ Lệ Đúng</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboardTbody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
         </div>
       </div>
     </section>
 
   </main>
-
-  <!-- Dedicated Print Container for Flawless A4/A5 Printing -->
-  <div id="printSheetsContainer"></div>
 
   <!-- Footer with Huycomf credit -->
   <footer class="app-footer">
@@ -669,12 +379,86 @@ D. 6
   <!-- Toast Alert -->
   <div id="toast" class="toast-msg"></div>
 
-  <!-- Scripts -->
-  <script src="js/cv.js"></script>
-  <script src="js/aruco.js"></script>
-  <script src="js/card-generator.js"></script>
-  <script src="js/scanner.js"></script>
-  <script src="js/quiz.js"></script>
-  <script src="js/app.js"></script>
+  <!-- Portal Script -->
+  <script>
+    function showToast(msg) {
+      var t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(function () { t.style.display = 'none'; }, 2800);
+    }
+
+    function switchTab(tId) {
+      document.querySelectorAll('.nav-tab-btn').forEach(function (b) {
+        b.classList.toggle('active', b.getAttribute('data-tab') === tId);
+      });
+      document.querySelectorAll('.tab-view').forEach(function (v) {
+        v.classList.toggle('active', v.id === 'tab-' + tId);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.nav-tab-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          switchTab(btn.getAttribute('data-tab'));
+        });
+      });
+
+      document.querySelectorAll('[data-goto-tab]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          switchTab(btn.getAttribute('data-goto-tab'));
+        });
+      });
+
+      // Search Đồ Nghề
+      var dnSearch = document.getElementById('dongheSearchInput');
+      if (dnSearch) {
+        dnSearch.addEventListener('input', function () {
+          var q = dnSearch.value.toLowerCase().trim();
+          document.querySelectorAll('#dongheAppsGrid .app-item-card').forEach(function (c) {
+            var match = (c.getAttribute('data-title') || '').toLowerCase().includes(q) || (c.getAttribute('data-desc') || '').toLowerCase().includes(q);
+            c.style.display = match ? 'flex' : 'none';
+          });
+        });
+      }
+
+      // Search Hỗ Trợ
+      var htSearch = document.getElementById('hotroSearchInput');
+      if (htSearch) {
+        htSearch.addEventListener('input', function () {
+          var q = htSearch.value.toLowerCase().trim();
+          document.querySelectorAll('#hotroAppsGrid .app-item-card').forEach(function (c) {
+            var match = (c.getAttribute('data-title') || '').toLowerCase().includes(q) || (c.getAttribute('data-desc') || '').toLowerCase().includes(q);
+            c.style.display = match ? 'flex' : 'none';
+          });
+        });
+      }
+
+      // Sample Tools
+      var copyBtn = document.getElementById('copyLatexSampleBtn');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function () {
+          navigator.clipboard.writeText('x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}');
+          showToast('Đã sao chép công thức nghiệm bậc 2 (LaTeX)!');
+        });
+      }
+
+      var spinBtn = document.getElementById('spinLuckyStudentBtn');
+      if (spinBtn) {
+        spinBtn.addEventListener('click', function () {
+          var randNum = Math.floor(Math.random() * 43) + 1;
+          var numStr = (randNum < 10 ? '0' : '') + randNum;
+          var resEl = document.getElementById('luckyStudentResult');
+          if (resEl) {
+            resEl.innerHTML = `<span style="font-size:1.15rem; color:#fef08a; font-weight:800;">🎉 Chúc mừng: Học sinh #${numStr} 🎉</span>`;
+          }
+          showToast('Đã quay ngẫu nhiên Học sinh #' + numStr);
+        });
+      }
+    });
+  </script>
 </body>
 </html>
