@@ -684,10 +684,10 @@
 </head>
 <body>
 
-  <!-- Top App Navigation -->
+  <!-- Top App Navigation (Hỗ trợ quay về trang chủ qua đường dẫn thông minh) -->
   <header class="app-header">
     <div class="header-container">
-      <a href="/giao_vien/index.html" class="brand-logo">
+      <a href="../index.html" class="brand-logo" onclick="navigateToHome(event)">
         <div class="brand-icon">🎓</div>
         <div>
           <div class="brand-title">Quiz<span>Scanner</span> Pro</div>
@@ -703,7 +703,7 @@
         <button class="nav-tab-btn" data-tab="guide">📖 Hướng Dẫn</button>
       </nav>
 
-      <a href="giao_vien/index.html" class="btn btn-secondary" style="font-size: 0.85rem; padding: 6px 14px;">
+      <a href="../index.html" class="btn btn-secondary" style="font-size: 0.85rem; padding: 6px 14px;" onclick="navigateToHome(event)">
         🏠 Về Tiện Ích Giáo Viên
       </a>
     </div>
@@ -998,6 +998,19 @@ D. 6
 
   <!-- EMBEDDED JAVASCRIPT ENGINE -->
   <script>
+    // Smart Navigation Helper (Tự động xác định đường dẫn về index.html bất kể ở thư mục gốc hay cong_cu/)
+    function navigateToHome(e) {
+      if (e) e.preventDefault();
+      var path = window.location.pathname;
+      if (path.includes('/cong_cu/')) {
+        window.location.href = '../index.html';
+      } else if (path.endsWith('quizscannerpro.html')) {
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = '../index.html';
+      }
+    }
+
     /* CV Engine */
     var CV = {};
     CV.grayscale = function (imageSrc, imageDst) {
