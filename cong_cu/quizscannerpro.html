@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizScanner Pro - Quét Thẻ Đáp Án Trắc Nghiệm Camera | Thầy Phan Ngọc Huy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       THEME: GREEN & DARK GREEN SCIENTIFIC CLASSROOM
+       Author: Thầy Phan Ngọc Huy - THPT Lộc Ninh, TP. Đồng Nai
+       Footer: Made by Huycomf
+       ============================================================ */
+    :root {
+      --bg-primary: #02160e;
+      --bg-secondary: #052618;
+      --bg-card: rgba(6, 44, 30, 0.85);
+      --border-color: rgba(16, 185, 129, 0.28);
+      --border-glow: rgba(52, 211, 153, 0.7);
+      
+      --emerald-300: #6ee7b7;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --emerald-600: #059669;
+      --emerald-700: #047857;
+      --emerald-800: #065f46;
+      --emerald-900: #064e3b;
+      
+      --text-main: #f0fdf4;
+      --text-muted: #a7f3d0;
+      --text-dim: #6ee7b7;
+
+      --color-a: #10b981;
+      --color-b: #38bdf8;
+      --color-c: #fbbf24;
+      --color-d: #f43f5e;
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --transition-fast: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(5, 150, 105, 0.15) 0%, transparent 50%),
+        linear-gradient(180deg, #021a11 0%, #010f09 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .app-header {
+      background: rgba(3, 30, 20, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 24px;
+    }
+
+    .header-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--emerald-400), var(--emerald-800));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .brand-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .brand-title span {
+      color: var(--emerald-400);
+      background: linear-gradient(90deg, #34d399, #a7f3d0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle { font-size: 0.78rem; color: var(--text-muted); }
+
+    .nav-tabs {
+      display: flex;
+      background: rgba(2, 38, 26, 0.75);
+      padding: 5px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      gap: 5px;
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition-fast);
+    }
+
+    .nav-tab-btn:hover { color: #ffffff; background: rgba(16, 185, 129, 0.15); }
+
+    .nav-tab-btn.active {
+      background: linear-gradient(135deg, var(--emerald-600), var(--emerald-800));
+      color: #ffffff;
+      box-shadow: 0 2px 14px rgba(5, 150, 105, 0.4);
+      border: 1px solid var(--emerald-400);
+    }
+
+    /* Main Container */
+    .main-content {
+      flex: 1;
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 24px;
+    }
+
+    .tab-view { display: none; }
+    .tab-view.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .panel-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--emerald-500), var(--emerald-700));
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      border-color: var(--emerald-400);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--emerald-400), var(--emerald-600));
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(6, 78, 59, 0.6);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover { background: rgba(6, 78, 59, 0.9); border-color: var(--emerald-400); }
+    .btn-success { background: linear-gradient(135deg, #10b981, #047857); color: white; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; }
+
+    /* Live Quiz Grid */
+    .live-quiz-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      .live-quiz-grid { grid-template-columns: 1fr; }
+    }
+
+    .question-card { display: flex; flex-direction: column; height: 100%; }
+
+    .quiz-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .q-badge {
+      background: linear-gradient(135deg, var(--emerald-700), var(--emerald-900));
+      border: 1px solid var(--emerald-400);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #ffffff;
+    }
+
+    .question-text-box {
+      background: rgba(2, 44, 34, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .question-text { font-size: 1.35rem; font-weight: 600; line-height: 1.5; color: #ffffff; }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 640px) { .options-grid { grid-template-columns: 1fr; } }
+
+    .option-box {
+      background: rgba(6, 44, 30, 0.7);
+      border: 2px solid rgba(16, 185, 129, 0.2);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: var(--transition-fast);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-box:hover { border-color: var(--emerald-400); background: rgba(6, 44, 30, 0.95); }
+
+    .option-box.revealed-correct {
+      border-color: #10b981 !important;
+      background: rgba(16, 185, 129, 0.25) !important;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .option-box.revealed-correct::after {
+      content: '✓ ĐÁP ÁN ĐÚNG';
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #34d399;
+    }
+
+    .opt-letter {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .opt-a .opt-letter { background: var(--color-a); }
+    .opt-b .opt-letter { background: var(--color-b); }
+    .opt-c .opt-letter { background: var(--color-c); }
+    .opt-d .opt-letter { background: var(--color-d); }
+
+    .opt-text { font-size: 1.05rem; color: var(--text-main); font-weight: 500; }
+
+    .explanation-box {
+      background: rgba(4, 120, 87, 0.2);
+      border-left: 4px solid var(--emerald-400);
+      padding: 14px 18px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    .explanation-box.show { display: block; animation: fadeIn 0.3s ease; }
+
+    .quiz-action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .scanner-container { display: flex; flex-direction: column; gap: 16px; }
+
+    .camera-preview-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #021a11;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+    }
+
+    #cameraVideo { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #overlayCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+    .camera-status-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 26, 17, 0.85);
+      color: var(--text-muted);
+      gap: 12px;
+      z-index: 5;
+    }
+
+    .camera-status-overlay.hidden { display: none; }
+
+    .camera-controls-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .select-styled {
+      background: rgba(2, 44, 34, 0.8);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .stats-summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .chart-bars-container { display: flex; flex-direction: column; gap: 8px; }
+    .chart-bar-item { display: flex; align-items: center; gap: 10px; }
+    .chart-bar-label { width: 24px; font-weight: 800; font-size: 0.95rem; }
+
+    .chart-bar-track {
+      flex: 1;
+      height: 22px;
+      background: rgba(2, 44, 34, 0.8);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .chart-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 5px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chart-bar-fill.bar-a { background: linear-gradient(90deg, #059669, #10b981); }
+    .chart-bar-fill.bar-b { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+    .chart-bar-fill.bar-c { background: linear-gradient(90deg, #d97706, #fbbf24); }
+    .chart-bar-fill.bar-d { background: linear-gradient(90deg, #e11d48, #f43f5e); }
+
+    .chart-bar-count { width: 65px; text-align: right; font-size: 0.88rem; font-weight: 700; color: var(--text-dim); }
+
+    .roster-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+      gap: 6px;
+      max-height: 160px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .roster-pill {
+      background: rgba(2, 44, 34, 0.6);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 6px;
+      padding: 4px 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text-muted);
+      transition: var(--transition-fast);
+    }
+
+    .roster-pill.answered {
+      background: linear-gradient(135deg, var(--emerald-800), var(--emerald-600));
+      border-color: var(--emerald-400);
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+
+    .roster-pill.answered .pill-choice { color: #fef08a; margin-left: 2px; }
+
+    /* Card Generator Layout */
+    .generator-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) { .generator-layout { grid-template-columns: 1fr; } }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+
+    .input-styled, .textarea-styled {
+      width: 100%;
+      background: rgba(2, 44, 34, 0.7);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .interactive-preview-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 44, 34, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+    }
+
+    .rotate-controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Single Card Visual */
+    .student-card {
+      width: 100%;
+      max-width: 480px;
+      aspect-ratio: 1.414 / 1;
+      background: #ffffff;
+      color: #000000;
+      border: 2px dashed #9ca3af;
+      border-radius: 4px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 36px 1fr 36px;
+      grid-template-rows: 28px 1fr 28px;
+      position: relative;
+      box-sizing: border-box;
+      margin: 0 auto;
+    }
+
+    .card-edge { display: flex; align-items: center; justify-content: center; font-weight: 900; color: #000000; }
+    .edge-top { grid-column: 2; grid-row: 1; flex-direction: column; }
+    .edge-bottom { grid-column: 2; grid-row: 3; flex-direction: column; transform: rotate(180deg); }
+    .edge-left { grid-column: 1; grid-row: 2; flex-direction: column; transform: rotate(270deg); }
+    .edge-right { grid-column: 3; grid-row: 2; flex-direction: column; transform: rotate(90deg); }
+
+    .choice-letter { font-size: 1.6rem; line-height: 1; font-weight: 900; }
+    .edge-hint { font-size: 0.62rem; font-weight: 600; color: #4b5563; margin-top: 1px; }
+
+    .card-center {
+      grid-column: 2;
+      grid-row: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+    }
+
+    .card-header { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 4px; }
+    .student-badge { font-size: 0.8rem; font-weight: 800; background: #000000; color: #ffffff; padding: 2px 6px; border-radius: 4px; }
+    .student-name { font-size: 0.9rem; font-weight: 700; color: #000000; }
+    .card-footer { margin-top: 2px; font-size: 0.68rem; color: #6b7280; font-style: italic; }
+
+    /* ============================================================
+       ROCK-SOLID PRINT ISOLATION (A4 Portrait - 2 A5 Cards / Page)
+       ============================================================ */
+    #printSheetsContainer { display: none; }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm;
+      }
+
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      body * { visibility: hidden; }
+
+      #printSheetsContainer, #printSheetsContainer * {
+        visibility: visible !important;
+      }
+
+      #printSheetsContainer {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .print-page {
+        width: 100% !important;
+        height: 275mm !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+      }
+
+      .print-page:last-child { page-break-after: auto !important; break-after: auto !important; }
+
+      .student-card {
+        width: 100% !important;
+        height: 132mm !important;
+        max-width: 100% !important;
+        aspect-ratio: auto !important;
+        border: 1.5px dashed #374151 !important;
+        border-radius: 4px !important;
+        background: #ffffff !important;
+        box-shadow: none !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        padding: 10mm 8mm !important;
+        box-sizing: border-box !important;
+      }
+
+      .print-cut-divider {
+        text-align: center;
+        font-size: 9pt;
+        color: #6b7280;
+        margin: 2mm 0;
+        border-top: 1px dashed #9ca3af;
+        padding-top: 1mm;
+      }
+    }
+
+    /* Question Manager & Table */
+    .question-manager-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .question-manager-grid { grid-template-columns: 1fr; } }
+    .q-list-container { display: flex; flex-direction: column; gap: 12px; max-height: 540px; overflow-y: auto; }
+    .q-list-item { background: rgba(2, 44, 34, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px; }
+    .q-item-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; color: #ffffff; }
+    .q-item-meta { font-size: 0.82rem; color: var(--text-dim); display: flex; gap: 12px; }
+
+    .table-responsive { overflow-x: auto; }
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .data-table th, .data-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid rgba(16, 185, 129, 0.15); }
+    .data-table th { background: rgba(2, 44, 34, 0.9); color: var(--text-muted); font-weight: 700; font-size: 0.88rem; }
+    .data-table tbody tr:hover { background: rgba(16, 185, 129, 0.08); }
+
+    .rank-badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font-weight: 800; font-size: 0.85rem; }
+    .rank-1 { background: #fbbf24; color: #000; }
+    .rank-2 { background: #94a3b8; color: #000; }
+    .rank-3 { background: #d97706; color: #fff; }
+
+    /* Footer */
+    .app-footer {
+      background: rgba(2, 22, 15, 0.9);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-color);
+      padding: 16px 24px;
+      margin-top: auto;
+      text-align: center;
+    }
+
+    .footer-content {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-author { font-size: 0.95rem; font-weight: 700; color: #ffffff; }
+    .footer-author span { color: var(--emerald-400); text-shadow: 0 0 10px rgba(52, 211, 153, 0.6); }
+
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: linear-gradient(135deg, var(--emerald-800), var(--emerald-600));
+      border: 1px solid var(--emerald-400);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">🎓</div>
+        <div>
+          <div class="brand-title">Quiz<span>Scanner</span> Pro</div>
+          <div class="brand-subtitle">Quét Thẻ Đáp Án Trắc Nghiệm Camera 60 FPS • Thầy Phan Ngọc Huy</div>
+        </div>
+      </a>
+
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-tab="live">🎯 Trình Chiếu & Quét</button>
+        <button class="nav-tab-btn" data-tab="cards">🖨️ In Thẻ Học Sinh</button>
+        <button class="nav-tab-btn" data-tab="questions">📝 Quản Lý Đề</button>
+        <button class="nav-tab-btn" data-tab="leaderboard">📊 Bảng Điểm & Xuất</button>
+        <button class="nav-tab-btn" data-tab="guide">📖 Hướng Dẫn</button>
+      </nav>
+
+      <a href="index.html" class="btn btn-secondary" style="font-size: 0.85rem; padding: 6px 14px;">
+        🏠 Về Tiện Ích Giáo Viên
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Views Container -->
+  <main class="main-content">
+
+    <!-- TAB 1: TRÌNH CHIẾU & QUÉT CAMERA -->
+    <section id="tab-live" class="tab-view active">
+      <div class="live-quiz-grid">
+        
+        <!-- Left: Question Presentation -->
+        <div class="glass-panel question-card">
+          <div class="quiz-header-bar">
+            <div class="q-badge" id="qIndexBadge">CÂU HỎI 1 / 5</div>
+            <div class="quiz-controls-top">
+              <button class="btn btn-secondary" id="resetAnsBtn" title="Xóa dữ liệu đã quét của câu này để học sinh quét lại">🔄 Quét lại câu này</button>
+            </div>
+          </div>
+
+          <div class="question-text-box">
+            <div class="question-text" id="qText">Đang tải câu hỏi...</div>
+          </div>
+
+          <!-- Options Grid -->
+          <div class="options-grid">
+            <div class="option-box opt-a" id="optBoxA">
+              <div class="opt-letter">A</div>
+              <div class="opt-text" id="optTextA">Lựa chọn A</div>
+            </div>
+            <div class="option-box opt-b" id="optBoxB">
+              <div class="opt-letter">B</div>
+              <div class="opt-text" id="optTextB">Lựa chọn B</div>
+            </div>
+            <div class="option-box opt-c" id="optBoxC">
+              <div class="opt-letter">C</div>
+              <div class="opt-text" id="optTextC">Lựa chọn C</div>
+            </div>
+            <div class="option-box opt-d" id="optBoxD">
+              <div class="opt-letter">D</div>
+              <div class="opt-text" id="optTextD">Lựa chọn D</div>
+            </div>
+          </div>
+
+          <!-- Explanation Box -->
+          <div class="explanation-box" id="explanationBox">
+            <strong style="color:#34d399;">💡 Giải thích chi tiết:</strong>
+            <span id="explanationText"></span>
+          </div>
+
+          <!-- Quiz Action Bar -->
+          <div class="quiz-action-bar">
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary" id="prevQBtn">⬅ Câu Trước</button>
+              <button class="btn btn-secondary" id="nextQBtn">Câu Sau ➡</button>
+            </div>
+            <button class="btn btn-primary" id="revealAnsBtn" style="font-size: 1.05rem; padding: 10px 24px;">
+              ✨ Công Bố Đáp Án
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Camera Scanner & Live Stats -->
+        <div class="scanner-container">
+          
+          <div class="glass-panel" style="padding: 16px;">
+            <div class="camera-preview-wrapper">
+              <video id="cameraVideo" playsinline autoplay muted></video>
+              <canvas id="overlayCanvas"></canvas>
+              <div class="camera-status-overlay" id="cameraStatusOverlay">
+                <span style="font-size: 2.4rem;">📷</span>
+                <span>Camera đang tắt. Nhấn nút bên dưới để bắt đầu quét.</span>
+              </div>
+            </div>
+
+            <div class="camera-controls-bar" style="margin-top: 12px;">
+              <select id="cameraSelect" class="select-styled" style="flex: 1; min-width: 140px;">
+                <option value="">Đang tìm camera...</option>
+              </select>
+              <select id="resolutionSelect" class="select-styled">
+                <option value="720p">HD (720p)</option>
+                <option value="1080p" selected>Full HD (1080p)</option>
+                <option value="480p">SD (480p)</option>
+              </select>
+              <button class="btn btn-primary" id="toggleCameraBtn">📷 Bật Camera</button>
+            </div>
+          </div>
+
+          <!-- Realtime Statistics Chart -->
+          <div class="glass-panel">
+            <div class="stats-summary-row">
+              <span style="color:#ffffff;">📊 Thống Kê Phản Hồi</span>
+              <span style="color:var(--emerald-400);" id="answeredRatio">0 / 43 em</span>
+            </div>
+
+            <div class="chart-bars-container">
+              <div class="chart-bar-item">
+                <span class="chart-bar-label" style="color:var(--color-a);">A</span>
+                <div class="chart-bar-track"><div class="chart-bar-fill bar-a" id="barA"></div></div>
+                <span class="chart-bar-count" id="countA">0 (0%)</span>
+              </div>
+              <div class="chart-bar-item">
+                <span class="chart-bar-label" style="color:var(--color-b);">B</span>
+                <div class="chart-bar-track"><div class="chart-bar-fill bar-b" id="barB"></div></div>
+                <span class="chart-bar-count" id="countB">0 (0%)</span>
+              </div>
+              <div class="chart-bar-item">
+                <span class="chart-bar-label" style="color:var(--color-c);">C</span>
+                <div class="chart-bar-track"><div class="chart-bar-fill bar-c" id="barC"></div></div>
+                <span class="chart-bar-count" id="countC">0 (0%)</span>
+              </div>
+              <div class="chart-bar-item">
+                <span class="chart-bar-label" style="color:var(--color-d);">D</span>
+                <div class="chart-bar-track"><div class="chart-bar-fill bar-d" id="barD"></div></div>
+                <span class="chart-bar-count" id="countD">0 (0%)</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 14px;">
+              <div style="font-size: 0.82rem; color: var(--text-dim); margin-bottom: 6px; font-weight: 600;">
+                Danh sách nộp bài (Xanh là đã quét được):
+              </div>
+              <div class="roster-grid" id="rosterGrid"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: IN THẺ HỌC SINH (A5 / A4) -->
+    <section id="tab-cards" class="tab-view">
+      <div class="glass-panel">
+        <h2 class="panel-title">🖨️ Trình Sinh Mã & In Thẻ Đáp Án (Chuẩn Khổ A5 / A4)</h2>
+        
+        <div class="generator-layout">
+          <div>
+            <div class="form-group">
+              <label class="form-label">Số lượng học sinh trong lớp:</label>
+              <input type="number" id="studentCountInput" class="input-styled" min="1" max="60" value="43">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Danh sách tên học sinh (Mỗi tên 1 dòng):</label>
+              <textarea id="studentNamesTextarea" class="textarea-styled" rows="8" placeholder="Nhập họ tên từng em học sinh vào đây..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-direction: column;">
+              <button class="btn btn-secondary" id="applyStudentsBtn">💾 Lưu & Áp Dụng Danh Sách</button>
+              <button class="btn btn-primary" id="printCardsBtn" style="font-size: 1.05rem; padding: 12px;">
+                🖨️ In Toàn Bộ Bộ Thẻ (Đã Fix Lỗi Trang A4/A5)
+              </button>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--emerald-300); margin-top: 10px; line-height: 1.5;">
+              ✓ Hệ thống đã tối ưu: 1 trang A4 chứa đúng 2 thẻ A5 có đường cắt đôi rõ ràng, không bị tràn trang và không bị in dính phần giao diện xem trước.
+            </p>
+          </div>
+
+          <div class="interactive-preview-box">
+            <div style="font-weight: 700; color: #ffffff; margin-bottom: 12px;">
+              Xem trước Thẻ Học Sinh & Thử Xoay Đáp Án:
+            </div>
+            <div id="previewCardContainer"></div>
+            <div class="rotate-controls">
+              <span style="font-size: 0.85rem; color: var(--text-muted); align-self: center; margin-right: 6px;">Thử xoay:</span>
+              <button class="btn btn-secondary btn-test-rotate" data-choice="A">Hướng A lên</button>
+              <button class="btn btn-secondary btn-test-rotate" data-choice="B">Hướng B lên</button>
+              <button class="btn btn-secondary btn-test-rotate" data-choice="C">Hướng C lên</button>
+              <button class="btn btn-secondary btn-test-rotate" data-choice="D">Hướng D lên</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: QUẢN LÝ ĐỀ TRẮC NGHIỆM -->
+    <section id="tab-questions" class="tab-view">
+      <div class="glass-panel">
+        <h2 class="panel-title">📝 Quản Lý & Nhập Đề Trắc Nghiệm Thông Minh</h2>
+        <div class="question-manager-grid">
+          <div>
+            <div class="form-group">
+              <label class="form-label">Dán văn bản đề trắc nghiệm (Cực kỳ tự nhiên):</label>
+              <textarea id="importTextarea" class="textarea-styled" rows="12" placeholder="Câu 1: Thủ đô của Việt Nam là gì?
+A. TP. Hồ Chí Minh
+B. Hà Nội
+C. Đà Nẵng
+D. Hải Phòng
+Đáp án: B
+Giải thích: Hà Nội là thủ đô của nước CHXHCN Việt Nam.
+
+Câu 2: Số nguyên tố chẵn duy nhất là:
+A. 0
+B. 2
+C. 4
+D. 6
+Đáp án: B"></textarea>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-primary" id="parseImportBtn">📥 Nhập Đề Này</button>
+              <button class="btn btn-secondary" id="loadSampleBtn">🎲 Nạp 5 Câu Mẫu</button>
+              <button class="btn btn-danger" id="clearQuestionsBtn">🗑 Xóa Hết Câu Hỏi</button>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Danh sách câu hỏi hiện có trong đề:</label>
+            <div class="q-list-container" id="questionsListContainer"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: BẢNG ĐIỂM & XUẤT DỮ LIỆU -->
+    <section id="tab-leaderboard" class="tab-view">
+      <div class="glass-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+          <h2 class="panel-title" style="margin-bottom: 0; border: none; padding: 0;">📊 Bảng Tổng Hợp Kết Quả & Điểm Số</h2>
+          <button class="btn btn-success" id="exportCsvBtn">📥 Tải File Excel (CSV)</button>
+        </div>
+
+        <div style="background: rgba(2, 44, 34, 0.6); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <span style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">🔗 Google Sheets Webhook URL:</span>
+          <input type="text" id="googleSheetWebhookInput" class="input-styled" style="flex: 1; min-width: 260px;" placeholder="Dán URL Web App của Google Apps Script vào đây...">
+          <button class="btn btn-primary" id="syncSheetBtn">🚀 Đồng Bộ Lên Google Sheets</button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 80px;">Hạng</th>
+                <th style="width: 100px;">Mã Thẻ</th>
+                <th>Họ Và Tên</th>
+                <th>Số Câu Đúng</th>
+                <th>Số Câu Đã Nộp</th>
+                <th>Tỉ Lệ Đúng</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: HƯỚNG DẪN -->
+    <section id="tab-guide" class="tab-view">
+      <div class="glass-panel" style="line-height: 1.7;">
+        <h2 class="panel-title">📖 Hướng Dẫn Sử Dụng & Mẹo Quét Camera</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div>
+            <h3 style="color:var(--emerald-400); margin-bottom: 8px;">💡 Hướng Dẫn Học Sinh Cầm Thẻ</h3>
+            <ul style="margin-left: 20px; color: var(--text-muted); font-size: 0.92rem;">
+              <li>Muốn chọn <strong>A</strong>: Xoay cạnh có chữ A quay lên trên cùng.</li>
+              <li>Muốn chọn <strong>B</strong>: Xoay cạnh có chữ B quay lên trên cùng.</li>
+              <li>Muốn chọn <strong>C</strong>: Xoay cạnh có chữ C quay lên trên cùng.</li>
+              <li>Muốn chọn <strong>D</strong>: Xoay cạnh có chữ D quay lên trên cùng.</li>
+              <li>Nhắc học sinh cầm vào mép giấy, không che ngón tay vào mã vuông ở giữa.</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="color:var(--emerald-400); margin-bottom: 8px;">📷 Mẹo Quét Đạt 100% Độ Nhạy</h3>
+            <ul style="margin-left: 20px; color: var(--text-muted); font-size: 0.92rem;">
+              <li>Bật camera ở độ phân giải <strong>Full HD (1080p)</strong> để bắt nét cả lớp từ xa.</li>
+              <li>Quét lia nhẹ từ góc trái sang góc phải lớp học trong 2-3 giây.</li>
+              <li>Đảm bảo phòng học đủ ánh sáng và không bị bóng đèn phản chiếu lóa vào giấy.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Dedicated Print Container -->
+  <div id="printSheetsContainer"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <div class="footer-author">
+        🚀 <span>Made by Huycomf</span> • QuizScanner Pro
+      </div>
+      <div style="font-size: 0.85rem; color: var(--text-muted);">
+        Phát triển bởi <strong>Thầy Phan Ngọc Huy</strong> - Trường THPT Lộc Ninh, TP. Đồng Nai
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast-msg"></div>
+
+  <!-- EMBEDDED JAVASCRIPT ENGINE -->
+  <script>
+    /* CV Engine */
+    var CV = {};
+    CV.grayscale = function (imageSrc, imageDst) {
+      var src = imageSrc.data, dst = imageDst.data, len = src.length, i = 0, j = 0;
+      while (i < len) {
+        dst[j++] = (src[i] * 77 + src[i + 1] * 151 + src[i + 2] * 28) >> 8;
+        i += 4;
+      }
+      imageDst.width = imageSrc.width; imageDst.height = imageSrc.height;
+      return imageDst;
+    };
+    CV.adaptiveThreshold = function (imageSrc, imageDst, kernelSize, threshold) {
+      var src = imageSrc.data, dst = imageDst.data, width = imageSrc.width, height = imageSrc.height, size = Math.max(3, kernelSize >> 1);
+      var integral = new Int32Array((width + 1) * (height + 1)), intWidth = width + 1;
+      for (var y = 0; y < height; ++y) {
+        var rowSum = 0, yOffset = y * width, intYOffset = (y + 1) * intWidth, prevIntYOffset = y * intWidth;
+        for (var x = 0; x < width; ++x) {
+          rowSum += src[yOffset + x];
+          integral[intYOffset + x + 1] = integral[prevIntYOffset + x + 1] + rowSum;
+        }
+      }
+      for (var y = 0; y < height; ++y) {
+        var y1 = Math.max(0, y - size), y2 = Math.min(height, y + size + 1), count = (y2 - y1), yOffset = y * width;
+        for (var x = 0; x < width; ++x) {
+          var x1 = Math.max(0, x - size), x2 = Math.min(width, x + size + 1), area = count * (x2 - x1);
+          var sum = integral[y2 * intWidth + x2] - integral[y1 * intWidth + x2] - integral[y2 * intWidth + x1] + integral[y1 * intWidth + x1];
+          var avg = sum / area;
+          dst[yOffset + x] = (src[yOffset + x] <= avg - threshold) ? 0 : 255;
+        }
+      }
+      imageDst.width = width; imageDst.height = height;
+      return imageDst;
+    };
+    CV.findContours = function (imageSrc) {
+      var width = imageSrc.width, height = imageSrc.height, src = imageSrc.data, contours = [], visited = new Uint8Array(width * height);
+      var dx = [1, 1, 0, -1, -1, -1, 0, 1], dy = [0, 1, 1, 1, 0, -1, -1, -1];
+      for (var y = 1; y < height - 1; y += 2) {
+        for (var x = 1; x < width - 1; x += 2) {
+          var pos = y * width + x;
+          if (src[pos] === 0 && !visited[pos]) {
+            var contour = [], cur = { x: x, y: y }, start = { x: x, y: y }, dir = 0;
+            while (true) {
+              contour.push({ x: cur.x, y: cur.y });
+              visited[cur.y * width + cur.x] = 1;
+              var next = null;
+              for (var i = 0; i < 8; ++i) {
+                var nextDir = (dir + i) % 8, nx = cur.x + dx[nextDir], ny = cur.y + dy[nextDir];
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height && src[ny * width + nx] === 0) {
+                  next = { x: nx, y: ny }; dir = (nextDir + 6) % 8; break;
+                }
+              }
+              if (!next || (next.x === start.x && next.y === start.y)) break;
+              cur = next;
+              if (contour.length > 1500) break;
+            }
+            if (contour.length >= 24) contours.push(contour);
+          }
+        }
+      }
+      return contours;
+    };
+    CV.approxPolyDP = function (contour, epsilon) {
+      if (contour.length <= 2) return contour;
+      var first = contour[0], last = contour[contour.length - 1], maxDist = 0, index = 0;
+      for (var i = 1; i < contour.length - 1; ++i) {
+        var dx = last.x - first.x, dy = last.y - first.y;
+        var num = Math.abs(dy * contour[i].x - dx * contour[i].y + last.x * first.y - last.y * first.x);
+        var d = num / (Math.sqrt(dx * dx + dy * dy) || 1);
+        if (d > maxDist) { maxDist = d; index = i; }
+      }
+      if (maxDist > epsilon) {
+        var left = CV.approxPolyDP(contour.slice(0, index + 1), epsilon);
+        var right = CV.approxPolyDP(contour.slice(index), epsilon);
+        return left.slice(0, left.length - 1).concat(right);
+      }
+      return [first, last];
+    };
+    CV.isContourConvex = function (contour) {
+      var len = contour.length; if (len < 3) return false;
+      var prev = 0;
+      for (var i = 0; i < len; ++i) {
+        var p1 = contour[i], p2 = contour[(i + 1) % len], p3 = contour[(i + 2) % len];
+        var cross = (p2.x - p1.x) * (p3.y - p2.y) - (p2.y - p1.y) * (p3.x - p2.x);
+        if (cross !== 0) {
+          if (prev === 0) prev = cross > 0 ? 1 : -1;
+          else if ((cross > 0 ? 1 : -1) !== prev) return false;
+        }
+      }
+      return true;
+    };
+    CV.warp = function (imageSrc, imageDst, contour, warpSize) {
+      var src = imageSrc.data, dst = imageDst.data, width = imageSrc.width, height = imageSrc.height;
+      var srcPts = contour, dstPts = [{x:0,y:0},{x:warpSize-1,y:0},{x:warpSize-1,y:warpSize-1},{x:0,y:warpSize-1}];
+      var a = [], b = [];
+      for (var i = 0; i < 4; ++i) {
+        a.push([dstPts[i].x, dstPts[i].y, 1, 0, 0, 0, -dstPts[i].x * srcPts[i].x, -dstPts[i].y * srcPts[i].x]);
+        b.push(srcPts[i].x);
+        a.push([0, 0, 0, dstPts[i].x, dstPts[i].y, 1, -dstPts[i].x * srcPts[i].y, -dstPts[i].y * srcPts[i].y]);
+        b.push(srcPts[i].y);
+      }
+      var n = 8;
+      for (var i = 0; i < n; ++i) {
+        var maxEl = Math.abs(a[i][i]), maxRow = i;
+        for (var k = i + 1; k < n; ++k) if (Math.abs(a[k][i]) > maxEl) { maxEl = Math.abs(a[k][i]); maxRow = k; }
+        var tmp = a[maxRow]; a[maxRow] = a[i]; a[i] = tmp;
+        var tmpB = b[maxRow]; b[maxRow] = b[i]; b[i] = tmpB;
+        for (var k = i + 1; k < n; ++k) {
+          var c = -a[k][i] / (a[i][i] || 1e-10);
+          for (var j = i; j < n; ++j) a[k][j] = (i === j) ? 0 : a[k][j] + c * a[i][j];
+          b[k] += c * b[i];
+        }
+      }
+      var m = new Array(8);
+      for (var i = n - 1; i >= 0; --i) {
+        var sum = 0;
+        for (var j = i + 1; j < n; ++j) sum += a[i][j] * m[j];
+        m[i] = (b[i] - sum) / (a[i][i] || 1e-10);
+      }
+      m.push(1.0);
+      for (var v = 0; v < warpSize; ++v) {
+        for (var u = 0; u < warpSize; ++u) {
+          var w = m[6] * u + m[7] * v + m[8];
+          if (w !== 0) {
+            var x = Math.round((m[0] * u + m[1] * v + m[2]) / w);
+            var y = Math.round((m[3] * u + m[4] * v + m[5]) / w);
+            dst[v * warpSize + u] = (x >= 0 && x < width && y >= 0 && y < height) ? src[y * width + x] : 255;
+          }
+        }
+      }
+      imageDst.width = warpSize; imageDst.height = warpSize;
+      return imageDst;
+    };
+
+    /* ArUco Decoder */
+    var AR = {
+      DICTIONARY_4X4: [
+        [7,9,14,3],[5,11,6,12],[10,3,13,8],[9,14,1,11],[6,12,11,5],[13,8,4,14],[11,5,14,2],[14,2,7,9],[3,13,9,6],[12,6,3,13],
+        [5,10,12,3],[10,5,6,9],[9,3,10,6],[6,9,5,10],[3,12,9,5],[12,3,10,9],[7,11,13,14],[11,13,7,14],[13,7,11,14],[14,11,13,7],
+        [6,13,11,8],[13,11,6,8],[11,6,13,8],[8,13,11,6],[9,6,12,5],[6,12,9,5],[12,9,6,5],[5,9,6,12],[7,14,11,2],[14,11,7,2],
+        [11,7,14,2],[2,14,11,7],[10,6,9,13],[6,9,10,13],[9,10,6,13],[13,6,9,10],[12,5,3,10],[5,3,12,10],[3,12,5,10],[10,12,5,3],
+        [7,13,14,9],[13,14,7,9],[14,7,13,9],[9,7,13,14],[11,14,2,7],[14,2,11,7],[2,11,14,7],[7,2,11,14],[6,11,8,13],[11,8,6,13],
+        [8,6,11,13],[13,8,6,11],[9,12,5,6],[12,5,9,6],[5,9,12,6],[6,5,9,12],[10,9,13,3],[9,13,10,3],[13,10,9,3],[3,9,13,10]
+      ],
+      ROTATION_MAP: ['A', 'B', 'C', 'D'],
+      Detector: function () {
+        this.grey = { data: null, width: 0, height: 0 };
+        this.thres = { data: null, width: 0, height: 0 };
+        this.homography = { data: null, width: 0, height: 0 };
+        this.warpSize = 48;
+      }
+    };
+    AR.Detector.prototype.detect = function (image) {
+      var width = image.width, height = image.height;
+      if (!this.grey.data || this.grey.data.length !== width * height) {
+        this.grey.data = new Uint8Array(width * height);
+        this.thres.data = new Uint8Array(width * height);
+        this.homography.data = new Uint8Array(this.warpSize * this.warpSize);
+      }
+      CV.grayscale(image, this.grey);
+      CV.adaptiveThreshold(this.grey, this.thres, 31, 7);
+      var contours = CV.findContours(this.thres);
+      var candidates = [];
+      for (var i = 0; i < contours.length; ++i) {
+        var approx = CV.approxPolyDP(contours[i], contours[i].length * 0.05);
+        if (approx.length === 4 && CV.isContourConvex(approx)) {
+          var p0 = approx[0], p1 = approx[1], p2 = approx[2], p3 = approx[3];
+          var d1 = Math.hypot(p1.x - p0.x, p1.y - p0.y), d2 = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+          var d3 = Math.hypot(p3.x - p2.x, p3.y - p2.y), d4 = Math.hypot(p0.x - p3.x, p0.y - p3.y);
+          var minSide = Math.min(d1, d2, d3, d4), maxSide = Math.max(d1, d2, d3, d4);
+          if (minSide > width * 0.03 && maxSide / (minSide || 1) < 2.5) {
+            var cross = (p1.x - p0.x) * (p2.y - p1.y) - (p1.y - p0.y) * (p2.x - p1.x);
+            if (cross > 0) candidates.push([approx[0], approx[1], approx[2], approx[3]]);
+            else candidates.push([approx[0], approx[3], approx[2], approx[1]]);
+          }
+        }
+      }
+      var markers = [];
+      for (var i = 0; i < candidates.length; ++i) {
+        CV.warp(this.grey, this.homography, candidates[i], this.warpSize);
+        var marker = this.decodeMarker(this.homography);
+        if (marker) {
+          marker.corners = candidates[i];
+          marker.center = {
+            x: (candidates[i][0].x + candidates[i][1].x + candidates[i][2].x + candidates[i][3].x) / 4,
+            y: (candidates[i][0].y + candidates[i][1].y + candidates[i][2].y + candidates[i][3].y) / 4
+          };
+          marker.choice = AR.ROTATION_MAP[marker.rotation];
+          markers.push(marker);
+        }
+      }
+      return markers;
+    };
+    AR.Detector.prototype.decodeMarker = function (warpImg) {
+      var size = this.warpSize, cellSize = size / 6, grid = [];
+      for (var r = 0; r < 6; ++r) {
+        for (var c = 0; c < 6; ++c) {
+          var sum = 0, samples = 0;
+          for (var y = Math.floor(r * cellSize + cellSize * 0.25); y < Math.floor((r + 1) * cellSize - cellSize * 0.25); ++y) {
+            for (var x = Math.floor(c * cellSize + cellSize * 0.25); x < Math.floor((c + 1) * cellSize - cellSize * 0.25); ++x) {
+              sum += warpImg.data[y * size + x]; samples++;
+            }
+          }
+          var isWhite = (sum / (samples || 1)) > 125 ? 1 : 0;
+          if ((r === 0 || r === 5 || c === 0 || c === 5) && isWhite === 1) return null;
+          if (r >= 1 && r <= 4 && c >= 1 && c <= 4) {
+            if (!grid[r - 1]) grid[r - 1] = [];
+            grid[r - 1][c - 1] = isWhite;
+          }
+        }
+      }
+      var bestMatch = null, minDistance = 2;
+      for (var rotation = 0; rotation < 4; ++rotation) {
+        var rotated = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+        for (var r = 0; r < 4; ++r) {
+          for (var c = 0; c < 4; ++c) {
+            if (rotation === 0) rotated[r][c] = grid[r][c];
+            else if (rotation === 1) rotated[c][3 - r] = grid[r][c];
+            else if (rotation === 2) rotated[3 - r][3 - c] = grid[r][c];
+            else if (rotation === 3) rotated[3 - c][r] = grid[r][c];
+          }
+        }
+        var rowVals = [
+          (rotated[0][0] << 3) | (rotated[0][1] << 2) | (rotated[0][2] << 1) | rotated[0][3],
+          (rotated[1][0] << 3) | (rotated[1][1] << 2) | (rotated[1][2] << 1) | rotated[1][3],
+          (rotated[2][0] << 3) | (rotated[2][1] << 2) | (rotated[2][2] << 1) | rotated[2][3],
+          (rotated[3][0] << 3) | (rotated[3][1] << 2) | (rotated[3][2] << 1) | rotated[3][3]
+        ];
+        for (var idIdx = 0; idIdx < AR.DICTIONARY_4X4.length; ++idIdx) {
+          var dictPattern = AR.DICTIONARY_4X4[idIdx], dist = 0;
+          for (var k = 0; k < 4; ++k) {
+            var v = rowVals[k] ^ dictPattern[k], cCount = 0;
+            while (v) { cCount += v & 1; v >>= 1; }
+            dist += cCount;
+          }
+          if (dist < minDistance) {
+            minDistance = dist;
+            bestMatch = { id: idIdx + 1, rotation: rotation, distance: dist };
+          }
+        }
+      }
+      return bestMatch;
+    };
+
+    /* Card Generator */
+    var CardGenerator = {
+      generateMarkerSVG: function (id, size) {
+        size = size || 220;
+        var pattern = AR.DICTIONARY_4X4[id - 1]; if (!pattern) return '<svg></svg>';
+        var cellSize = size / 6;
+        var svg = `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:0 auto;"><rect x="0" y="0" width="${size}" height="${size}" fill="#000000" />`;
+        for (var r = 0; r < 4; ++r) {
+          var rowVal = pattern[r];
+          for (var c = 0; c < 4; ++c) {
+            if (((rowVal >> (3 - c)) & 1) === 1) {
+              svg += `<rect x="${(c + 1) * cellSize}" y="${(r + 1) * cellSize}" width="${cellSize}" height="${cellSize}" fill="#ffffff" />`;
+            }
+          }
+        }
+        svg += '</svg>';
+        return svg;
+      },
+      renderCardHTML: function (studentNumber, studentName) {
+        var markerSvg = this.generateMarkerSVG(studentNumber, 220);
+        var displayNum = (studentNumber < 10 ? '0' : '') + studentNumber;
+        return `
+          <div class="student-card" data-student-id="${studentNumber}">
+            <div class="card-edge edge-top"><span class="choice-letter">A</span><span class="edge-hint">▲ Hướng lên trên để chọn A</span></div>
+            <div class="card-edge edge-left"><span class="choice-letter">D</span><span class="edge-hint">▲ Chọn D</span></div>
+            <div class="card-center">
+              <div class="card-header"><div class="student-badge">Thẻ số #${displayNum}</div><div class="student-name">${studentName || `Học sinh ${displayNum}`}</div></div>
+              <div class="marker-wrapper">${markerSvg}</div>
+              <div class="card-footer"><span class="guide-text">Giơ đáp án của bạn quay lên phía trên</span></div>
+            </div>
+            <div class="card-edge edge-right"><span class="choice-letter">B</span><span class="edge-hint">▲ Chọn B</span></div>
+            <div class="card-edge edge-bottom"><span class="choice-letter">C</span><span class="edge-hint">▲ Hướng lên trên để chọn C</span></div>
+          </div>
+        `;
+      },
+      renderAllCards: function (container, studentList) {
+        var html = '';
+        for (var i = 0; i < studentList.length; i += 2) {
+          html += '<div class="print-page">' + this.renderCardHTML(studentList[i].id, studentList[i].name);
+          if (i + 1 < studentList.length) {
+            html += '<div class="print-cut-divider">✂ - - - - - - - - - - Đường cắt chia đôi tờ A4 thành 2 thẻ A5 - - - - - - - - - - ✂</div>';
+            html += this.renderCardHTML(studentList[i + 1].id, studentList[i + 1].name);
+          }
+          html += '</div>';
+        }
+        container.innerHTML = html;
+      }
+    };
+
+    /* Quiz Manager */
+    var DEFAULT_QUESTIONS = [
+      { id: 1, text: "Hành tinh nào gần Mặt Trời nhất trong Hệ Mặt Trời?", options: { A: "Sao Kim", B: "Sao Thủy", C: "Sao Hỏa", D: "Trái Đất" }, correct: "B", explanation: "Sao Thủy nằm gần Mặt Trời nhất (~58 triệu km)." },
+      { id: 2, text: "Đỉnh núi cao nhất thế giới hiện nay là đỉnh núi nào?", options: { A: "Fansipan", B: "K2", C: "Everest", D: "Kilimanjaro" }, correct: "C", explanation: "Đỉnh Everest cao 8.848,86 m." },
+      { id: 3, text: "Khí Oxi chiếm khoảng bao nhiêu phần trăm thể tích không khí?", options: { A: "Khoảng 21%", B: "Khoảng 78%", C: "Khoảng 1%", D: "Khoảng 50%" }, correct: "A", explanation: "Nitơ ~78%, Oxi ~21%." },
+      { id: 4, text: "Tác phẩm văn học 'Truyện Kiều' là của đại thi hào nào?", options: { A: "Hồ Xuân Hương", B: "Nguyễn Trãi", C: "Nguyễn Du", D: "Đoàn Thị Điểm" }, correct: "C", explanation: "Đại thi hào Nguyễn Du (1765 - 1820)." },
+      { id: 5, text: "Kết quả của phép tính: 2 + 3 x 4 là bao nhiêu?", options: { A: "20", B: "14", C: "24", D: "18" }, correct: "B", explanation: "Nhân chia trước: 3 x 4 = 12, 2 + 12 = 14." }
+    ];
+
+    function QuizManager() {
+      this.questions = JSON.parse(localStorage.getItem('qr_quiz_questions')) || DEFAULT_QUESTIONS;
+      this.currentIndex = 0;
+      this.isAnswerRevealed = false;
+      this.sessionResults = {};
+    }
+    QuizManager.prototype.getCurrentQuestion = function () { return this.questions[this.currentIndex] || null; };
+    QuizManager.prototype.setQuestionIndex = function (idx) {
+      if (idx >= 0 && idx < this.questions.length) { this.currentIndex = idx; this.isAnswerRevealed = false; return true; }
+      return false;
+    };
+    QuizManager.prototype.nextQuestion = function () { return this.setQuestionIndex(this.currentIndex + 1); };
+    QuizManager.prototype.prevQuestion = function () { return this.setQuestionIndex(this.currentIndex - 1); };
+    QuizManager.prototype.revealAnswer = function (activeAnswers) {
+      this.isAnswerRevealed = true;
+      var q = this.getCurrentQuestion(); if (!q) return;
+      if (!this.sessionResults[this.currentIndex]) this.sessionResults[this.currentIndex] = {};
+      for (var stId in activeAnswers) {
+        this.sessionResults[this.currentIndex][stId] = { choice: activeAnswers[stId].choice, isCorrect: activeAnswers[stId].choice === q.correct };
+      }
+    };
+    QuizManager.prototype.parseTextQuestions = function (text) {
+      var lines = text.split(/\r?\n/), questions = [], cur = null;
+      for (var i = 0; i < lines.length; ++i) {
+        var l = lines[i].trim(); if (!l) continue;
+        var qm = l.match(/^(?:câu|bài|question|\d+[\.\/\:\)])\s*(\d*)[\.\:\s\-\)]\s*(.*)/i);
+        if (qm && (!cur || cur.options.A)) {
+          if (cur && cur.text && Object.keys(cur.options).length >= 2) questions.push(cur);
+          cur = { id: questions.length + 1, text: qm[2] || l, options: {}, correct: 'A', explanation: '' };
+          continue;
+        }
+        if (!cur) { cur = { id: questions.length + 1, text: l, options: {}, correct: 'A', explanation: '' }; continue; }
+        var optm = l.match(/^([A-D])[\.\:\)\s\-]\s*(.*)/i);
+        if (optm) { cur.options[optm[1].toUpperCase()] = optm[2].trim(); continue; }
+        var ansm = l.match(/^(?:đáp án|dap an|answer|key)[\s\:\=]+([A-D])/i);
+        if (ansm) { cur.correct = ansm[1].toUpperCase(); continue; }
+        var expm = l.match(/^(?:giải thích|giai thich|explanation|note)[\s\:\=]+(.*)/i);
+        if (expm) { cur.explanation = expm[1].trim(); continue; }
+        if (Object.keys(cur.options).length === 0) cur.text += ' ' + l;
+        else if (cur.explanation) cur.explanation += ' ' + l;
+      }
+      if (cur && cur.text && Object.keys(cur.options).length >= 2) questions.push(cur);
+      return questions;
+    };
+    QuizManager.prototype.calculateLeaderboard = function (studentsList) {
+      var scores = {}, total = this.questions.length;
+      studentsList.forEach(function (s) { scores[s.id] = { id: s.id, name: s.name, correctCount: 0, answeredCount: 0, totalQuestions: total }; });
+      for (var qIdx in this.sessionResults) {
+        var qr = this.sessionResults[qIdx];
+        for (var stId in qr) {
+          if (scores[stId]) { scores[stId].answeredCount++; if (qr[stId].isCorrect) scores[stId].correctCount++; }
+        }
+      }
+      var arr = Object.values(scores);
+      arr.sort(function (a, b) { return b.correctCount !== a.correctCount ? b.correctCount - a.correctCount : b.answeredCount - a.answeredCount; });
+      return arr;
+    };
+
+    /* App Controller */
+    var studentsList = [], quizManager = null, scannerStream = null, isCamRunning = false, activeAnswers = {}, detector = new AR.Detector();
+
+    function initStudents() {
+      var saved = localStorage.getItem('qr_quiz_students');
+      if (saved) { try { studentsList = JSON.parse(saved); return; } catch (e) {} }
+      studentsList = [];
+      for (var i = 1; i <= 43; ++i) studentsList.push({ id: i, name: 'Học sinh ' + (i < 10 ? '0' : '') + i });
+    }
+
+    function showToast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg; t.style.display = 'block';
+      setTimeout(function () { t.style.display = 'none'; }, 2800);
+    }
+
+    function switchTab(tId) {
+      document.querySelectorAll('.nav-tab-btn').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === tId); });
+      document.querySelectorAll('.tab-view').forEach(function (v) { v.classList.toggle('active', v.id === 'tab-' + tId); });
+      if (tId === 'cards') renderCardGeneratorPreview();
+      else if (tId === 'leaderboard') renderLeaderboard();
+      else if (tId === 'questions') renderQuestionList();
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+      initStudents();
+      quizManager = new QuizManager();
+
+      document.querySelectorAll('.nav-tab-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () { switchTab(btn.getAttribute('data-tab')); });
+      });
+
+      // Camera init
+      var video = document.getElementById('cameraVideo'), overlay = document.getElementById('overlayCanvas'), ctx = overlay.getContext('2d');
+      var camSelect = document.getElementById('cameraSelect'), toggleCamBtn = document.getElementById('toggleCameraBtn'), statusOverlay = document.getElementById('cameraStatusOverlay');
+
+      try {
+        var devices = await navigator.mediaDevices.enumerateDevices();
+        var videoDevices = devices.filter(function (d) { return d.kind === 'videoinput'; });
+        camSelect.innerHTML = '';
+        videoDevices.forEach(function (d, i) {
+          var opt = document.createElement('option'); opt.value = d.deviceId; opt.textContent = d.label || ('Camera ' + (i + 1));
+          camSelect.appendChild(opt);
+        });
+      } catch (e) {}
+
+      async function startCam() {
+        var devId = camSelect.value, res = document.getElementById('resolutionSelect').value;
+        var w = res === '1080p' ? 1920 : (res === '480p' ? 640 : 1280), h = res === '1080p' ? 1080 : (res === '480p' ? 480 : 720);
+        var constraints = { video: { width: { ideal: w }, height: { ideal: h } }, audio: false };
+        if (devId) constraints.video.deviceId = { exact: devId }; else constraints.video.facingMode = { ideal: 'environment' };
+        scannerStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = scannerStream;
+        await video.play();
+        isCamRunning = true;
+        statusOverlay.classList.add('hidden');
+        toggleCamBtn.textContent = '⏹ Tắt Camera'; toggleCamBtn.className = 'btn btn-danger';
+        processFrame();
+      }
+
+      function stopCam() {
+        isCamRunning = false;
+        if (scannerStream) { scannerStream.getTracks().forEach(function (t) { t.stop(); }); scannerStream = null; }
+        video.srcObject = null;
+        ctx.clearRect(0, 0, overlay.width, overlay.height);
+        statusOverlay.classList.remove('hidden');
+        toggleCamBtn.textContent = '📷 Bật Camera'; toggleCamBtn.className = 'btn btn-primary';
+      }
+
+      toggleCamBtn.addEventListener('click', function () { if (isCamRunning) stopCam(); else startCam(); });
+      camSelect.addEventListener('change', function () { if (isCamRunning) { stopCam(); startCam(); } });
+
+      var hiddenCanvas = document.createElement('canvas'), hiddenCtx = hiddenCanvas.getContext('2d', { willReadFrequently: true });
+      function processFrame() {
+        if (!isCamRunning) return;
+        var vw = video.videoWidth, vh = video.videoHeight;
+        if (vw > 0 && vh > 0) {
+          hiddenCanvas.width = vw; hiddenCanvas.height = vh; overlay.width = vw; overlay.height = vh;
+          hiddenCtx.drawImage(video, 0, 0, vw, vh);
+          var img = hiddenCtx.getImageData(0, 0, vw, vh);
+          var markers = detector.detect(img);
+          ctx.clearRect(0, 0, vw, vh);
+          var newAns = false;
+          markers.forEach(function (m) {
+            if (!activeAnswers[m.id] || activeAnswers[m.id].choice !== m.choice) {
+              activeAnswers[m.id] = { id: m.id, choice: m.choice, time: Date.now() };
+              newAns = true;
+            }
+            // Draw overlay
+            var pts = m.corners;
+            ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y); ctx.lineTo(pts[1].x, pts[1].y); ctx.lineTo(pts[2].x, pts[2].y); ctx.lineTo(pts[3].x, pts[3].y); ctx.closePath();
+            ctx.lineWidth = 4; ctx.strokeStyle = '#10b981'; ctx.stroke();
+            ctx.fillStyle = 'rgba(16, 185, 129, 0.2)'; ctx.fill();
+            var stName = (studentsList.find(function(s){return s.id===m.id;})||{}).name || ('Học sinh #'+m.id);
+            var badgeText = '#' + (m.id < 10 ? '0' : '') + m.id + ' ' + stName + ' [' + m.choice + ']';
+            ctx.font = 'bold 15px sans-serif';
+            var tw = ctx.measureText(badgeText).width;
+            ctx.fillStyle = 'rgba(6, 44, 30, 0.9)'; ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2;
+            ctx.fillRect(m.center.x - tw / 2 - 10, m.center.y - 45, tw + 20, 26);
+            ctx.strokeRect(m.center.x - tw / 2 - 10, m.center.y - 45, tw + 20, 26);
+            ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.fillText(badgeText, m.center.x, m.center.y - 27);
+          });
+          if (newAns) updateStats();
+        }
+        requestAnimationFrame(processFrame);
+      }
+
+      function updateStats() {
+        var counts = { A: 0, B: 0, C: 0, D: 0 }, total = 0;
+        for (var k in activeAnswers) { counts[activeAnswers[k].choice]++; total++; }
+        var totSt = studentsList.length || 1;
+        ['A','B','C','D'].forEach(function (c) {
+          var pct = total > 0 ? (counts[c] / total * 100) : 0;
+          document.getElementById('bar' + c).style.width = pct + '%';
+          document.getElementById('count' + c).textContent = counts[c] + ' (' + Math.round(pct) + '%)';
+        });
+        document.getElementById('answeredRatio').textContent = total + ' / ' + totSt + ' em';
+        studentsList.forEach(function (s) {
+          var p = document.getElementById('rosterPill-' + s.id);
+          if (p) {
+            if (activeAnswers[s.id]) { p.classList.add('answered'); p.querySelector('.pill-choice').textContent = '(' + activeAnswers[s.id].choice + ')'; }
+            else { p.classList.remove('answered'); p.querySelector('.pill-choice').textContent = ''; }
+          }
+        });
+      }
+
+      function renderQuestion() {
+        var q = quizManager.getCurrentQuestion(); if (!q) return;
+        document.getElementById('qIndexBadge').textContent = 'CÂU HỎI ' + (quizManager.currentIndex + 1) + ' / ' + quizManager.questions.length;
+        document.getElementById('qText').textContent = q.text;
+        ['A','B','C','D'].forEach(function(c){ document.getElementById('optText' + c).textContent = q.options[c] || '(Trống)'; });
+        document.querySelectorAll('.option-box').forEach(function (box) { box.classList.remove('revealed-correct'); });
+        var expBox = document.getElementById('explanationBox');
+        if (quizManager.isAnswerRevealed) {
+          document.querySelector('.opt-' + q.correct.toLowerCase()).classList.add('revealed-correct');
+          if (q.explanation) { document.getElementById('explanationText').textContent = q.explanation; expBox.classList.add('show'); }
+        } else { expBox.classList.remove('show'); }
+      }
+
+      document.getElementById('prevQBtn').addEventListener('click', function () { if (quizManager.prevQuestion()) { activeAnswers = {}; updateStats(); renderQuestion(); } });
+      document.getElementById('nextQBtn').addEventListener('click', function () { if (quizManager.nextQuestion()) { activeAnswers = {}; updateStats(); renderQuestion(); } });
+      document.getElementById('revealAnsBtn').addEventListener('click', function () { quizManager.revealAnswer(activeAnswers); renderQuestion(); });
+      document.getElementById('resetAnsBtn').addEventListener('click', function () { activeAnswers = {}; updateStats(); renderQuestion(); showToast('Đã làm mới lượt quét câu này!'); });
+
+      // Cards setup
+      document.getElementById('applyStudentsBtn').addEventListener('click', function () {
+        var count = parseInt(document.getElementById('studentCountInput').value, 10) || 43;
+        var lines = document.getElementById('studentNamesTextarea').value.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
+        studentsList = [];
+        for (var i = 1; i <= count; ++i) studentsList.push({ id: i, name: lines[i-1] || ('Học sinh ' + (i<10?'0':'')+i) });
+        localStorage.setItem('qr_quiz_students', JSON.stringify(studentsList));
+        renderRoster(); renderCardGeneratorPreview();
+        showToast('Đã cập nhật ' + studentsList.length + ' học sinh!');
+      });
+
+      document.getElementById('printCardsBtn').addEventListener('click', function () {
+        var printBox = document.getElementById('printSheetsContainer');
+        CardGenerator.renderAllCards(printBox, studentsList);
+        setTimeout(function () { window.print(); }, 150);
+      });
+
+      document.querySelectorAll('.btn-test-rotate').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var c = btn.getAttribute('data-choice'), deg = { 'A': 0, 'B': 270, 'C': 180, 'D': 90 }[c] || 0;
+          document.getElementById('interactiveTestCard').style.transform = 'rotate(' + deg + 'deg)';
+          showToast('Đã xoay thẻ: Hướng ' + c + ' lên trên!');
+        });
+      });
+
+      // Question Manager
+      document.getElementById('parseImportBtn').addEventListener('click', function () {
+        var txt = document.getElementById('importTextarea').value.trim();
+        var parsed = quizManager.parseTextQuestions(txt);
+        if (parsed.length === 0) { alert('Không nhận diện được câu hỏi nào.'); return; }
+        quizManager.questions = parsed; quizManager.currentIndex = 0;
+        localStorage.setItem('qr_quiz_questions', JSON.stringify(parsed));
+        renderQuestionList(); renderQuestion();
+        showToast('Đã nhập ' + parsed.length + ' câu hỏi!');
+      });
+
+      document.getElementById('loadSampleBtn').addEventListener('click', function () {
+        quizManager.questions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS)); quizManager.currentIndex = 0;
+        localStorage.setItem('qr_quiz_questions', JSON.stringify(quizManager.questions));
+        renderQuestionList(); renderQuestion();
+        showToast('Đã nạp 5 câu mẫu!');
+      });
+
+      document.getElementById('clearQuestionsBtn').addEventListener('click', function () {
+        if (confirm('Xóa hết câu hỏi?')) { quizManager.questions = []; quizManager.currentIndex = 0; renderQuestionList(); renderQuestion(); }
+      });
+
+      // Leaderboard
+      document.getElementById('exportCsvBtn').addEventListener('click', function () {
+        var lb = quizManager.calculateLeaderboard(studentsList);
+        var csv = '\uFEFFSTT,Mã Thẻ,Họ Và Tên,Số Câu Đúng,Số Câu Đã Trả Lời,Tổng Số Câu,Điểm Số (%)\n';
+        lb.forEach(function (it, idx) {
+          var pct = it.totalQuestions > 0 ? ((it.correctCount / it.totalQuestions) * 100).toFixed(1) : '0';
+          csv += `${idx + 1},Thẻ #${it.id},"${it.name}",${it.correctCount},${it.answeredCount},${it.totalQuestions},${pct}%\n`;
+        });
+        var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+        a.download = 'Ket_Qua_Quiz_' + new Date().toISOString().slice(0, 10) + '.csv'; a.click();
+      });
+
+      document.getElementById('syncSheetBtn').addEventListener('click', async function () {
+        var url = document.getElementById('googleSheetWebhookInput').value.trim();
+        if (!url) { alert('Vui lòng dán Webhook URL Google Apps Script'); return; }
+        var lb = quizManager.calculateLeaderboard(studentsList);
+        await fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ timestamp: new Date().toISOString(), totalQuestions: quizManager.questions.length, leaderboard: lb }) });
+        showToast('Đã gửi điểm sang Google Sheets!');
+      });
+
+      function renderRoster() {
+        var g = document.getElementById('rosterGrid'); g.innerHTML = '';
+        studentsList.forEach(function (s) {
+          var p = document.createElement('div'); p.id = 'rosterPill-' + s.id; p.className = 'roster-pill';
+          p.innerHTML = '#' + (s.id < 10 ? '0' : '') + s.id + ' <span class="pill-choice"></span>';
+          g.appendChild(p);
+        });
+      }
+
+      function renderCardGeneratorPreview() {
+        var c = document.getElementById('previewCardContainer');
+        var s = studentsList[0] || { id: 1, name: 'Học sinh 01' };
+        c.innerHTML = '<div id="interactiveTestCard" style="display:inline-block; transition:transform 0.4s ease;">' + CardGenerator.renderCardHTML(s.id, s.name) + '</div>';
+      }
+
+      function renderQuestionList() {
+        var c = document.getElementById('questionsListContainer'); c.innerHTML = '';
+        quizManager.questions.forEach(function (q, i) {
+          var d = document.createElement('div'); d.className = 'q-list-item';
+          d.innerHTML = '<div class="q-item-title">Câu ' + (i + 1) + ': ' + q.text + '</div><div class="q-item-meta"><span>✓ Đáp án: <strong>' + q.correct + '</strong></span><span>' + (q.options[q.correct] || '') + '</span></div>';
+          c.appendChild(d);
+        });
+      }
+
+      function renderLeaderboard() {
+        var tbody = document.getElementById('leaderboardTbody'); tbody.innerHTML = '';
+        var lb = quizManager.calculateLeaderboard(studentsList);
+        lb.forEach(function (st, idx) {
+          var rk = idx === 0 ? '🥇 1' : (idx === 1 ? '🥈 2' : (idx === 2 ? '🥉 3' : (idx + 1)));
+          var pct = st.totalQuestions > 0 ? Math.round((st.correctCount / st.totalQuestions) * 100) : 0;
+          var tr = document.createElement('tr');
+          tr.innerHTML = `<td><span class="rank-badge ${idx<3?'rank-'+(idx+1):''}">${rk}</span></td><td><strong>#${(st.id<10?'0':'')+st.id}</strong></td><td>${st.name}</td><td><strong style="color:var(--emerald-400);">${st.correctCount}</strong> / ${st.totalQuestions}</td><td>${st.answeredCount} câu</td><td><strong>${pct}%</strong></td>`;
+          tbody.appendChild(tr);
+        });
+      }
+
+      renderRoster();
+      renderQuestion();
+      renderCardGeneratorPreview();
+      document.getElementById('studentCountInput').value = studentsList.length;
+      document.getElementById('studentNamesTextarea').value = studentsList.map(function(s){return s.name;}).join('\n');
+    });
+  </script>
+</body>
+</html>
