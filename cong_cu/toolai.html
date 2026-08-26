@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Trợ Lý AI tích hợp trực tiếp vào Word, Excel và PowerPoint, hỗ trợ giáo viên soạn bài và xây dựng học liệu nhanh chóng.">
+  <title>Trợ Lý AI Cho Giáo Viên - Thầy Phan Ngọc Huy | THPT Lộc Ninh, Đồng Nai</title>
+  <link rel="stylesheet" href="https://huycomf2020.github.io/giao_vien/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    .tool-hero { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:28px; align-items:center; margin-bottom:24px; }
+    .tool-kicker { display:inline-flex; align-items:center; gap:8px; padding:7px 13px; border:1px solid rgba(52,211,153,.38); border-radius:999px; color:#a7f3d0; background:rgba(16,185,129,.12); font-size:.82rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+    .tool-heading { margin:17px 0 12px; color:#fff; font-size:clamp(2rem,5vw,3.55rem); line-height:1.05; letter-spacing:-.045em; }
+    .tool-heading span { color:#34d399; }
+    .tool-lead { max-width:780px; color:var(--text-muted); font-size:1.05rem; line-height:1.75; }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+    .download-btn { padding:14px 23px!important; font-size:1rem!important; box-shadow:0 12px 32px rgba(16,185,129,.24); }
+    .tool-visual { position:relative; min-height:300px; display:grid; place-items:center; border:1px solid rgba(52,211,153,.28); border-radius:24px; overflow:hidden; background:radial-gradient(circle at 50% 30%,rgba(52,211,153,.25),transparent 55%),rgba(2,44,30,.58); }
+    .tool-visual:before,.tool-visual:after { content:""; position:absolute; width:130px; height:130px; border:1px solid rgba(52,211,153,.22); border-radius:30px; transform:rotate(18deg); }
+    .tool-visual:before { left:-48px; top:-45px; } .tool-visual:after { right:-52px; bottom:-52px; }
+    .ai-orb { width:150px; height:150px; display:grid; place-items:center; border:1px solid rgba(167,243,208,.45); border-radius:42px; background:linear-gradient(145deg,rgba(52,211,153,.32),rgba(6,78,59,.8)); box-shadow:0 0 60px rgba(16,185,129,.28); font-size:4.7rem; }
+    .office-row { position:absolute; bottom:26px; display:flex; gap:10px; }
+    .office-chip { min-width:48px; padding:9px 11px; border:1px solid rgba(255,255,255,.14); border-radius:11px; color:#fff; background:rgba(2,44,30,.78); text-align:center; font-weight:900; }
+    .feature-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:20px; }
+    .feature-card { display:flex; gap:14px; padding:18px; border:1px solid var(--border-color); border-radius:15px; background:rgba(8,64,44,.55); }
+    .feature-icon { flex:0 0 44px; height:44px; display:grid; place-items:center; border-radius:12px; background:linear-gradient(135deg,rgba(52,211,153,.3),rgba(6,78,59,.85)); font-size:1.35rem; }
+    .feature-title { margin-bottom:5px; color:#fff; font-size:.98rem; font-weight:800; }
+    .feature-desc { color:var(--text-muted); font-size:.85rem; line-height:1.55; }
+    .closing-panel { margin-top:24px; text-align:center; background:linear-gradient(135deg,rgba(6,78,59,.62),rgba(2,44,30,.82)); }
+    .closing-panel p { max-width:920px; margin:0 auto; color:var(--text-muted); line-height:1.8; }
+    .closing-panel strong { color:#a7f3d0; }
+    .download-note { margin-top:10px; color:var(--text-dim); font-size:.78rem; }
+    @media (max-width:900px) { .tool-hero { grid-template-columns:1fr; } .tool-visual { min-height:250px; } }
+    @media (max-width:640px) { .feature-grid { grid-template-columns:1fr; } .hero-actions .btn { width:100%; text-align:center; justify-content:center; } }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-container">
+      <a href="https://huycomf2020.github.io/giao_vien/index.html" class="brand-logo">
+        <div class="brand-icon">🌱</div>
+        <div>
+          <div class="brand-title">Tiện Ích <span>Giáo Viên</span></div>
+          <div class="brand-subtitle">Cổng Tiện Ích Số &amp; Trợ Giảng Thông Minh</div>
+        </div>
+      </a>
+      <nav class="nav-tabs" aria-label="Điều hướng chính">
+        <a class="nav-tab-btn" href="https://huycomf2020.github.io/giao_vien/index.html">🏠 Trang Chủ</a>
+        <a class="nav-tab-btn" href="https://huycomf2020.github.io/giao_vien/index.html#tab-about">🌟 Giới Thiệu</a>
+        <a class="nav-tab-btn" href="https://huycomf2020.github.io/giao_vien/index.html#tab-donghe">🧰 Đồ Nghề Giáo Viên</a>
+        <a class="nav-tab-btn active" href="https://huycomf2020.github.io/giao_vien/index.html#tab-hotro">🛠️ Hỗ Trợ Giáo Viên</a>
+      </nav>
+      <div class="author-pill">👨‍🏫 <strong>Thầy Phan Ngọc Huy</strong> • THPT Lộc Ninh, Đồng Nai</div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="glass-panel tool-hero">
+      <div>
+        <span class="tool-kicker">✨ Trợ giảng thông minh dành cho giáo viên</span>
+        <h1 class="tool-heading">Trợ Lý AI tích hợp trực tiếp vào <span>Microsoft Office</span></h1>
+        <p class="tool-lead">Làm việc cùng AI ngay trong Word, Excel và PowerPoint. Phân tích tài liệu, tạo học liệu, thiết kế nội dung trực quan và chèn kết quả trở lại Office chỉ trong một quy trình liền mạch.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary download-btn" href="https://github.com/Huycomf2020/giao_vien/raw/refs/heads/main/media-images/TroLyAI-Setup.exe" download="TroLyAI-Setup.exe">⬇️ Tải Trợ Lý AI cho Windows</a>
+          <a class="btn btn-secondary" href="#tinh-nang">🔎 Khám phá tính năng</a>
+        </div>
+        <div class="download-note">Tệp cài đặt: TroLyAI-Setup.exe • Dành cho máy tính Windows</div>
+      </div>
+      <div class="tool-visual" aria-label="Trợ Lý AI hoạt động trong Word, Excel và PowerPoint">
+        <div class="ai-orb">🤖</div>
+        <div class="office-row" aria-hidden="true">
+          <span class="office-chip">W</span><span class="office-chip">X</span><span class="office-chip">P</span><span class="office-chip">AI</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="tinh-nang" class="glass-panel">
+      <h2 class="panel-title">🚀 Một công cụ – Trọn bộ khả năng hỗ trợ soạn giảng</h2>
+      <p style="color:var(--text-muted);line-height:1.7;">Công cụ được tích hợp trực tiếp vào Word, Excel và PowerPoint, hỗ trợ thầy cô:</p>
+      <div class="feature-grid">
+        <article class="feature-card"><div class="feature-icon">🔍</div><div><h3 class="feature-title">Phân tích nội dung</h3><p class="feature-desc">Phân tích toàn bộ tài liệu hoặc chỉ vùng nội dung thầy cô đang chọn.</p></div></article>
+        <article class="feature-card"><div class="feature-icon">📊</div><div><h3 class="feature-title">Tạo báo cáo có cấu trúc</h3><p class="feature-desc">Biến dữ liệu và tài liệu thành báo cáo rõ ràng, logic và dễ sử dụng.</p></div></article>
+        <article class="feature-card"><div class="feature-icon">✅</div><div><h3 class="feature-title">Tạo câu hỏi trắc nghiệm</h3><p class="feature-desc">Tạo câu hỏi A, B, C, D kèm đáp án từ nội dung bài học.</p></div></article>
+        <article class="feature-card"><div class="feature-icon">✍️</div><div><h3 class="feature-title">Bài tập Gap-filling</h3><p class="feature-desc">Tạo nhanh bài tập điền từ phù hợp với nội dung đang giảng dạy.</p></div></article>
+        <article class="feature-card"><div class="feature-icon">🎨</div><div><h3 class="feature-title">Infographic &amp; ảnh minh họa</h3><p class="feature-desc">Thiết kế nội dung trực quan giúp học liệu sinh động và dễ ghi nhớ hơn.</p></div></article>
+        <article class="feature-card"><div class="feature-icon">🔀</div><div><h3 class="feature-title">Diagram &amp; sơ đồ quy trình</h3><p class="feature-desc">Trình bày quy trình, mối quan hệ và kiến thức phức tạp bằng sơ đồ.</p></div></article>
+        <article class="feature-card"><div class="feature-icon">🧠</div><div><h3 class="feature-title">Xây dựng mind map</h3><p class="feature-desc">Hệ thống hóa bài học bằng bản đồ tư duy mạch lạc, trực quan.</p></div></article>
+        <article class="feature-card"><div class="feature-icon">🌐</div><div><h3 class="feature-title">Tóm tắt, viết lại &amp; dịch</h3><p class="feature-desc">Tinh gọn, diễn đạt lại hoặc chuyển ngữ nội dung theo đúng nhu cầu.</p></div></article>
+        <article class="feature-card"><div class="feature-icon">📥</div><div><h3 class="feature-title">Chèn trực tiếp vào Office</h3><p class="feature-desc">Đưa kết quả AI trở lại tài liệu mà không cần sao chép qua nhiều ứng dụng.</p></div></article>
+        <article class="feature-card"><div class="feature-icon">📄</div><div><h3 class="feature-title">Xuất tài liệu PDF</h3><p class="feature-desc">Hoàn thiện và xuất tài liệu thành PDF để chia sẻ hoặc in ấn thuận tiện.</p></div></article>
+      </div>
+    </section>
+
+    <section class="glass-panel closing-panel">
+      <h2 class="panel-title" style="justify-content:center;">🌱 Công nghệ thiết thực cho mỗi giờ dạy</h2>
+      <p>Một bước nhỏ trong ứng dụng công nghệ số, nhưng là giải pháp thiết thực giúp thầy cô tiết kiệm thời gian soạn bài và làm phong phú học liệu. <strong>Chúc quý thầy cô một năm học mới nhiều năng lượng, sáng tạo và thành công!</strong></p>
+      <div class="hero-actions" style="justify-content:center;">
+        <a class="btn btn-primary download-btn" href="https://github.com/Huycomf2020/giao_vien/raw/refs/heads/main/media-images/TroLyAI-Setup.exe" download="TroLyAI-Setup.exe">⬇️ Tải file cài đặt ngay</a>
+        <a class="btn btn-secondary" href="https://huycomf2020.github.io/giao_vien/index.html">⬅ Quay lại Tiện Ích Giáo Viên</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content">
+      <div class="footer-author">🚀 <span>Made by Huycomf</span> • Tiện Ích Giáo Viên</div>
+      <div class="footer-school">Phát triển bởi <strong>Thầy Phan Ngọc Huy</strong> - Trường THPT Lộc Ninh, TP. Đồng Nai</div>
+    </div>
+  </footer>
+</body>
+</html>
