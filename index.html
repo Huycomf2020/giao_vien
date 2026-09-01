@@ -8,6 +8,67 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ============================================================
+       TỐI ƯU CẤU TRÚC MOBILE RESPONSIVE CHO HEADER & THANH DIEU HUONG
+       ============================================================ */
+    @media (max-width: 992px) {
+      .header-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+      }
+
+      .brand-logo {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .nav-tabs {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Dành cho Firefox */
+      }
+
+      .nav-tabs::-webkit-scrollbar {
+        display: none; /* Ẩn thanh cuộn thừa trên Mobile */
+      }
+
+      .nav-tab-btn {
+        flex-shrink: 0;
+        font-size: 0.85rem;
+        padding: 8px 14px;
+      }
+
+      .author-pill {
+        width: 100%;
+        text-align: center;
+        font-size: 0.78rem;
+        padding: 6px 10px;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand-title {
+        font-size: 1.1rem;
+      }
+      .brand-subtitle {
+        font-size: 0.75rem;
+      }
+      .portal-hero-text h1 {
+        font-size: 1.35rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -22,7 +83,7 @@
         </div>
       </a>
 
-      <!-- Clean Navigation Tabs (Bỏ tab thừa QuizScanner trên thanh điều hướng) -->
+      <!-- Clean Navigation Tabs (Cuộn ngang mượt mà trên Mobile) -->
       <nav class="nav-tabs">
         <button class="nav-tab-btn active" data-tab="home">🏠 Trang Chủ</button>
         <button class="nav-tab-btn" data-tab="about">🌟 Giới Thiệu</button>
@@ -52,12 +113,12 @@
             Nền tảng chuyển đổi số toàn diện hỗ trợ giáo viên tối ưu hóa giáo án, tra cứu học liệu số và tổ chức lớp học tương tác thời gian thực bằng camera quét mã.
           </p>
         </div>
-        <div style="font-size: 4rem; opacity: 0.9; text-shadow: 0 0 30px rgba(16, 185, 129, 0.6);">
+        <div style="font-size: 3.5rem; opacity: 0.9; text-shadow: 0 0 30px rgba(16, 185, 129, 0.6);">
           📚✨
         </div>
       </div>
 
-      <!-- 3 NÚT GƯƠNG HERO CHÍNH THEO YÊU CẦU -->
+      <!-- 3 NÚT GƯƠNG HERO CHÍNH -->
       <div class="hero-3-grid">
         
         <!-- Nút Gương 1: Giới thiệu -->
@@ -86,7 +147,7 @@
             <span style="font-size: 1.2rem;">➡</span>
           </div>
           <div class="mirror-desc">
-            Kho lưu trữ & tra cứu trực tuyến: <strong>Giáo Án chuẩn 5512</strong>, <strong>Giáo Án Tích Hợp Số</strong>, <strong>Sách Giáo Khoa điện tử (3 bộ sách)</strong> và ngân hàng đề thi.
+            Kho lưu trữ & tra cứu trực tuyến: <strong>Giáo Án chuẩn 5512</strong>, <strong>Giáo Án Tích Hợp Số (GATHS)</strong>, <strong>Sách Giáo Khoa điện tử (3 bộ sách)</strong> và ngân hàng đề thi.
           </div>
         </a>
 
@@ -107,7 +168,7 @@
 
       </div>
 
-      <!-- Quick Launch Bar for QuizScanner Pro (Link trực tiếp sang file độc lập trong cong_cu/) -->
+      <!-- Quick Launch Bar for QuizScanner Pro -->
       <div class="glass-panel" style="background: linear-gradient(135deg, rgba(6, 78, 59, 0.4), rgba(2, 44, 30, 0.7)); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div style="display: flex; align-items: center; gap: 16px;">
           <div style="font-size: 2.2rem;">📷</div>
@@ -124,7 +185,7 @@
     </section>
 
     <!-- ============================================================
-         TAB 1: GIỚI THIỆU (THẦY PHAN NGỌC HUY - THPT LỘC NINH)
+         TAB 1: GIỚI THIỆU
          ============================================================ -->
     <section id="tab-about" class="tab-view">
       <div class="about-teacher-card">
@@ -175,7 +236,7 @@
     </section>
 
     <!-- ============================================================
-         TAB 2: ĐỒ NGHỀ GIÁO VIÊN (SEARCH + APPS)
+         TAB 2: ĐỒ NGHỀ GIÁO VIÊN
          ============================================================ -->
     <section id="tab-donghe" class="tab-view">
       <div class="glass-panel">
@@ -190,7 +251,7 @@
         <!-- Apps Grid -->
         <div class="apps-grid" id="dongheAppsGrid">
           
-          <!-- App 1: Giáo Án -->
+          <!-- App 1: Giáo Án chuẩn 5512 -->
           <div class="app-item-card" data-title="Giáo Án chuẩn 5512 soạn giáo án điện tử mẫu bài dạy" data-desc="Mẫu giáo án khung kế hoạch bài dạy chuẩn công văn 5512 của Bộ GD&ĐT">
             <div class="app-item-header">
               <div class="app-item-icon">📄</div>
@@ -208,21 +269,23 @@
             </div>
           </div>
 
-          <!-- App 2: Giáo Án Tích Hợp Số -->
-          <div class="app-item-card" data-title="Giáo Án Tích Hợp Số e-learning chuyển đổi số bài giảng tương tác" data-desc="Giáo án kết hợp phần mềm mô phỏng AI và hoạt động số hóa">
+          <!-- App 2: Giáo Án Tích Hợp Số (GATHS) - ĐÃ HOÀN THIỆN & LIÊN KẾT FILE -->
+          <div class="app-item-card" style="border-color: var(--emerald-400); background: rgba(8, 64, 44, 0.85);" data-title="Giáo Án Tích Hợp Số GATHS e-learning soạn bài AI chuẩn công văn 5512 thông tư 18 quyết định 2422" data-desc="Ứng dụng soạn giáo án tích hợp năng lực số và trí tuệ nhân tạo AI xuất file Word">
             <div class="app-item-header">
-              <div class="app-item-icon">💻</div>
+              <div class="app-item-icon" style="background: linear-gradient(135deg, var(--emerald-400), var(--emerald-700));">💻</div>
               <div>
-                <div class="app-item-title">Giáo Án Tích Hợp Số</div>
-                <div class="app-tag">Chuyển Đổi Số</div>
+                <div class="app-item-title" style="color: #34d399;">Giáo Án Tích Hợp Số (GATHS)</div>
+                <div class="app-tag" style="background: var(--emerald-700); color: #fff;">ĐÃ HOÀN THIỆN</div>
               </div>
             </div>
             <div class="app-item-desc">
-              Tích hợp bài tập tương tác, liên kết video thí nghiệm ảo, mã QR học tập và công cụ AI hỗ trợ giảng dạy hiện đại.
+              Tạo kế hoạch bài dạy chuẩn CV 5512, tích hợp Khung Năng lực số (TT 18/2026) & Giáo dục AI (QĐ 2422), hỗ trợ kết nối Gemini AI và xuất file Word (.docx) A4 chuẩn định dạng.
             </div>
             <div class="app-item-footer">
-              <span style="font-size: 0.78rem; color: var(--text-dim);">Sẽ cập nhật sau</span>
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem;" onclick="showToast('Mục Giáo Án Tích Hợp Số đang được hoàn thiện!')">Xem Chi Tiết</button>
+              <span style="font-size: 0.82rem; color: #a7f3d0; font-weight: 700;">★ Khuyên dùng</span>
+              <a href="do_nghe/gaths.html" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.88rem;">
+                🚀 Mở Ứng Dụng Ngay
+              </a>
             </div>
           </div>
 
@@ -267,7 +330,7 @@
     </section>
 
     <!-- ============================================================
-         TAB 3: HỖ TRỢ GIÁO VIÊN (SEARCH + QUIZSCANNER, MATHTYPE, GAME)
+         TAB 3: HỖ TRỢ GIÁO VIÊN
          ============================================================ -->
     <section id="tab-hotro" class="tab-view">
       <div class="glass-panel">
@@ -282,7 +345,7 @@
         <!-- Apps Grid -->
         <div class="apps-grid" id="hotroAppsGrid">
           
-          <!-- App 1: QuizScanner Pro (Link thẳng vào cong_cu/quizscannerpro.html) -->
+          <!-- App 1: QuizScanner Pro -->
           <div class="app-item-card" style="border-color: var(--emerald-400); background: rgba(8, 64, 44, 0.85);" data-title="Quizscanner Pro quét thẻ đáp án camera trắc nghiệm lớp học plickers A B C D" data-desc="Hệ thống quét câu trả lời A B C D bằng camera thời gian thực">
             <div class="app-item-header">
               <div class="app-item-icon" style="background: linear-gradient(135deg, var(--emerald-400), var(--emerald-700));">🎓</div>
@@ -359,7 +422,8 @@
               <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem;" onclick="showToast('Tính năng Trợ Lý Soạn Đề AI đang được phát triển!')">Xem Chi Tiết</button>
             </div>
           </div>
-          <!-- App 5: Công cụ Trợ lý ảo cho Word, Excel, Powerpoint -->
+
+          <!-- App 5: Tool Trợ Lý AI -->
           <div class="app-item-card" data-title="Tool Trợ lý AI" data-desc="Một tool giúp các bạn dùng A.I. làm việc trực tiếp với tài liệu Word, Excel, Powerpoint của bạn">
             <div class="app-item-header">
               <div class="app-item-icon">🤖</div>
@@ -455,15 +519,6 @@
             var match = (c.getAttribute('data-title') || '').toLowerCase().includes(q) || (c.getAttribute('data-desc') || '').toLowerCase().includes(q);
             c.style.display = match ? 'flex' : 'none';
           });
-        });
-      }
-
-      // Sample Tools
-      var copyBtn = document.getElementById('copyLatexSampleBtn');
-      if (copyBtn) {
-        copyBtn.addEventListener('click', function () {
-          navigator.clipboard.writeText('x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}');
-          showToast('Đã sao chép công thức nghiệm bậc 2 (LaTeX)!');
         });
       }
 
