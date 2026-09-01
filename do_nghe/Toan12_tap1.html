@@ -3,120 +3,496 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flipbook Toán 12 - Tập 1 | Thầy Phan Ngọc Huy</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  <title>Flipbook Toán 12 | Thầy Phan Ngọc Huy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
   <style>
     :root {
       --bg-primary: #02160e;
-      --bg-card: rgba(6, 44, 30, 0.9);
-      --border-color: rgba(16, 185, 129, 0.3);
+      --bg-card: rgba(6, 44, 30, 0.92);
+      --border-color: rgba(16, 185, 129, 0.28);
+      --emerald-300: #6ee7b7;
       --emerald-400: #34d399;
       --emerald-500: #10b981;
       --emerald-600: #059669;
       --text-main: #f0fdf4;
+      --text-muted: #a7f3d0;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background: var(--bg-primary); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-    
-    .topbar { background: rgba(3, 30, 20, 0.95); border-bottom: 1px solid var(--border-color); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .btn { background: var(--emerald-600); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; font-size: 0.85rem; }
-    .btn:hover { background: var(--emerald-500); }
-    .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); }
-    
-    .viewport { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
-    .book-container { width: 100%; max-width: 1100px; height: 90%; display: flex; background: #064e3b; border-radius: 12px; border: 4px solid #047857; box-shadow: 0 20px 50px rgba(0,0,0,0.8); overflow: hidden; }
-    
-    .page-spread { flex: 1; background: #fdfbf7; color: #1e293b; padding: 30px; display: flex; flex-direction: column; position: relative; overflow-y: auto; }
-    .page-spread.left { border-right: 2px solid #e2e8f0; }
-    .page-header { display: flex; justify-content: space-between; border-bottom: 1px solid #cbd5e1; padding-bottom: 6px; font-size: 0.8rem; color: #64748b; font-weight: 600; }
-    .page-body { flex: 1; margin-top: 15px; font-family: 'Playfair Display', serif; line-height: 1.8; }
-    .page-body h3 { font-family: 'Inter', sans-serif; color: #064e3b; margin-bottom: 12px; border-left: 4px solid var(--emerald-500); padding-left: 10px; }
-    .page-footer { border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 0.8rem; font-weight: 700; color: #064e3b; display: flex; justify-content: space-between; }
-    
-    .bottombar { background: rgba(3, 30, 20, 0.95); border-top: 1px solid var(--border-color); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(5, 150, 105, 0.15) 0%, transparent 50%),
+        linear-gradient(180deg, #021a11 0%, #010f09 100%);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Topbar Header */
+    .topbar {
+      background: rgba(3, 30, 20, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover { background: linear-gradient(135deg, var(--emerald-400), var(--emerald-500)); transform: translateY(-1px); }
+    .btn-secondary { background: rgba(6, 78, 59, 0.6); border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-secondary:hover { background: rgba(6, 78, 59, 0.9); }
+
+    /* Viewport Flipbook */
+    .viewport {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .book-container {
+      width: 100%;
+      max-width: 1180px;
+      height: 92%;
+      display: flex;
+      background: #064e3b;
+      border-radius: 12px;
+      border: 4px solid #047857;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page-spread {
+      flex: 1;
+      background: #fdfbf7;
+      color: #1e293b;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .page-spread.left {
+      border-right: 2px solid #e2e8f0;
+      box-shadow: inset -15px 0 20px rgba(0,0,0,0.05);
+    }
+
+    .page-spread.right {
+      box-shadow: inset 15px 0 20px rgba(0,0,0,0.05);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 6px;
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .page-body {
+      flex: 1;
+      margin-top: 14px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.02rem;
+      line-height: 1.8;
+      color: #1e293b;
+    }
+
+    .page-body h3 {
+      font-family: 'Inter', sans-serif;
+      color: #064e3b;
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--emerald-500);
+      padding-left: 10px;
+    }
+
+    .page-body ul, .page-body ol {
+      margin-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .box-target {
+      background: rgba(6, 78, 59, 0.08);
+      border-left: 3px solid #059669;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.92rem;
+      font-style: italic;
+      font-family: 'Inter', sans-serif;
+      border-radius: 4px;
+    }
+
+    .box-quiz {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px dashed #10b981;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .page-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 8px;
+      margin-top: 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #064e3b;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Bottom Control Bar */
+    .bottombar {
+      background: rgba(3, 30, 20, 0.95);
+      border-top: 1px solid var(--border-color);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    /* Sidebar Mục Lục */
+    .toc-sidebar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -320px;
+      width: 320px;
+      background: rgba(3, 30, 20, 0.98);
+      border-right: 1px solid var(--border-color);
+      z-index: 50;
+      transition: left 0.3s ease;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.7);
+    }
+
+    .toc-sidebar.open { left: 0; }
+
+    .toc-item {
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .toc-item:hover, .toc-item.active {
+      background: rgba(16, 185, 129, 0.2);
+      color: #ffffff;
+      border-left: 3px solid var(--emerald-400);
+    }
   </style>
 </head>
 <body>
 
+  <!-- Top Navigation Bar -->
   <div class="topbar">
     <div style="display: flex; align-items: center; gap: 12px;">
       <a href="etextbook.html" class="btn btn-secondary">⬅️ Thư Viện Sách</a>
+      <button class="btn btn-secondary" id="toggleTocBtn">📑 Mục Lục Sách</button>
       <div>
-        <h3 style="font-size: 1.05rem; color: #fff;">Toán Học 12 - Tập 1</h3>
-        <p style="font-size: 0.75rem; color: var(--emerald-400);">Bộ Sách Chuẩn GDPT 2018 • Biên soạn & Số hóa bởi Thầy Phan Ngọc Huy</p>
+        <h3 style="font-size: 1.1rem; color: #ffffff;">Sách Giáo Khoa Toán Học 12 - Tập 1</h3>
+        <p style="font-size: 0.78rem; color: var(--emerald-300);">Bộ Sách Chuẩn GDPT 2018 • Biên soạn số bởi Thầy Phan Ngọc Huy</p>
       </div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <a href="https://drive.google.com/file/d/1tPjYtDwBIXV5s4jXlbPERDOtYC3Zlf67/view?usp=drive_link" target="_blank" class="btn btn-secondary">☁️ File Drive Gốc PDF</a>
     </div>
   </div>
 
+  <!-- Sidebar Mục Lục -->
+  <div class="toc-sidebar" id="tocSidebar">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+      <h4 style="color: var(--emerald-400); font-size: 1rem;">📑 Mục Lục Chương Trình</h4>
+      <button id="closeTocBtn" style="background: none; border: none; color: #ffffff; font-size: 1.2rem; cursor: pointer;">✕</button>
+    </div>
+    <div id="tocListContainer" style="flex: 1; overflow-y: auto;"></div>
+  </div>
+
+  <!-- Viewport Flipbook 3D -->
   <div class="viewport">
     <div class="book-container">
-      <!-- Trang trái -->
+      <!-- Trang bên trái -->
       <div class="page-spread left">
-        <div class="page-header"><span>TOÁN HỌC 12 - TẬP 1</span><span id="leftChapter">Bài 1</span></div>
+        <div class="page-header">
+          <span>TOÁN HỌC 12 - TẬP 1</span>
+          <span id="leftChapter">Chương I</span>
+        </div>
         <div class="page-body" id="leftBody"></div>
-        <div class="page-footer"><span id="leftPageNum">Trang 1</span><span>BGD&ĐT • GDPT 2018</span></div>
+        <div class="page-footer">
+          <span id="leftPageNum">Trang 1</span>
+          <span>Bộ GD&ĐT • GDPT 2018</span>
+        </div>
       </div>
-      <!-- Trang phải -->
+
+      <!-- Trang bên phải -->
       <div class="page-spread right">
-        <div class="page-header"><span>TOÁN HỌC 12 - TẬP 1</span><span id="rightChapter">Bài 2</span></div>
+        <div class="page-header">
+          <span>TOÁN HỌC 12 - TẬP 1</span>
+          <span id="rightChapter">Bài Học</span>
+        </div>
         <div class="page-body" id="rightBody"></div>
-        <div class="page-footer"><span>Bản quyền số © Huycomf</span><span id="rightPageNum">Trang 2</span></div>
+        <div class="page-footer">
+          <span>Bản quyền số © Huycomf</span>
+          <span id="rightPageNum">Trang 2</span>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Bottom Navigation Controller -->
   <div class="bottombar">
-    <button class="btn" id="prevBtn">◀ Trang Trước</button>
-    <span id="pageIndicator" style="font-weight: 700; color: var(--emerald-400);">Trang 1 - 2</span>
-    <button class="btn" id="nextBtn">Trang Sau ▶</button>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-secondary" id="firstPageBtn">⏮ Trang Đầu</button>
+      <button class="btn" id="prevBtn">◀ Lật Trang Trước</button>
+    </div>
+    <span id="pageIndicator" style="font-weight: 700; color: var(--emerald-400); font-size: 0.95rem;">Trang 1 - 2 / 12</span>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn" id="nextBtn">Lật Trang Sau ▶</button>
+      <button class="btn btn-secondary" id="lastPageBtn">Trang Cuối ⏭</button>
+    </div>
   </div>
 
   <script>
-    var PAGES_DATA = [
+    // Database nội dung các bài học Toán 12 Tập 1 đầy đủ chuẩn GDPT 2018
+    var TOAN12_TAP1_PAGES = [
       {
+        chapter: "CHƯƠNG I: ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT HÀM SỐ",
         title: "Bài 1: Tính Đơn Điệu và Cực Trị Của Hàm Số",
-        content: "Ký hiệu K là một khoảng, đoạn hoặc nửa khoảng. Giả sử hàm số y = f(x) có đạo hàm trên K.<br><br>• Nếu f'(x) > 0 với mọi x thuộc K thì hàm số f(x) đồng biến trên K.<br>• Nếu f'(x) < 0 với mọi x thuộc K thì hàm số f(x) nghịch biến trên K.<br><br><strong>Quy tắc tìm cực trị:</strong><br>1. Tìm tập xác định D.<br>2. Tính đạo hàm f'(x). Tìm các điểm x_i mà tại đó f'(x_i) = 0.<br>3. Lập bảng biến thiên và kết luận điểm cực đại, cực tiểu."
+        content: `Giả sử hàm số y = f(x) có đạo hàm trên khoảng K.<br><br>
+        • Nếu f'(x) > 0 với mọi x ∈ K thì hàm số f(x) <strong>đồng biến</strong> trên K.<br>
+        • Nếu f'(x) < 0 với mọi x ∈ K thì hàm số f(x) <strong>nghịch biến</strong> trên K.<br><br>
+        <strong>Quy tắc tìm cực trị hàm số:</strong><br>
+        1. Tìm tập xác định D của hàm số.<br>
+        2. Tính đạo hàm f'(x). Tìm các điểm x_i ∈ D mà tại đó f'(x_i) = 0 hoặc f'(x) không xác định.<br>
+        3. Lập bảng biến thiên và đưa ra kết luận cực đại, cực tiểu.`,
+        target: "🎯 Đạt được: Xét tính đơn biến, nghịch biến và tìm điểm cực trị của hàm số bậc 3, hàm trùng phương và hàm phân thức.",
+        quiz: "💡 Câu hỏi củng cố: Cho f'(x) = x(x - 1)². Hàm số đã cho có bao nhiêu điểm cực trị?"
       },
       {
+        chapter: "CHƯƠNG I: ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT HÀM SỐ",
         title: "Bài 2: Giá Trị Lớn Nhất và Nhỏ Nhất Của Hàm Số",
-        content: "Cho hàm số y = f(x) xác định trên tập hợp D.<br><br>• Số M là GTLN của f(x) trên D nếu f(x) ≤ M với mọi x ∈ D và tồn tại x_0 ∈ D sao cho f(x_0) = M.<br>• Số m là GTNN của f(x) trên D nếu f(x) ≥ m với mọi x ∈ D và tồn tại x_0 sao cho f(x_0) = m.<br><br><strong>Cách tìm trên đoạn [a; b]:</strong> Tính f(a), f(b) và f(x_i) tại các điểm có đạo hàm bằng 0, sau đó so sánh các giá trị."
+        content: `Cho hàm số y = f(x) xác định trên tập D.<br><br>
+        • Số M là <strong>Giá Trị Lớn Nhất (GTLN)</strong> trên D nếu f(x) ≤ M với mọi x ∈ D và ∃x_0 ∈ D sao cho f(x_0) = M.<br>
+        • Số m là <strong>Giá Trị Nhỏ Nhất (GTNN)</strong> trên D nếu f(x) ≥ m với mọi x ∈ D và ∃x_0 ∈ D sao cho f(x_0) = m.<br><br>
+        <strong>Phương pháp tìm GTLN, GTNN trên đoạn [a; b]:</strong><br>
+        - Tính f(a) và f(b).<br>
+        - Tìm nghiệm x_i ∈ (a; b) của f'(x) = 0 và tính f(x_i).<br>
+        - So sánh các giá trị thu được để kết luận max và min.`,
+        target: "🎯 Đạt được: Giải thành thạo bài toán tối ưu hóa trong hình học, kinh tế và đời sống thực tế.",
+        quiz: "💡 Câu hỏi củng cố: Tìm min của f(x) = x + 4/x trên đoạn [1; 3]."
       },
       {
+        chapter: "CHƯƠNG I: ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT HÀM SỐ",
         title: "Bài 3: Đường Tiệm Cận Của Đồ Thị Hàm Số",
-        content: "<strong>1. Tiệm cận ngang:</strong> Đường thẳng y = y_0 là tiệm cận ngang nếu lim f(x) = y_0 khi x → +∞ hoặc x → -∞.<br><br><strong>2. Tiệm cận đứng:</strong> Đường thẳng x = x_0 là tiệm cận đứng nếu lim f(x) = ±∞ khi x → x_0^+ hoặc x → x_0^-.<br><br><strong>3. Tiệm cận xiên:</strong> Đường thẳng y = ax + b (a ≠ 0) là tiệm cận xiên nếu lim [f(x) - (ax + b)] = 0 khi x → ±∞."
+        content: `<strong>1. Tiệm cận ngang:</strong> Đường thẳng y = y_0 là TCN nếu lim f(x) = y_0 khi x → +∞ hoặc x → -∞.<br><br>
+        <strong>2. Tiệm cận đứng:</strong> Đường thẳng x = x_0 là TCĐ nếu ít nhất một trong các giới hạn một bên lim f(x) = ±∞ khi x → x_0^+ hoặc x → x_0^-.<br><br>
+        <strong>3. Tiệm cận xiên:</strong> Đường thẳng y = ax + b (a ≠ 0) là TCX nếu lim [f(x) - (ax + b)] = 0 khi x → ±∞.`,
+        target: "🎯 Đạt được: Xác định chính xác các đường tiệm cận của hàm phân thức bậc nhất / bậc nhất và bậc hai / bậc nhất.",
+        quiz: "💡 Câu hỏi củng cố: Tìm tổng số đường tiệm cận của đồ thị hàm số y = (2x + 1) / (x - 1)."
       },
       {
+        chapter: "CHƯƠNG I: ỨNG DỤNG ĐẠO HÀM ĐỂ KHẢO SÁT HÀM SỐ",
         title: "Bài 4: Khảo Sát Sự Biến Thiên và Vẽ Đồ Thị Hàm Số",
-        content: "<strong>Sơ đồ khảo sát tổng quát:</strong><br>1. Tập xác định D.<br>2. Sự biến thiên: Chiều biến thiên, cực trị, giới hạn, tiệm cận, bảng biến thiên.<br>3. Vẽ đồ thị: Xác định các giao điểm với trục tọa độ Ox, Oy và các điểm đặc biệt."
+        content: `<strong>Sơ đồ tổng quát khảo sát hàm số y = f(x):</strong><br><br>
+        1. Tìm tập xác định D.<br>
+        2. Xét sự biến thiên: Tính f'(x), lập bảng biến thiên, tìm cực trị và tiệm cận.<br>
+        3. Vẽ đồ thị: Tìm điểm cắt Ox, Oy, tâm đối xứng (nếu có) và biểu diễn đồ thị trên mặt phẳng tọa độ Oxy.`,
+        target: "🎯 Đạt được: Vẽ chính xác đồ thị hàm bậc 3 và đồ thị hàm phân thức hữu tỉ.",
+        quiz: "💡 Câu hỏi củng cố: Nhận dạng bảng biến thiên và đồ thị hàm số chứa tham số m."
+      },
+      {
+        chapter: "CHƯƠNG II: VECTƠ VÀ HỆ TỌA ĐỘ TRONG KHÔNG GIAN",
+        title: "Bài 1: Vectơ Trong Không Gian 3 Chiều",
+        content: `Vectơ trong không gian là một đoạn thẳng có hướng.<br><br>
+        • <strong>Quy tắc ba điểm:</strong> Vectơ AB + Vectơ BC = Vectơ AC.<br>
+        • <strong>Quy tắc hình bình hành:</strong> Vectơ AB + Vectơ AD = Vectơ AC.<br>
+        • <strong>Quy tắc hình hộp:</strong> Vectơ AB + Vectơ AD + Vectơ AA' = Vectơ AC'.<br><br>
+        <strong>Tích vô hướng:</strong> a . b = |a| . |b| . cos(a, b). Hai vectơ vuông góc khi a . b = 0.`,
+        target: "🎯 Đạt được: Biểu diễn vectơ, chứng minh quan hệ song song và vuông góc trong không gian.",
+        quiz: "💡 Câu hỏi củng cố: Cho hình lập phương ABCD.A'B'C'D', tính góc giữa vectơ AB và A'C'."
+      },
+      {
+        chapter: "CHƯƠNG II: VECTƠ VÀ HỆ TỌA ĐỘ TRONG KHÔNG GIAN",
+        title: "Bài 2: Hệ Trục Tọa Độ Oxyz Trong Không Gian",
+        content: `Hệ trục Oxyz gồm 3 trục Ox, Oy, Oz vuông góc đôi một với các vectơ đơn vị i, j, k.<br><br>
+        • Tọa độ điểm M(x; y; z) ⇔ OM = x.i + y.j + z.k.<br>
+        • Tọa độ trung điểm I của AB: x_I = (x_A + x_B)/2, y_I = (y_A + y_B)/2, z_I = (z_A + z_B)/2.<br>
+        • Tọa độ trọng tâm tam giác G: x_G = (x_A + x_B + x_C)/3.`,
+        target: "🎯 Đạt được: Xác định tọa độ điểm, độ dài vectơ và khoảng cách giữa hai điểm trong không gian.",
+        quiz: "💡 Câu hỏi củng cố: Cho A(1; 2; -1) và B(3; 0; 3). Tìm tọa độ trung điểm I của đoạn AB."
+      },
+      {
+        chapter: "CHƯƠNG II: VECTƠ VÀ HỆ TỌA ĐỘ TRONG KHÔNG GIAN",
+        title: "Bài 3: Biểu Thức Tọa Độ Của Các Phép Toán Vectơ",
+        content: `Cho u = (x_1; y_1; z_1) và v = (x_2; y_2; z_2):<br><br>
+        • u ± v = (x_1 ± x_2; y_1 ± y_2; z_1 ± z_2).<br>
+        • k.u = (k.x_1; k.y_1; k.z_1).<br>
+        • Tích vô hướng: u . v = x_1.x_2 + y_1.y_2 + z_1.z_2.<br>
+        • Độ dài vectơ: |u| = √(x_1² + y_1² + z_1²).<br>
+        • cos(u, v) = (u . v) / (|u| . |v|).`,
+        target: "🎯 Đạt được: Tính toán tích vô hướng, độ dài vectơ và góc giữa hai đường thẳng.",
+        quiz: "💡 Câu hỏi củng cố: Tính góc giữa hai vectơ u = (1; 1; 0) và v = (0; 1; 1)."
+      },
+      {
+        chapter: "CHƯƠNG III: CÁC SỐ ĐẶC TRƯNG ĐO MỨC ĐỘ PHÂN TÁN CHO MẪU SỐ LIỆU GHÉP NHÓM",
+        title: "Bài 1: Khoảng Biến Thiên và Khoảng Tứ Phân Vị",
+        content: `Mẫu số liệu ghép nhóm giúp tóm tắt tập dữ liệu lớn.<br><br>
+        • <strong>Khoảng biến thiên:</strong> R = x_max - x_min.<br>
+        • <strong>Khoảng tứ phân vị:</strong> ΔQ = Q_3 - Q_1.<br><br>
+        Ý nghĩa: Khoảng tứ phân vị đo mức độ phân tán của 50% số liệu trung tâm, không bị ảnh hưởng bởi giá trị đột biến.`,
+        target: "🎯 Đạt được: Tính toán khoảng biến thiên và khoảng tứ phân vị từ bảng tần số ghép nhóm.",
+        quiz: "💡 Câu hỏi củng cố: Đánh giá độ đồng đều của kết quả kiểm tra học sinh qua khoảng tứ phân vị."
+      },
+      {
+        chapter: "CHƯƠNG III: CÁC SỐ ĐẶC TRƯNG ĐO MỨC ĐỘ PHÂN TÁN CHO MẪU SỐ LIỆU GHÉP NHÓM",
+        title: "Bài 2: Phương Sai và Độ Lệch Chuẩn Của Mẫu Số Liệu Ghép Nhóm",
+        content: `• <strong>Công thức Phương sai s²:</strong><br>
+        s² = (1/n) * Σ [f_i * (x_i - x̄)²]<br>
+        Trong đó x_i là giá trị đại diện của nhóm thứ i, f_i là tần số nhóm.<br><br>
+        • <strong>Độ lệch chuẩn s:</strong> s = √(s²).<br>
+        Ý nghĩa: Giá trị độ lệch chuẩn càng nhỏ thì mẫu số liệu càng đồng đều và ít phân tán.`,
+        target: "🎯 Đạt được: Sử dụng máy tính cầm tay để tính nhanh phương sai và độ lệch chuẩn của số liệu ghép nhóm.",
+        quiz: "💡 Câu hỏi củng cố: So sánh độ rủi ro giữa hai danh mục đầu tư chứng khoán dựa trên độ lệch chuẩn."
+      },
+      {
+        chapter: "ÔN TẬP CHƯƠNG TRÌNH TOÁN 12 TẬP 1",
+        title: "Tổng Ôn Kiến Thức Trọng Tâm & Dạng Bài Thi",
+        content: `<strong>Cấu trúc đề thi tham khảo GDPT 2018:</strong><br><br>
+        1. Trắc nghiệm nhiều lựa chọn (12 câu).<br>
+        2. Trắc nghiệm Đúng/Sai (4 câu - 16 ý).<br>
+        3. Trắc nghiệm trả lời ngắn (6 câu).<br><br>
+        Yêu cầu kết hợp giữa tư duy lý thuyết, kỹ năng bấm máy tính CASIO và giải bài toán ứng dụng thực tế.`,
+        target: "🎯 Đạt được: Sẵn sàng cho kỳ thi Học kỳ 1 và kỳ thi Tốt nghiệp THPT.",
+        quiz: "💡 Luyện tập: Mở ngay QuizScanner Pro để giải bộ 50 câu trắc nghiệm chuẩn hóa!"
       }
     ];
 
     var currentPage = 0;
 
-    function renderPages() {
-      var p1 = PAGES_DATA[currentPage] || { title: "Hết trang", content: "Đã đến cuối tài liệu." };
-      var p2 = PAGES_DATA[currentPage + 1] || { title: "Ghi chú", content: "Nội dung đang được cập nhật thêm." };
+    function renderFlipBook() {
+      var p1 = TOAN12_TAP1_PAGES[currentPage] || {
+        chapter: "KẾT THÚC",
+        title: "Trang Cuối",
+        content: "Bạn đã hoàn thành các bài học trong Sách Giáo Khoa Toán 12 - Tập 1.",
+        target: "",
+        quiz: ""
+      };
 
-      document.getElementById('leftChapter').textContent = "Bài " + (currentPage + 1);
-      document.getElementById('leftBody').innerHTML = `<h3>${p1.title}</h3><p>${p1.content}</p>`;
+      var p2 = TOAN12_TAP1_PAGES[currentPage + 1] || {
+        chapter: "GHI CHÚ",
+        title: "Sổ Tay Luyện Tập",
+        content: "Học sinh hệ thống lại công thức và giải bài tập tự luyện cuối chương.",
+        target: "",
+        quiz: ""
+      };
+
+      // Trang trái
+      document.getElementById('leftChapter').textContent = p1.chapter;
+      document.getElementById('leftBody').innerHTML = `
+        <h3>${p1.title}</h3>
+        <p>${p1.content}</p>
+        ${p1.target ? `<div class="box-target">${p1.target}</div>` : ''}
+      `;
       document.getElementById('leftPageNum').textContent = "Trang " + (currentPage + 1);
 
-      document.getElementById('rightChapter').textContent = "Bài " + (currentPage + 2);
-      document.getElementById('rightBody').innerHTML = `<h3>${p2.title}</h3><p>${p2.content}</p>`;
+      // Trang phải
+      document.getElementById('rightChapter').textContent = p2.chapter;
+      document.getElementById('rightBody').innerHTML = `
+        <h3>${p2.title}</h3>
+        <p>${p2.content}</p>
+        ${p2.quiz ? `<div class="box-quiz">${p2.quiz}</div>` : ''}
+      `;
       document.getElementById('rightPageNum').textContent = "Trang " + (currentPage + 2);
 
-      document.getElementById('pageIndicator').textContent = `Trang ${currentPage + 1} - ${currentPage + 2} / ${PAGES_DATA.length}`;
+      document.getElementById('pageIndicator').textContent = `Trang ${currentPage + 1} - ${currentPage + 2} / ${TOAN12_TAP1_PAGES.length}`;
+      buildTocUI();
     }
 
-    document.getElementById('prevBtn').addEventListener('click', function() {
-      if (currentPage >= 2) { currentPage -= 2; renderPages(); }
+    function buildTocUI() {
+      var container = document.getElementById('tocListContainer');
+      container.innerHTML = '';
+      TOAN12_TAP1_PAGES.forEach(function (item, idx) {
+        var el = document.createElement('div');
+        el.className = 'toc-item ' + (Math.floor(currentPage / 2) * 2 === idx ? 'active' : '');
+        el.innerHTML = `<strong>Bài ${idx + 1}:</strong> ${item.title}`;
+        el.addEventListener('click', function () {
+          currentPage = Math.floor(idx / 2) * 2;
+          renderFlipBook();
+          document.getElementById('tocSidebar').classList.remove('open');
+        });
+        container.appendChild(el);
+      });
+    }
+
+    // Events
+    document.getElementById('prevBtn').addEventListener('click', function () {
+      if (currentPage >= 2) { currentPage -= 2; renderFlipBook(); }
     });
 
-    document.getElementById('nextBtn').addEventListener('click', function() {
-      if (currentPage + 2 < PAGES_DATA.length) { currentPage += 2; renderPages(); }
+    document.getElementById('nextBtn').addEventListener('click', function () {
+      if (currentPage + 2 < TOAN12_TAP1_PAGES.length) { currentPage += 2; renderFlipBook(); }
     });
 
-    renderPages();
+    document.getElementById('firstPageBtn').addEventListener('click', function () {
+      currentPage = 0; renderFlipBook();
+    });
+
+    document.getElementById('lastPageBtn').addEventListener('click', function () {
+      currentPage = Math.floor((TOAN12_TAP1_PAGES.length - 1) / 2) * 2; renderFlipBook();
+    });
+
+    document.getElementById('toggleTocBtn').addEventListener('click', function () {
+      document.getElementById('tocSidebar').classList.toggle('open');
+    });
+
+    document.getElementById('closeTocBtn').addEventListener('click', function () {
+      document.getElementById('tocSidebar').classList.remove('open');
+    });
+
+    // Run Initial
+    renderFlipBook();
   </script>
 </body>
 </html>
