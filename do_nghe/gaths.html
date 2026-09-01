@@ -28,7 +28,18 @@
             font-family: 'Lexend', sans-serif;
             background-color: var(--bg-dark);
             color: #e5e7eb;
+            padding-top: 82px;
+            padding-bottom: 62px;
         }
+
+        .site-header { position: fixed; inset: 0 0 auto 0; z-index: 60; }
+        .site-footer { position: fixed; inset: auto 0 0 0; z-index: 55; }
+        .guide-step { border-left: 3px solid var(--emerald-primary); padding-left: 12px; }
+        .guide-step b { color: var(--emerald-light); }
+        .image-placeholder { border: 2px dashed #94a3b8; background: #f8fafc; color: #475569; padding: 22px; text-align: center; margin: 12px 0; border-radius: 6px; }
+        .lesson-image { display: block; max-width: 100%; height: auto; margin: 12px auto 5px; page-break-inside: avoid; }
+        .image-caption { text-align: center; font-size: 10.5pt; font-style: italic; color: #374151; margin: 0 0 12px; }
+        #wordPreview[contenteditable="true"]:focus { outline: 3px solid rgba(16,185,129,.25); }
 
         .border-theme {
             border-color: var(--border-green);
@@ -60,12 +71,18 @@
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
         ::-webkit-scrollbar-thumb { background: var(--border-green); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--emerald-primary); }
+        @media (max-width: 767px) {
+            body { padding-top: 74px; padding-bottom: 76px; }
+            .site-header .profile-badge { display: none; }
+            .site-footer { font-size: 10px; }
+            .a4-preview { width: 100%; min-height: 0; padding: 18px; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
     <!-- HEADER CHUẨN TONE TRANG CHỦ -->
-    <header class="border-b border-theme bg-[#031710]/90 backdrop-blur sticky top-0 z-50 px-4 py-3">
+    <header class="site-header border-b border-theme bg-[#031710]/95 backdrop-blur px-4 py-3 shadow-xl">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
             
             <!-- Logo & Brand -->
@@ -102,7 +119,7 @@
                 <button onclick="openApiModal()" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition">
                     🔑 API Key
                 </button>
-                <div class="bg-black/40 border border-theme px-3.5 py-1.5 rounded-full flex items-center gap-2 text-xs">
+                <div class="profile-badge bg-black/40 border border-theme px-3.5 py-1.5 rounded-full flex items-center gap-2 text-xs">
                     <span class="text-base">🧑‍🏫</span>
                     <div>
                         <span class="font-bold text-white block">Thầy Phan Ngọc Huy</span>
@@ -124,6 +141,21 @@
                     <i class="fa-solid fa-sliders"></i> Thông Tin Bài Dạy & Tích Hợp Số
                 </h2>
                 <span class="text-[11px] bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">GATHS 2026</span>
+            </div>
+
+            <div class="rounded-xl border border-emerald-500/30 bg-emerald-950/40 overflow-hidden">
+                <button type="button" onclick="toggleGuide()" class="w-full p-3 flex items-center justify-between text-left hover:bg-emerald-900/30 transition">
+                    <span class="font-bold text-amber-300"><i class="fa-solid fa-compass mr-2"></i>Bắt đầu nhanh cho giáo viên</span>
+                    <span id="guideChevron" class="text-emerald-400">▼</span>
+                </button>
+                <div id="quickGuide" class="px-4 pb-4 space-y-3 text-[11px] text-gray-300">
+                    <div class="guide-step"><b>Bước 1 — Chọn đúng bối cảnh.</b><br>Chọn cấp học, khối, môn và nhập tên bài. Với môn Tiếng Anh, AI sẽ soạn hoàn toàn bằng tiếng Anh.</div>
+                    <div class="guide-step"><b>Bước 2 — Chọn vừa đủ tích hợp số.</b><br>Chỉ chọn công cụ thật sự phục vụ mục tiêu. Học sinh phải có sản phẩm hoặc minh chứng số rõ ràng.</div>
+                    <div class="guide-step"><b>Bước 3 — Mô tả đầu ra mong muốn.</b><br>Ở ô “Yêu cầu cần đạt”, nêu kiến thức, kĩ năng, đối tượng học sinh và tình huống thực tế.</div>
+                    <div class="guide-step"><b>Bước 4 — Tạo rồi biên tập.</b><br>Đọc lại mục tiêu, thời lượng, đánh giá và an toàn số. Bấm trực tiếp vào trang A4 để sửa nội dung.</div>
+                    <div class="guide-step"><b>Bước 5 — Chèn hình đúng chỗ.</b><br>Gõ <code class="text-amber-300">[INSERT IMAGE]</code> trong giáo án, đặt con trỏ tại vị trí cần chèn, hoặc dùng nút “Chèn/Tạo ảnh”.</div>
+                    <button type="button" onclick="openFullGuide()" class="text-emerald-300 hover:underline font-semibold">Xem hướng dẫn chi tiết và ví dụ câu nhắc →</button>
+                </div>
             </div>
 
             <form id="lessonForm" class="space-y-3.5 text-xs">
@@ -215,6 +247,9 @@
                     <i class="fa-regular fa-file-lines text-emerald-400"></i> Trang Xem Trước (Chuẩn A4)
                 </span>
                 <div class="flex gap-2">
+                    <button onclick="openImageModal()" class="bg-sky-600/80 hover:bg-sky-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-sky-400/40 transition">
+                        <i class="fa-regular fa-image"></i> Chèn / Tạo ảnh
+                    </button>
                     <button onclick="copyContent()" class="bg-black/40 hover:bg-black/60 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-theme transition">
                         <i class="fa-regular fa-copy"></i> Sao chép
                     </button>
@@ -226,7 +261,7 @@
 
             <!-- Khung cuộn trang A4 -->
             <div class="flex-1 overflow-y-auto max-h-[720px] p-4 bg-[#020e0c] rounded-2xl border border-theme">
-                <div id="wordPreview" class="a4-preview">
+                <div id="wordPreview" class="a4-preview" contenteditable="true" spellcheck="true" title="Có thể bấm trực tiếp để chỉnh sửa và đặt con trỏ chèn ảnh">
                     <div class="text-center text-gray-400 py-24">
                         <i class="fa-solid fa-file-circle-plus text-5xl mb-3 text-emerald-700"></i>
                         <p class="text-base font-semibold text-gray-600">Chưa có dữ liệu giáo án.</p>
@@ -238,18 +273,52 @@
     </main>
 
     <!-- FOOTER CHUẨN TONE TRANG CHỦ -->
-    <footer class="border-t border-theme bg-[#031710] py-4 px-6 text-xs text-gray-400 mt-6">
+    <footer class="site-footer border-t border-theme bg-[#031710]/98 py-3 px-6 text-xs text-gray-400 shadow-2xl">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
             <div class="flex items-center gap-2">
                 <span>🚀</span>
                 <a href="https://huycomf2020.github.io/giao_vien/index.html" class="font-bold text-emerald-400 hover:underline">Made by Huycomf</a>
                 <span>• Tiện Ích Giáo Viên</span>
             </div>
-            <div>
-                Phát triển bởi <b class="text-gray-200">Thầy Phan Ngọc Huy</b> - Trường THPT Lộc Ninh, TP. Đồng Nai
+            <div class="flex items-center gap-3">
+                <a href="https://huycomf2020.github.io/giao_vien/index.html" class="text-emerald-400 hover:text-emerald-300 font-semibold"><i class="fa-solid fa-house"></i> Về Homepage</a>
+                <span>Phát triển bởi <b class="text-gray-200">Thầy Phan Ngọc Huy</b> - Trường THPT Lộc Ninh, TP. Đồng Nai</span>
             </div>
         </div>
     </footer>
+
+    <!-- MODAL HƯỚNG DẪN -->
+    <div id="guideModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[80] p-4">
+        <div class="bg-card-theme border border-theme rounded-2xl max-w-2xl w-full p-6 shadow-2xl max-h-[88vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-emerald-300"><i class="fa-solid fa-graduation-cap mr-2"></i>Soạn giáo án trong 5 phút</h3><button onclick="closeFullGuide()" class="w-8 h-8 rounded-full bg-black/40">✕</button></div>
+            <div class="space-y-4 text-sm text-gray-300">
+                <div class="guide-step"><b>1. Bắt đầu từ mục tiêu, không bắt đầu từ công cụ.</b><p>Ví dụ: “Học sinh lớp 7 sử dụng được 8 từ vựng về hobbies trong hội thoại 4 lượt; tạo một poster số có trích nguồn.”</p></div>
+                <div class="guide-step"><b>2. Mỗi hoạt động chỉ nên có một đầu ra chính.</b><p>Khởi động: câu trả lời/dự đoán. Hình thành kiến thức: phiếu học tập. Luyện tập: bài làm. Vận dụng: sản phẩm số.</p></div>
+                <div class="guide-step"><b>3. Tích hợp số phải nhìn thấy được.</b><p>Trong I. MỤC TIÊU cần nêu năng lực số; trong III. TIẾN TRÌNH phải có công cụ, hành động của học sinh, sản phẩm/minh chứng và lưu ý an toàn.</p></div>
+                <div class="guide-step"><b>4. Câu nhắc tốt.</b><p class="p-3 rounded-lg bg-black/30 text-amber-200">“Soạn bài cho lớp 8, 45 phút; học sinh trình độ không đồng đều; ưu tiên giao tiếp; tạo infographic nhóm; không yêu cầu mỗi em có điện thoại; thêm rubric 4 mức và [INSERT IMAGE] ở hoạt động khởi động.”</p></div>
+                <div class="guide-step"><b>5. Kiểm tra trước khi xuất Word.</b><p>Mục tiêu có đo được không? Tổng thời gian có đúng không? Công cụ số có phục vụ bài học không? Có phương án mất mạng? Hình có chú thích và nguồn không?</p></div>
+            </div>
+            <div class="mt-5 flex justify-end"><button onclick="closeFullGuide()" class="px-5 py-2 bg-emerald-600 rounded-lg font-bold">Đã hiểu, bắt đầu soạn</button></div>
+        </div>
+    </div>
+
+    <!-- MODAL CHÈN / TẠO ẢNH -->
+    <div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[80] p-4">
+        <div class="bg-card-theme border border-theme rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center"><h3 class="text-base font-bold text-sky-300"><i class="fa-regular fa-image mr-2"></i>Chèn hình vào giáo án</h3><button onclick="closeImageModal()" class="w-8 h-8 rounded-full bg-black/40">✕</button></div>
+            <p class="text-xs text-gray-300">Ảnh được chèn tại con trỏ. Nếu trong giáo án có chữ <b class="text-amber-300">[INSERT IMAGE]</b>, hệ thống sẽ ưu tiên thay chữ đó bằng ảnh.</p>
+            <div class="grid grid-cols-3 gap-2 text-xs">
+                <button onclick="setImageMode('upload')" class="image-mode bg-emerald-700 p-2 rounded-lg" data-mode="upload">Tải ảnh lên</button>
+                <button onclick="setImageMode('url')" class="image-mode bg-black/40 p-2 rounded-lg" data-mode="url">Dán URL</button>
+                <button onclick="setImageMode('ai')" class="image-mode bg-black/40 p-2 rounded-lg" data-mode="ai">Tạo ảnh AI</button>
+            </div>
+            <div id="imageUploadPane"><label class="text-xs text-gray-300">Chọn JPG, PNG, WEBP</label><input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp" class="mt-1 block w-full text-xs bg-black/40 border border-theme rounded-lg p-2"></div>
+            <div id="imageUrlPane" class="hidden"><label class="text-xs text-gray-300">Địa chỉ ảnh</label><input id="imageUrl" type="url" placeholder="https://.../image.png" class="mt-1 w-full bg-black/40 border border-theme rounded-lg p-2 text-xs"></div>
+            <div id="imageAiPane" class="hidden space-y-2"><label class="text-xs text-gray-300">Câu nhắc tạo ảnh minh họa</label><textarea id="imagePrompt" rows="3" class="w-full bg-black/40 border border-theme rounded-lg p-2 text-xs" placeholder="Ví dụ: Educational illustration of students discussing hobbies, clean flat design, no text..."></textarea><p class="text-[10px] text-amber-300">Tạo ảnh dùng dịch vụ Pollinations công khai. Không nhập dữ liệu cá nhân hoặc hình ảnh nhận dạng học sinh.</p></div>
+            <div class="grid grid-cols-2 gap-2"><div><label class="text-xs text-gray-300">Chú thích</label><input id="imageCaption" placeholder="Hình 1. ..." class="mt-1 w-full bg-black/40 border border-theme rounded-lg p-2 text-xs"></div><div><label class="text-xs text-gray-300">Văn bản thay thế</label><input id="imageAlt" placeholder="Mô tả nội dung hình" class="mt-1 w-full bg-black/40 border border-theme rounded-lg p-2 text-xs"></div></div>
+            <div class="flex justify-end gap-2"><button onclick="insertImagePlaceholder()" class="px-3 py-2 border border-theme rounded-lg text-xs">Chèn ô nhắc [INSERT IMAGE]</button><button id="insertImageButton" onclick="insertSelectedImage()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg text-xs font-bold">Chèn ảnh</button></div>
+        </div>
+    </div>
 
     <!-- MODAL API KEY -->
     <div id="apiModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
@@ -275,7 +344,29 @@
         document.addEventListener("DOMContentLoaded", () => {
             const savedKey = localStorage.getItem("GEMINI_API_KEY");
             if (savedKey) document.getElementById("apiKeyInput").value = savedKey;
+            if (!localStorage.getItem("GATHS_GUIDE_SEEN")) openFullGuide();
+            const preview = document.getElementById("wordPreview");
+            preview.addEventListener("keyup", rememberImageRange);
+            preview.addEventListener("mouseup", rememberImageRange);
         });
+
+        let imageMode = "upload";
+        let savedImageRange = null;
+        function toggleGuide() { const g=document.getElementById("quickGuide"), hidden=g.classList.toggle("hidden"); document.getElementById("guideChevron").textContent=hidden?"▶":"▼"; }
+        function openFullGuide() { document.getElementById("guideModal").classList.remove("hidden"); document.getElementById("guideModal").classList.add("flex"); }
+        function closeFullGuide() { document.getElementById("guideModal").classList.add("hidden"); document.getElementById("guideModal").classList.remove("flex"); localStorage.setItem("GATHS_GUIDE_SEEN","1"); }
+        function rememberImageRange() { const s=window.getSelection(); if(s && s.rangeCount && document.getElementById("wordPreview").contains(s.anchorNode)) savedImageRange=s.getRangeAt(0).cloneRange(); }
+        function openImageModal() { rememberImageRange(); document.getElementById("imageModal").classList.remove("hidden"); document.getElementById("imageModal").classList.add("flex"); }
+        function closeImageModal() { document.getElementById("imageModal").classList.add("hidden"); document.getElementById("imageModal").classList.remove("flex"); }
+        function setImageMode(mode) { imageMode=mode; ["upload","url","ai"].forEach(x=>{document.getElementById("image"+x[0].toUpperCase()+x.slice(1)+"Pane").classList.toggle("hidden",x!==mode)}); document.querySelectorAll(".image-mode").forEach(b=>{b.classList.toggle("bg-emerald-700",b.dataset.mode===mode);b.classList.toggle("bg-black/40",b.dataset.mode!==mode)}); document.getElementById("insertImageButton").textContent=mode==="ai"?"Tạo và chèn ảnh":"Chèn ảnh"; }
+        function insertImagePlaceholder() { insertHtmlAtMarker('<div class="image-placeholder"><b>[INSERT IMAGE]</b><br><span>Nhắc chèn hình minh họa phù hợp với nội dung hoạt động này.</span></div>'); closeImageModal(); }
+        function insertHtmlAtMarker(html) { const preview=document.getElementById("wordPreview"), marker=findTextNode(preview,"[INSERT IMAGE]"); if(marker){const range=document.createRange(),idx=marker.nodeValue.indexOf("[INSERT IMAGE]");range.setStart(marker,idx);range.setEnd(marker,idx+14);range.deleteContents();range.insertNode(htmlNode(html));return} if(savedImageRange && preview.contains(savedImageRange.commonAncestorContainer)){savedImageRange.deleteContents();savedImageRange.insertNode(htmlNode(html));return} preview.insertAdjacentHTML("beforeend",html); }
+        function htmlNode(html){const t=document.createElement("template");t.innerHTML=html.trim();return t.content}
+        function findTextNode(root,search){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode())if(n.nodeValue.includes(search))return n;return null}
+        function imageHtml(src){const alt=(document.getElementById("imageAlt").value||"Hình minh họa bài học").replace(/"/g,"&quot;"),cap=document.getElementById("imageCaption").value.trim();return `<figure style="page-break-inside:avoid"><img class="lesson-image" src="${src}" alt="${alt}">${cap?`<figcaption class="image-caption">${cap}</figcaption>`:""}</figure>`}
+        function fileToDataUrl(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)})}
+        async function urlToDataUrl(url){try{const r=await fetch(url);if(!r.ok)throw Error();return await fileToDataUrl(await r.blob())}catch(e){return url}}
+        async function insertSelectedImage(){const btn=document.getElementById("insertImageButton"),old=btn.textContent;btn.disabled=true;btn.textContent="Đang xử lý...";try{let src;if(imageMode==="upload"){const f=document.getElementById("imageFile").files[0];if(!f)throw Error("Hãy chọn một tệp ảnh.");if(f.size>8*1024*1024)throw Error("Ảnh lớn hơn 8 MB. Hãy nén ảnh trước.");src=await fileToDataUrl(f)}else if(imageMode==="url"){const u=document.getElementById("imageUrl").value.trim();if(!u)throw Error("Hãy nhập URL ảnh.");src=await urlToDataUrl(u)}else{const p=document.getElementById("imagePrompt").value.trim()||`${document.getElementById("lessonTitle").value}, educational illustration, classroom-safe, no text, clean composition`;const seed=Math.floor(Math.random()*999999);const u=`https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=1024&height=576&nologo=true&seed=${seed}`;src=await urlToDataUrl(u)}insertHtmlAtMarker(imageHtml(src));closeImageModal()}catch(e){alert(e.message||"Chưa thể tạo/chèn ảnh. Hãy thử tải ảnh từ máy.")}finally{btn.disabled=false;btn.textContent=old}}
 
         function openApiModal() { document.getElementById("apiModal").classList.remove("hidden"); document.getElementById("apiModal").classList.add("flex"); }
         function closeApiModal() { document.getElementById("apiModal").classList.add("hidden"); document.getElementById("apiModal").classList.remove("flex"); }
@@ -321,7 +412,7 @@ Miền năng lực AI: ${selectedAIDomains}
 Nội dung bổ sung: ${userPrompt}
 
 Yêu cầu xuất HTML sạch (chỉ dùng các thẻ <table>, <tr>, <td>, <th>, <h2>, <h3>, <b>, <i>, <p>, <ul>, <li>), KHÔNG dùng Markdown block.
-Gồm: Bảng Quốc hiệu/Tên trường, TÊN BÀI DẠY, I. MỤC TIÊU, II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU SỐ, III. TIẾN TRÌNH DẠY HỌC (4 hoạt động chuẩn 5512 kèm phân công công cụ số/AI).`;
+Gồm: Bảng Quốc hiệu/Tên trường, TÊN BÀI DẠY, I. MỤC TIÊU, II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU SỐ, III. TIẾN TRÌNH DẠY HỌC (4 hoạt động chuẩn 5512 kèm phân công công cụ số/AI). Nếu một hình minh họa thực sự giúp học sinh hiểu hoặc thực hiện nhiệm vụ, hãy đặt chính xác chuỗi [INSERT IMAGE] tại vị trí phù hợp và mô tả hình cần tạo ngay sau đó trong ngoặc. Không lạm dụng hình ảnh.`;
 
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
                         method: "POST",
@@ -397,7 +488,7 @@ Gồm: Bảng Quốc hiệu/Tên trường, TÊN BÀI DẠY, I. MỤC TIÊU, II.
                     <tbody>
                         <tr>
                             <td><b>1. Khởi động</b><br><i>(5 phút)</i></td>
-                            <td>GV tạo trò chơi tương tác qua <i>Quizizz/Mentimeter</i>. HS quét mã QR tham gia khởi động bài học.</td>
+                            <td>GV tạo trò chơi tương tác qua <i>Quizizz/Mentimeter</i>. HS quét mã QR tham gia khởi động bài học.<div class="image-placeholder"><b>[INSERT IMAGE]</b><br>Hình minh họa trực quan cho tình huống khởi động của bài “${title}”.</div></td>
                         </tr>
                         <tr>
                             <td><b>2. Hình thành kiến thức</b><br><i>(15 phút)</i></td>
@@ -428,11 +519,20 @@ Gồm: Bảng Quốc hiệu/Tên trường, TÊN BÀI DẠY, I. MỤC TIÊU, II.
             document.getElementById("wordPreview").innerHTML = html;
         }
 
-        function exportToWord() {
-            const content = document.getElementById("wordPreview").innerHTML;
+        async function exportToWord() {
+            const preview = document.getElementById("wordPreview");
+            if (preview.innerHTML.includes("Chưa có dữ liệu")) return alert("Vui lòng tạo giáo án trước!");
+            const clone = preview.cloneNode(true);
+            const images = Array.from(clone.querySelectorAll("img"));
+            for (const img of images) {
+                if (!img.src.startsWith("data:")) img.src = await urlToDataUrl(img.src);
+                img.removeAttribute("contenteditable");
+            }
+            clone.querySelectorAll(".image-placeholder").forEach(x=>{x.style.border="1px dashed #777";x.style.padding="12px"});
+            const content = clone.innerHTML;
             if (content.includes("Chưa có dữ liệu")) return alert("Vui lòng tạo giáo án trước!");
 
-            const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>@page{size:A4;margin:20mm 15mm 20mm 25mm;}body{font-family:'Times New Roman',serif;font-size:13pt;line-height:1.3;}table{border-collapse:collapse;width:100%;}table,th,td{border:1px solid black;padding:5px;font-size:12pt;}</style></head><body>`;
+            const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>@page{size:A4;margin:20mm 15mm 20mm 25mm;}body{font-family:'Times New Roman',serif;font-size:13pt;line-height:1.3;}table{border-collapse:collapse;width:100%;}table,th,td{border:1px solid black;padding:5px;font-size:12pt;}img{display:block;max-width:100%;height:auto;margin:10px auto 4px;}figure{page-break-inside:avoid;text-align:center;}figcaption{text-align:center;font-size:10.5pt;font-style:italic;color:#333;}</style></head><body>`;
             const sourceHTML = header + content + "</body></html>";
             const converted = htmlDocx.asBlob(sourceHTML);
             saveAs(converted, `Giao_An_So_${document.getElementById("teacherName").value.replace(/\s+/g, '_')}.docx`);
