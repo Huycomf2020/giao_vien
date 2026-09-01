@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flipbook Toán 12 - Tập 1 | Thầy Phan Ngọc Huy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #02160e;
+      --bg-card: rgba(6, 44, 30, 0.9);
+      --border-color: rgba(16, 185, 129, 0.3);
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --emerald-600: #059669;
+      --text-main: #f0fdf4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg-primary); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    
+    .topbar { background: rgba(3, 30, 20, 0.95); border-bottom: 1px solid var(--border-color); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .btn { background: var(--emerald-600); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; font-size: 0.85rem; }
+    .btn:hover { background: var(--emerald-500); }
+    .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); }
+    
+    .viewport { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
+    .book-container { width: 100%; max-width: 1100px; height: 90%; display: flex; background: #064e3b; border-radius: 12px; border: 4px solid #047857; box-shadow: 0 20px 50px rgba(0,0,0,0.8); overflow: hidden; }
+    
+    .page-spread { flex: 1; background: #fdfbf7; color: #1e293b; padding: 30px; display: flex; flex-direction: column; position: relative; overflow-y: auto; }
+    .page-spread.left { border-right: 2px solid #e2e8f0; }
+    .page-header { display: flex; justify-content: space-between; border-bottom: 1px solid #cbd5e1; padding-bottom: 6px; font-size: 0.8rem; color: #64748b; font-weight: 600; }
+    .page-body { flex: 1; margin-top: 15px; font-family: 'Playfair Display', serif; line-height: 1.8; }
+    .page-body h3 { font-family: 'Inter', sans-serif; color: #064e3b; margin-bottom: 12px; border-left: 4px solid var(--emerald-500); padding-left: 10px; }
+    .page-footer { border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 0.8rem; font-weight: 700; color: #064e3b; display: flex; justify-content: space-between; }
+    
+    .bottombar { background: rgba(3, 30, 20, 0.95); border-top: 1px solid var(--border-color); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="etextbook.html" class="btn btn-secondary">⬅️ Thư Viện Sách</a>
+      <div>
+        <h3 style="font-size: 1.05rem; color: #fff;">Toán Học 12 - Tập 1</h3>
+        <p style="font-size: 0.75rem; color: var(--emerald-400);">Bộ Sách Chuẩn GDPT 2018 • Biên soạn & Số hóa bởi Thầy Phan Ngọc Huy</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="viewport">
+    <div class="book-container">
+      <!-- Trang trái -->
+      <div class="page-spread left">
+        <div class="page-header"><span>TOÁN HỌC 12 - TẬP 1</span><span id="leftChapter">Bài 1</span></div>
+        <div class="page-body" id="leftBody"></div>
+        <div class="page-footer"><span id="leftPageNum">Trang 1</span><span>BGD&ĐT • GDPT 2018</span></div>
+      </div>
+      <!-- Trang phải -->
+      <div class="page-spread right">
+        <div class="page-header"><span>TOÁN HỌC 12 - TẬP 1</span><span id="rightChapter">Bài 2</span></div>
+        <div class="page-body" id="rightBody"></div>
+        <div class="page-footer"><span>Bản quyền số © Huycomf</span><span id="rightPageNum">Trang 2</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottombar">
+    <button class="btn" id="prevBtn">◀ Trang Trước</button>
+    <span id="pageIndicator" style="font-weight: 700; color: var(--emerald-400);">Trang 1 - 2</span>
+    <button class="btn" id="nextBtn">Trang Sau ▶</button>
+  </div>
+
+  <script>
+    var PAGES_DATA = [
+      {
+        title: "Bài 1: Tính Đơn Điệu và Cực Trị Của Hàm Số",
+        content: "Ký hiệu K là một khoảng, đoạn hoặc nửa khoảng. Giả sử hàm số y = f(x) có đạo hàm trên K.<br><br>• Nếu f'(x) > 0 với mọi x thuộc K thì hàm số f(x) đồng biến trên K.<br>• Nếu f'(x) < 0 với mọi x thuộc K thì hàm số f(x) nghịch biến trên K.<br><br><strong>Quy tắc tìm cực trị:</strong><br>1. Tìm tập xác định D.<br>2. Tính đạo hàm f'(x). Tìm các điểm x_i mà tại đó f'(x_i) = 0.<br>3. Lập bảng biến thiên và kết luận điểm cực đại, cực tiểu."
+      },
+      {
+        title: "Bài 2: Giá Trị Lớn Nhất và Nhỏ Nhất Của Hàm Số",
+        content: "Cho hàm số y = f(x) xác định trên tập hợp D.<br><br>• Số M là GTLN của f(x) trên D nếu f(x) ≤ M với mọi x ∈ D và tồn tại x_0 ∈ D sao cho f(x_0) = M.<br>• Số m là GTNN của f(x) trên D nếu f(x) ≥ m với mọi x ∈ D và tồn tại x_0 sao cho f(x_0) = m.<br><br><strong>Cách tìm trên đoạn [a; b]:</strong> Tính f(a), f(b) và f(x_i) tại các điểm có đạo hàm bằng 0, sau đó so sánh các giá trị."
+      },
+      {
+        title: "Bài 3: Đường Tiệm Cận Của Đồ Thị Hàm Số",
+        content: "<strong>1. Tiệm cận ngang:</strong> Đường thẳng y = y_0 là tiệm cận ngang nếu lim f(x) = y_0 khi x → +∞ hoặc x → -∞.<br><br><strong>2. Tiệm cận đứng:</strong> Đường thẳng x = x_0 là tiệm cận đứng nếu lim f(x) = ±∞ khi x → x_0^+ hoặc x → x_0^-.<br><br><strong>3. Tiệm cận xiên:</strong> Đường thẳng y = ax + b (a ≠ 0) là tiệm cận xiên nếu lim [f(x) - (ax + b)] = 0 khi x → ±∞."
+      },
+      {
+        title: "Bài 4: Khảo Sát Sự Biến Thiên và Vẽ Đồ Thị Hàm Số",
+        content: "<strong>Sơ đồ khảo sát tổng quát:</strong><br>1. Tập xác định D.<br>2. Sự biến thiên: Chiều biến thiên, cực trị, giới hạn, tiệm cận, bảng biến thiên.<br>3. Vẽ đồ thị: Xác định các giao điểm với trục tọa độ Ox, Oy và các điểm đặc biệt."
+      }
+    ];
+
+    var currentPage = 0;
+
+    function renderPages() {
+      var p1 = PAGES_DATA[currentPage] || { title: "Hết trang", content: "Đã đến cuối tài liệu." };
+      var p2 = PAGES_DATA[currentPage + 1] || { title: "Ghi chú", content: "Nội dung đang được cập nhật thêm." };
+
+      document.getElementById('leftChapter').textContent = "Bài " + (currentPage + 1);
+      document.getElementById('leftBody').innerHTML = `<h3>${p1.title}</h3><p>${p1.content}</p>`;
+      document.getElementById('leftPageNum').textContent = "Trang " + (currentPage + 1);
+
+      document.getElementById('rightChapter').textContent = "Bài " + (currentPage + 2);
+      document.getElementById('rightBody').innerHTML = `<h3>${p2.title}</h3><p>${p2.content}</p>`;
+      document.getElementById('rightPageNum').textContent = "Trang " + (currentPage + 2);
+
+      document.getElementById('pageIndicator').textContent = `Trang ${currentPage + 1} - ${currentPage + 2} / ${PAGES_DATA.length}`;
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', function() {
+      if (currentPage >= 2) { currentPage -= 2; renderPages(); }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', function() {
+      if (currentPage + 2 < PAGES_DATA.length) { currentPage += 2; renderPages(); }
+    });
+
+    renderPages();
+  </script>
+</body>
+</html>
