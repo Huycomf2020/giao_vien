@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flipbook Ngữ Văn 12 - Tập 2 | Thầy Phan Ngọc Huy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #02160e;
+      --bg-card: rgba(6, 44, 30, 0.92);
+      --border-color: rgba(16, 185, 129, 0.28);
+      --emerald-300: #6ee7b7;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --emerald-600: #059669;
+      --text-main: #f0fdf4;
+      --text-muted: #a7f3d0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(5, 150, 105, 0.15) 0%, transparent 50%),
+        linear-gradient(180deg, #021a11 0%, #010f09 100%);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Topbar Header */
+    .topbar {
+      background: rgba(3, 30, 20, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover { background: linear-gradient(135deg, var(--emerald-400), var(--emerald-500)); transform: translateY(-1px); }
+    .btn-secondary { background: rgba(6, 78, 59, 0.6); border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-secondary:hover { background: rgba(6, 78, 59, 0.9); }
+
+    /* Viewport Flipbook */
+    .viewport {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .book-container {
+      width: 100%;
+      max-width: 1180px;
+      height: 92%;
+      display: flex;
+      background: #064e3b;
+      border-radius: 12px;
+      border: 4px solid #047857;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page-spread {
+      flex: 1;
+      background: #fdfbf7;
+      color: #1e293b;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .page-spread.left {
+      border-right: 2px solid #e2e8f0;
+      box-shadow: inset -15px 0 20px rgba(0,0,0,0.05);
+    }
+
+    .page-spread.right {
+      box-shadow: inset 15px 0 20px rgba(0,0,0,0.05);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 6px;
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .page-body {
+      flex: 1;
+      margin-top: 14px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.02rem;
+      line-height: 1.8;
+      color: #1e293b;
+    }
+
+    .page-body h3 {
+      font-family: 'Inter', sans-serif;
+      color: #064e3b;
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--emerald-500);
+      padding-left: 10px;
+    }
+
+    .box-target {
+      background: rgba(6, 78, 59, 0.08);
+      border-left: 3px solid #059669;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.92rem;
+      font-style: italic;
+      font-family: 'Inter', sans-serif;
+      border-radius: 4px;
+    }
+
+    .box-quiz {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px dashed #10b981;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .page-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 8px;
+      margin-top: 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #064e3b;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Bottom Control Bar */
+    .bottombar {
+      background: rgba(3, 30, 20, 0.95);
+      border-top: 1px solid var(--border-color);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    /* Sidebar Mục Lục */
+    .toc-sidebar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -320px;
+      width: 320px;
+      background: rgba(3, 30, 20, 0.98);
+      border-right: 1px solid var(--border-color);
+      z-index: 50;
+      transition: left 0.3s ease;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.7);
+    }
+
+    .toc-sidebar.open { left: 0; }
+
+    .toc-item {
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .toc-item:hover, .toc-item.active {
+      background: rgba(16, 185, 129, 0.2);
+      color: #ffffff;
+      border-left: 3px solid var(--emerald-400);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <div class="topbar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="etextbook.html" class="btn btn-secondary">⬅️ Thư Viện Sách</a>
+      <button class="btn btn-secondary" id="toggleTocBtn">📑 Mục Lục Sách</button>
+      <div>
+        <h3 style="font-size: 1.1rem; color: #ffffff;">Sách Giáo Khoa Ngữ Văn 12 - Tập 2</h3>
+        <p style="font-size: 0.78rem; color: var(--emerald-300);">Bộ Sách Chuẩn GDPT 2018 • Biên soạn số bởi Thầy Phan Ngọc Huy</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <a href="https://drive.google.com/file/d/1COrMMivxiTF9ES0njX7i30_7h4QJ47F6/view?usp=drive_link" target="_blank" class="btn btn-secondary">☁️ File Drive Gốc PDF</a>
+    </div>
+  </div>
+
+  <!-- Sidebar Mục Lục -->
+  <div class="toc-sidebar" id="tocSidebar">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+      <h4 style="color: var(--emerald-400); font-size: 1rem;">📑 Mục Lục Bài Học</h4>
+      <button id="closeTocBtn" style="background: none; border: none; color: #ffffff; font-size: 1.2rem; cursor: pointer;">✕</button>
+    </div>
+    <div id="tocListContainer" style="flex: 1; overflow-y: auto;"></div>
+  </div>
+
+  <!-- Viewport Flipbook 3D -->
+  <div class="viewport">
+    <div class="book-container">
+      <!-- Trang bên trái -->
+      <div class="page-spread left">
+        <div class="page-header">
+          <span>NGỮ VĂN 12 - TẬP 2</span>
+          <span id="leftChapter">Bài 6</span>
+        </div>
+        <div class="page-body" id="leftBody"></div>
+        <div class="page-footer">
+          <span id="leftPageNum">Trang 1</span>
+          <span>Sách của Bộ GD&ĐT 2026</span>
+        </div>
+      </div>
+
+      <!-- Trang bên phải -->
+      <div class="page-spread right">
+        <div class="page-header">
+          <span>NGỮ VĂN 12 - TẬP 2</span>
+          <span id="rightChapter">Nội Dung Bài Học</span>
+        </div>
+        <div class="page-body" id="rightBody"></div>
+        <div class="page-footer">
+          <span>Tinh gọn bởi Huycomf</span>
+          <span id="rightPageNum">Trang 2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Controller -->
+  <div class="bottombar">
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-secondary" id="firstPageBtn">⏮ Trang Đầu</button>
+      <button class="btn" id="prevBtn">◀ Lật Trang Trước</button>
+    </div>
+    <span id="pageIndicator" style="font-weight: 700; color: var(--emerald-400); font-size: 0.95rem;">Trang 1 - 2 / 8</span>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn" id="nextBtn">Lật Trang Sau ▶</button>
+      <button class="btn btn-secondary" id="lastPageBtn">Trang Cuối ⏭</button>
+    </div>
+  </div>
+
+  <script>
+    // Database nội dung các bài học Ngữ Văn 12 Tập 2 chuẩn GDPT 2018
+    var NGUVAN12_TAP2_PAGES = [
+      {
+        chapter: "BÀI 6: HỊCH, BÌNH, CHIẾU VÀ CÁC THỂ VĂN NGHỊ LUẬN CỔ",
+        title: "Bình Ngô Đại Cáo (Nguyễn Trãi)",
+        content: `<strong>Cảm hứng chủ đạo:</strong> Bản tuyên ngôn độc lập thứ hai của dân tộc Việt Nam, khẳng định sức mạnh chính nghĩa và lòng tự hào dân tộc.<br><br>
+        <strong>Nội dung trọng tâm:</strong><br>
+        • <strong>Tư tưởng nhân nghĩa:</strong> <em>"Yên dân"</em> và <em>"trừ暴"</em>, lấy bảo vệ cuộc sống bình yên của nhân dân làm gốc.<br>
+        • <strong>Chân lý về chủ quyền dân tộc:</strong> Khẳng định nước Đại Việt là quốc gia độc lập có nền văn hiến lâu đời, lãnh thổ riêng, phong tục riêng và các triều đại song song với phương Bắc.<br>
+        • <strong>Tố cáo tội ác giặc Minh:</strong> <em>"Độc ác hại thay, trúc Nam Sơn không ghi hết tội - Dơ bẩn thay, nước Đông Hải không rửa sạch mùi"</em>.<br>
+        • <strong>Khúc ca chiến thắng:</strong> Tái hiện khí thế hào hùng của nghĩa quân Lam Sơn từ gian khổ đến thắng lợi hoàn toàn.`,
+        target: "🎯 Mục tiêu: Phân tích tư tưởng nhân nghĩa, tinh thần độc lập và nghệ thuật sử dụng văn biền ngẫu đỉnh cao của Nguyễn Trãi.",
+        quiz: "💡 Câu hỏi suy ngẫm: Nhận xét về sự phát triển tư tưởng nhân nghĩa của Nguyễn Trãi so với các quan niệm trước đó."
+      },
+      {
+        chapter: "BÀI 6: HỊCH, BÌNH, CHIẾU VÀ CÁC THỂ VĂN NGHỊ LUẬN CỔ",
+        title: "Kỹ Năng Phân Tích Văn Bản Nghị Luận Trung Đại",
+        content: `<strong>Đặc điểm nghệ thuật văn nghị luận trung đại:</strong><br><br>
+        1. <strong>Thể văn biền ngẫu:</strong> Sử dụng các vế đối sánh đăng đối, nhịp điệu cân đối, giàu tính nhạc.<br>
+        2. <strong>Tính quy phạm & Lập luận:</strong> Kết hợp nhuần nhuyễn giữa lý lẽ sắc bén, dẫn chứng lịch sử phong phú và tình cảm nhiệt huyết cách mạng.<br>
+        3. <strong>Sức ảnh hưởng xã hội:</strong> Các tác phẩm hịch, bình, chiếu mang tính chiến đấu trực tiếp, vận động và tập hợp lực lượng toàn dân.`,
+        target: "🎯 Kỹ năng: Nhận biết bố cục chuẩn và phép đối trong văn bản biền ngẫu trung đại.",
+        quiz: "💡 Bài tập thực hành: Chỉ ra phép đối về ý và từ ngữ trong đoạn mở đầu của 'Bình Ngô đại cáo'."
+      },
+      {
+        chapter: "BÀI 7: SỨC HẤP DẪN CỦA TRUYỆN TRUYỀN KỲ VÀ KỊCH BẢN KỊCH",
+        title: "Chuyện Người Con Gái Nam Xương (Trích 'Truyền kỳ漫lục' - Nguyễn Dữ)",
+        content: `<strong>Vẻ đẹp & Số phận bi kịch của người phụ nữ:</strong><br>
+        • <strong>Nhân vật Vũ Nương:</strong> Người phụ nữ dung hạnh toàn vẹn, hiếu thảo, thủy chung nhưng chịu nỗi oan khuất cay đắng do chế độ phong kiến trọng nam khinh nữ và chiến tranh phi nghĩa.<br>
+        • <strong>Yếu tố kỳ ảo:</strong> Cảnh Vũ Nương ở thủy cung và sự trở về lung linh trên sông Hoàng Giang thể hiện ước mơ công lý của nhân dân.<br>
+        • <strong>Giá trị nhân đạo:</strong> Tố cáo xã hội phong kiến bất công, đồng thời trân trọng, tôn vinh vẻ đẹp tâm hồn người phụ nữ.`,
+        target: "🎯 Mục tiêu: Phân tích giá trị hiện thực, nhân đạo và vai trò của yếu tố kỳ ảo trong thể loại truyền kỳ.",
+        quiz: "💡 Câu hỏi suy ngẫm: Ý nghĩa nghệ thuật của chi tiết cái bóng trên tường đối với tiến trình bi kịch."
+      },
+      {
+        chapter: "BÀI 7: SỨC HẤP DẪN CỦA TRUYỆN TRUYỀN KỲ VÀ KỊCH BẢN KỊCH",
+        title: "Hồn Trương Ba, Da Hàng Thịt (Lưu Quang Vũ)",
+        content: `<strong>Xung đột kịch & Triết lý nhân sinh:</strong><br><br>
+        • <strong>Mấu chốt xung đột:</strong> Sự thảm hại khi linh hồn thanh cao của Trương Ba phải trú nhờ trong thân xác thô lỗ, ph dung của anh hàng thịt.<br>
+        • <strong>Bài học cuộc sống:</strong> Con người không thể sống bên trong một đằng, bên ngoài một nẻo; cần có sự thống nhất giữa tâm hồn và thể xác.<br>
+        • <strong>Khát vọng tự do:</strong> Quyết định dứt khoát của Trương Ba thà chết để giữ trọn sự trong sạch của tâm hồn.`,
+        target: "🎯 Mục tiêu: Cảm nhận xung đột tâm lý nhân vật và các giá trị nhân văn sâu sắc trong kịch bản hiện đại Lưu Quang Vũ.",
+        quiz: "💡 Câu hỏi suy ngẫm: Ý nghĩa triết lý của lời thoại: 'Không thể bên trong một đằng, bên ngoài một nẻo được'."
+      },
+      {
+        chapter: "BÀI 8: TỔNG HỢP VĂN HỌC VÀ LÍ LUẬN VĂN HỌC",
+        title: "Nhà Văn, Tác Phẩm Và Đọc Giả",
+        content: `<strong>Tam giác nghệ thuật trong lí luận văn học:</strong><br>
+        • <strong>Tác giả:</strong> Người sáng tạo ra tác phẩm từ những trải nghiệm sống, cảm xúc mãnh liệt và tư tưởng độc đáo.<br>
+        • <strong>Tác phẩm:</strong> Bức tranh đời sống được mã hóa bằng ngôn từ nghệ thuật, chứa đựng văn hóa và thẩm mỹ.<br>
+        • <strong>Đọc giả:</strong> Người tiếp nhận, giải mã và đồng sáng tạo, làm cho tác phẩm tiếp tục sống qua nhiều thế hệ.<br><br>
+        <em>"Tác phẩm văn học chỉ thực sự sống khi nó gieo được hạt mầm vào tâm hồn người đọc."</em>`,
+        target: "🎯 Mục tiêu: Nắm vững các khái niệm lí luận văn học cơ bản phục vụ câu hỏi nghị luận vận dụng cao.",
+        quiz: "💡 Câu hỏi suy ngẫm: Vai trò của người đọc trong việc đồng sáng tạo với tác phẩm văn học."
+      },
+      {
+        chapter: "BÀI 8: TỔNG HỢP VĂN HỌC VÀ LÍ LUẬN VĂN HỌC",
+        title: "Kỹ Năng Viết Bài Văn Nghị Luận Về Một Ý Kiến Lý Luận Văn Học",
+        content: `<strong>Các bước làm bài nghị luận lý luận văn học:</strong><br><br>
+        1. <strong>Mở bài:</strong> Giới thiệu ý kiến lí luận văn học và định hướng phân tích qua tác phẩm.<br>
+        2. <strong>Thân bài:</strong><br>
+        - Giải thích các khái niệm, từ ngữ cốt lõi trong nhận định.<br>
+        - Phân tích, chứng minh nhận định qua các tác phẩm văn học tiêu biểu.<br>
+        - Đánh giá, mở rộng: Giá trị của nhận định đối với sáng tác và tiếp nhận văn học.<br>
+        3. <strong>Kết bài:</strong> Khẳng định tính đúng đắn của ý kiến và rút ra bài học sáng tạo/đọc hiểu.`,
+        target: "🎯 Kỹ năng: Triển khai bài viết chặt chẽ, giàu chất văn và chuẩn xác về lí luận.",
+        quiz: "💡 Bài tập thực hành: Viết dàn ý chứng minh nhận định: 'Thơ là tiếng nói của tâm hồn'."
+      },
+      {
+        chapter: "TỔNG ÔN CUỐI NĂM - NGỮ VĂN 12",
+        title: "Ôn Tập Kỳ Thi Tốt Nghiệp THPT Kỷ Nguyên Số 2026",
+        content: `<strong>Cấu trúc tổng ôn kỹ năng làm bài thi Ngữ Văn:</strong><br><br>
+        1. <strong>Kỹ năng Đọc hiểu (4.0 điểm):</strong><br>
+        - Xác định thể loại, phương thức biểu đạt, các phép liên kết.<br>
+        - Phân tích tác dụng của biện pháp tu từ, rút ra thông điệp bài học.<br><br>
+        2. <strong>Kỹ năng Viết (6.0 điểm):</strong><br>
+        - Đoạn văn nghị luận xã hội (200 chữ): Lập luận sắc bén, dẫn chứng thực tế thuyết phục.<br>
+        - Bài văn nghị luận văn học (600 - 800 chữ): Phân tích ngữ liệu sâu sắc, giàu cảm xúc.`,
+        target: "🎯 Đạt được: Làm chủ ma trận đề thi chuẩn 2026 và sẵn sàng bứt phá điểm 9+.",
+        quiz: "💡 Luyện tập ngay: Sử dụng QuizScanner Pro để giải bộ đề ôn tập Ngữ Văn 12 mới nhất!"
+      }
+    ];
+
+    var currentPage = 0;
+
+    function renderFlipBook() {
+      var p1 = NGUVAN12_TAP2_PAGES[currentPage] || {
+        chapter: "KẾT THÚC",
+        title: "Trang Cuối",
+        content: "Bạn đã hoàn thành toàn bộ chương trình Sách Giáo Khoa Ngữ Văn 12 - Tập 2.",
+        target: "",
+        quiz: ""
+      };
+
+      var p2 = NGUVAN12_TAP2_PAGES[currentPage + 1] || {
+        chapter: "GHI CHÚ",
+        title: "Sổ Tay Đọc Hiểu",
+        content: "Học sinh tự rèn luyện kỹ năng đọc hiểu văn bản ngoài SGK và viết đoạn văn nghị luận ngắn.",
+        target: "",
+        quiz: ""
+      };
+
+      // Trang trái
+      document.getElementById('leftChapter').textContent = p1.chapter;
+      document.getElementById('leftBody').innerHTML = `
+        <h3>${p1.title}</h3>
+        <p>${p1.content}</p>
+        ${p1.target ? `<div class="box-target">${p1.target}</div>` : ''}
+      `;
+      document.getElementById('leftPageNum').textContent = "Trang " + (currentPage + 1);
+
+      // Trang phải
+      document.getElementById('rightChapter').textContent = p2.chapter;
+      document.getElementById('rightBody').innerHTML = `
+        <h3>${p2.title}</h3>
+        <p>${p2.content}</p>
+        ${p2.quiz ? `<div class="box-quiz">${p2.quiz}</div>` : ''}
+      `;
+      document.getElementById('rightPageNum').textContent = "Trang " + (currentPage + 2);
+
+      document.getElementById('pageIndicator').textContent = `Trang ${currentPage + 1} - ${currentPage + 2} / ${NGUVAN12_TAP2_PAGES.length}`;
+      buildTocUI();
+    }
+
+    function buildTocUI() {
+      var container = document.getElementById('tocListContainer');
+      container.innerHTML = '';
+      NGUVAN12_TAP2_PAGES.forEach(function (item, idx) {
+        var el = document.createElement('div');
+        el.className = 'toc-item ' + (Math.floor(currentPage / 2) * 2 === idx ? 'active' : '');
+        el.innerHTML = `<strong>Bài ${idx + 1}:</strong> ${item.title}`;
+        el.addEventListener('click', function () {
+          currentPage = Math.floor(idx / 2) * 2;
+          renderFlipBook();
+          document.getElementById('tocSidebar').classList.remove('open');
+        });
+        container.appendChild(el);
+      });
+    }
+
+    // Events
+    document.getElementById('prevBtn').addEventListener('click', function () {
+      if (currentPage >= 2) { currentPage -= 2; renderFlipBook(); }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', function () {
+      if (currentPage + 2 < NGUVAN12_TAP2_PAGES.length) { currentPage += 2; renderFlipBook(); }
+    });
+
+    document.getElementById('firstPageBtn').addEventListener('click', function () {
+      currentPage = 0; renderFlipBook();
+    });
+
+    document.getElementById('lastPageBtn').addEventListener('click', function () {
+      currentPage = Math.floor((NGUVAN12_TAP2_PAGES.length - 1) / 2) * 2; renderFlipBook();
+    });
+
+    document.getElementById('toggleTocBtn').addEventListener('click', function () {
+      document.getElementById('tocSidebar').classList.toggle('open');
+    });
+
+    document.getElementById('closeTocBtn').addEventListener('click', function () {
+      document.getElementById('tocSidebar').classList.remove('open');
+    });
+
+    // Run Initial
+    renderFlipBook();
+  </script>
+</body>
+</html>

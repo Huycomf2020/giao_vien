@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flipbook Ngữ Văn 12 - Tập 1 | Thầy Phan Ngọc Huy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #02160e;
+      --bg-card: rgba(6, 44, 30, 0.92);
+      --border-color: rgba(16, 185, 129, 0.28);
+      --emerald-300: #6ee7b7;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --emerald-600: #059669;
+      --text-main: #f0fdf4;
+      --text-muted: #a7f3d0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(5, 150, 105, 0.15) 0%, transparent 50%),
+        linear-gradient(180deg, #021a11 0%, #010f09 100%);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Topbar Header */
+    .topbar {
+      background: rgba(3, 30, 20, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover { background: linear-gradient(135deg, var(--emerald-400), var(--emerald-500)); transform: translateY(-1px); }
+    .btn-secondary { background: rgba(6, 78, 59, 0.6); border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-secondary:hover { background: rgba(6, 78, 59, 0.9); }
+
+    /* Viewport Flipbook */
+    .viewport {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .book-container {
+      width: 100%;
+      max-width: 1180px;
+      height: 92%;
+      display: flex;
+      background: #064e3b;
+      border-radius: 12px;
+      border: 4px solid #047857;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page-spread {
+      flex: 1;
+      background: #fdfbf7;
+      color: #1e293b;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .page-spread.left {
+      border-right: 2px solid #e2e8f0;
+      box-shadow: inset -15px 0 20px rgba(0,0,0,0.05);
+    }
+
+    .page-spread.right {
+      box-shadow: inset 15px 0 20px rgba(0,0,0,0.05);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 6px;
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .page-body {
+      flex: 1;
+      margin-top: 14px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.02rem;
+      line-height: 1.8;
+      color: #1e293b;
+    }
+
+    .page-body h3 {
+      font-family: 'Inter', sans-serif;
+      color: #064e3b;
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--emerald-500);
+      padding-left: 10px;
+    }
+
+    .box-target {
+      background: rgba(6, 78, 59, 0.08);
+      border-left: 3px solid #059669;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.92rem;
+      font-style: italic;
+      font-family: 'Inter', sans-serif;
+      border-radius: 4px;
+    }
+
+    .box-quiz {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px dashed #10b981;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .page-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 8px;
+      margin-top: 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #064e3b;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Bottom Control Bar */
+    .bottombar {
+      background: rgba(3, 30, 20, 0.95);
+      border-top: 1px solid var(--border-color);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    /* Sidebar Mục Lục */
+    .toc-sidebar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -320px;
+      width: 320px;
+      background: rgba(3, 30, 20, 0.98);
+      border-right: 1px solid var(--border-color);
+      z-index: 50;
+      transition: left 0.3s ease;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.7);
+    }
+
+    .toc-sidebar.open { left: 0; }
+
+    .toc-item {
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .toc-item:hover, .toc-item.active {
+      background: rgba(16, 185, 129, 0.2);
+      color: #ffffff;
+      border-left: 3px solid var(--emerald-400);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <div class="topbar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="etextbook.html" class="btn btn-secondary">⬅️ Thư Viện Sách</a>
+      <button class="btn btn-secondary" id="toggleTocBtn">📑 Mục Lục Sách</button>
+      <div>
+        <h3 style="font-size: 1.1rem; color: #ffffff;">Sách Giáo Khoa Ngữ Văn 12 - Tập 1</h3>
+        <p style="font-size: 0.78rem; color: var(--emerald-300);">Bộ Sách Chuẩn GDPT 2018 • Biên soạn số bởi Thầy Phan Ngọc Huy</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <a href="https://drive.google.com/file/d/198I2CqdmUAQ-OyQoiIV2_eHL_tc-17Hw/view?usp=drive_link" target="_blank" class="btn btn-secondary">☁️ File Drive Gốc PDF</a>
+    </div>
+  </div>
+
+  <!-- Sidebar Mục Lục -->
+  <div class="toc-sidebar" id="tocSidebar">
+    <div style="display: flex; justify-content: space-between; align- items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+      <h4 style="color: var(--emerald-400); font-size: 1rem;">📑 Mục Lục Bài Học</h4>
+      <button id="closeTocBtn" style="background: none; border: none; color: #ffffff; font-size: 1.2rem; cursor: pointer;">✕</button>
+    </div>
+    <div id="tocListContainer" style="flex: 1; overflow-y: auto;"></div>
+  </div>
+
+  <!-- Viewport Flipbook 3D -->
+  <div class="viewport">
+    <div class="book-container">
+      <!-- Trang bên trái -->
+      <div class="page-spread left">
+        <div class="page-header">
+          <span>NGỮ VĂN 12 - TẬP 1</span>
+          <span id="leftChapter">Bài 1</span>
+        </div>
+        <div class="page-body" id="leftBody"></div>
+        <div class="page-footer">
+          <span id="leftPageNum">Trang 1</span>
+          <span>Bộ GD&ĐT • GDPT 2018</span>
+        </div>
+      </div>
+
+      <!-- Trang bên phải -->
+      <div class="page-spread right">
+        <div class="page-header">
+          <span>NGỮ VĂN 12 - TẬP 1</span>
+          <span id="rightChapter">Nội Dung Bài Học</span>
+        </div>
+        <div class="page-body" id="rightBody"></div>
+        <div class="page-footer">
+          <span>Tinh gọn bởi Huycomf</span>
+          <span id="rightPageNum">Trang 2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Controller -->
+  <div class="bottombar">
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-secondary" id="firstPageBtn">⏮ Trang Đầu</button>
+      <button class="btn" id="prevBtn">◀ Lật Trang Trước</button>
+    </div>
+    <span id="pageIndicator" style="font-weight: 700; color: var(--emerald-400); font-size: 0.95rem;">Trang 1 - 2 / 10</span>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn" id="nextBtn">Lật Trang Sau ▶</button>
+      <button class="btn btn-secondary" id="lastPageBtn">Trang Cuối ⏭</button>
+    </div>
+  </div>
+
+  <script>
+    // Database nội dung các bài học Ngữ Văn 12 Tập 1 chuẩn GDPT 2018
+    var NGUVAN12_TAP1_PAGES = [
+      {
+        chapter: "BÀI 1: KHÁT VỌNG TỰ DO VÀ LÝ TƯỞNG CÁCH MẠNG",
+        title: "Tuyên Ngôn Độc Lập (Hồ Chí Minh)",
+        content: `<strong>Hoàn cảnh ra đời:</strong> Ngày 2/9/1945 tại Quảng trường Ba Đình lịch sử, Chủ tịch Hồ Chí Minh đọc bản Tuyên ngôn Độc lập khai sinh ra nước Việt Nam Dân chủ Cộng hòa.<br><br>
+        <strong>Giá trị nội dung & Tư tưởng:</strong><br>
+        • Khẳng định quyền con người, quyền dân tộc bình đẳng, quyền sống, quyền tự do và quyền mưu cầu hạnh phúc bất khả xâm phạm.<br>
+        • Tố cáo tội ác man rợ của thực dân Pháp và khẳng định tư thế chủ động, ý chí kiên cường bảo vệ nền độc lập dân tộc.<br><br>
+        <strong>Nghệ thuật lập luận:</strong> Chặt chẽ, đanh thép, dẫn chứng xác thực, ngôn từ hùng hồn giàu sức thuyết phục.`,
+        target: "🎯 Mục tiêu: Phân tích giá trị lịch sử, tư tưởng nhân văn và nghệ thuật lập luận mẫu mực của văn chính luận Hồ Chí Minh.",
+        quiz: "💡 Câu hỏi suy ngẫm: Sức mạnh lập luận trong phần mở đầu của Tuyên ngôn Độc lập được tạo nên từ việc trích dẫn những bản tuyên ngôn nào?"
+      },
+      {
+        chapter: "BÀI 1: KHÁT VỌNG TỰ DO VÀ LÝ TƯỞNG CÁCH MẠNG",
+        title: "Nghệ Thuật Viết Văn Nghị Luận Chính Luận",
+        content: `<strong>Đặc điểm của văn bản chính luận:</strong><br><br>
+        1. <strong>Luận điểm rõ ràng:</strong> Thể hiện tư tưởng, quan điểm dứt khoát của người viết trước các vấn đề thời sự, chính trị, xã hội.<br>
+        2. <strong>Luận cứ & Dẫn chứng:</strong> Dẫn chứng lịch sử, thực tiễn khách quan, có tính xác thực cao và khả năng lay động lòng người.<br>
+        3. <strong>Sức mạnh của ngôn từ:</strong> Sử dụng các phép điệp, phép đối, câu khẳng định và giọng điệu hào hùng, đanh thép.`,
+        target: "🎯 Kỹ năng: Viết đoạn văn nghị luận chính luận bàn về tinh thần yêu nước và trách nhiệm công dân của thế hệ trẻ.",
+        quiz: "💡 Bài tập vận dụng: Nhận diện phép đối và điệp từ được sử dụng trong bản Tuyên ngôn Độc lập."
+      },
+      {
+        chapter: "BÀI 2: VẺ ĐẸP TÂM HỒN VÀ TÍNH CÁCH VIỆT NAM",
+        title: "Tây Tiến (Quang Dũng)",
+        content: `<strong>Cảm hứng lãng mạn & Tinh thần bi tráng:</strong><br>
+        • Hình ảnh thiên nhiên Tây Bắc vừa hùng vĩ, dữ dội, vừa thơ mộng, trữ tình.<br>
+        • Chân dung người lính Tây Tiến: Trí thức Hà thành kiên cường, gian khổ (<em>"đoàn binh không mọc tóc", "quân xanh màu lá"</em>) nhưng vẫn hào hoa, lãng mạn (<em>"mắt gửi mộng", "đêm mơ Hà Nội dáng kiều thơm"</em>).<br>
+        • Sự hi sinh bi tráng nơi biên cương nhưng được xoa dịu bởi khúc quân hành bất tử của dòng sông Mã.`,
+        target: "🎯 Mục tiêu: Cảm nhận bức tranh thiên nhiên Tây Bắc và tượng đài lãng mạn, bi tráng của người lính vệ quốc.",
+        quiz: "💡 Câu hỏi suy ngẫm: Phân tích ý nghĩa của hình ảnh 'sông Mã gầm lên khúc độc hành' ở cuối bài thơ."
+      },
+      {
+        chapter: "BÀI 2: VẺ ĐẸP TÂM HỒN VÀ TÍNH CÁCH VIỆT NAM",
+        title: "Đất Nước (Trích Trường ca 'Mặt đường khát vọng' - Nguyễn Khoa Điềm)",
+        content: `<strong>Tư tưởng cốt lõi: Đất Nước của Nhân Dân</strong><br><br>
+        • <strong>Đất Nước được cảm nhận toàn diện:</strong> Trên các phương diện chiều sâu văn hóa dân gian, chiều dài lịch sử và chiều rộng không gian địa lý.<br>
+        • <strong>Định nghĩa mới mẻ:</strong> Đất Nước không xa xôi mà kết tinh trong máu thịt, trong truyền thống đoàn kết, lao động và chiến đấu của vô vàn những con người vô danh.<br>
+        • <strong>Chất liệu văn hóa dân gian:</strong> Ca dao, thần thoại, phong tục tập quán được vận dụng sáng tạo, trữ tình, sâu lắng.`,
+        target: "🎯 Mục tiêu: Khơi dậy niềm tự hào dân tộc và ý thức trách nhiệm của tuổi trẻ đối với quê hương đất nước.",
+        quiz: "💡 Câu hỏi suy ngẫm: Chỉ ra các chất liệu ca dao, thần thoại được tác giả sử dụng trong đoạn thơ 'Đất Nước là nơi em đến trường'."
+      },
+      {
+        chapter: "BÀI 3: NHỮNG TRẢI NGHIỆM VÀ KHÁT VỌNG SỐNG",
+        title: "Người Đàn Ông Cô Độc Giữa Rừng (Trích 'Đất rừng phương Nam' - Đoàn Giỏi)",
+        content: `<strong>Vẻ đẹp thiên nhiên & Con người Nam Bộ:</strong><br>
+        • Bức tranh thiên nhiên rừng tràm U Minh hoang sơ, kì vĩ, tràn đầy sức sống.<br>
+        • Nhân vật chú Võ Tòng: Hình ảnh đại diện cho tính cách kiên cường, tự do, phóng khoáng, thẳng thắn và giàu tình nghĩa của người dân vùng đất phương Nam.<br>
+        • Ngôn ngữ trần thuật sinh động, đậm đà màu sắc địa phương Nam Bộ.`,
+        target: "🎯 Mục tiêu: Phân tích nghệ thuật xây dựng nhân vật và ngôn ngữ trần thuật giàu chất hội họa, địa danh học.",
+        quiz: "💡 Câu hỏi suy ngẫm: Nêu cảm nhận của em về nhân vật Võ Tòng qua chi tiết chế tạo tên nỏ đánh địch."
+      },
+      {
+        chapter: "BÀI 3: NHỮNG TRẢI NGHIỆM VÀ KHÁT VỌNG SỐNG",
+        title: "Kỹ Năng Viết Bài Nghị Luận Văn Học Về Một Tác Phẩm Thơ",
+        content: `<strong>Cấu trúc bài phân tích thơ chuẩn GDPT 2018:</strong><br><br>
+        1. <strong>Mở bài:</strong> Giới thiệu tác giả, tác phẩm, hoàn cảnh sáng tác và luận đề chính.<br>
+        2. <strong>Thân bài:</strong><br>
+        - Phân tích chi tiết nội dung cảm xúc qua từng khổ thơ / đoạn thơ.<br>
+        - Bóc tách nghệ thuật: Hình ảnh, nhịp điệu, từ ngữ, phép điệp, phép đối.<br>
+        - Đánh giá đóng góp độc đáo của tác giả.<br>
+        3. <strong>Kết bài:</strong> Khẳng định giá trị tác phẩm và ấn tượng cá nhân.`,
+        target: "🎯 Kỹ năng: Viết bài văn nghị luận phân tích, đánh giá một bài thơ / đoạn thơ ngắn.",
+        quiz: "💡 Bài tập thực hành: Viết đoạn văn 200 chữ phân tích đoạn thơ 'Tây Tiến người đi không hẹn ước'."
+      },
+      {
+        chapter: "BÀI 4: NHÌN LẠI BẢN THÂN VÀ THẾ GIỚI XUNG QUANH",
+        title: "Kỹ Năng Viết Bài Nghị Luận Xã Hội Về Một Vấn Đề Tư Tưởng Đạo Lý",
+        content: `<strong>Quy trình triển khai bài nghị luận xã hội (600 chữ):</strong><br><br>
+        • <strong>Giải thích:</strong> Làm rõ khái niệm cốt lõi của tư tưởng, thông điệp bài học.<br>
+        • <strong>Phân tích & Chứng minh:</strong> Vì sao tư tưởng đó đúng/sai? Dẫn chứng thực tế từ các nhân vật truyền cảm hứng, sự kiện đời sống.<br>
+        • <strong>Bàn luận mở rộng:</strong> Phản biện các góc nhìn phiến diện, phê phán lối sống tiêu cực, hời hợt.<br>
+        • <strong>Rút ra bài học:</strong> Bài học nhận thức và hành động cụ thể cho bản thân.`,
+        target: "🎯 Kỹ năng: Rèn luyện tư duy phản biện và khả năng diễn đạt lập luận sắc bén, thuyết phục.",
+        quiz: "💡 Luyện viết: Lập dàn ý bài văn nghị luận xã hội bàn về ý nghĩa của tinh thần tự học đối với học sinh THPT."
+      },
+      {
+        chapter: "ÔN TẬP HỌC KỲ I - NGỮ VĂN 12",
+        title: "Tổng Ôn Kiến Thức Đọc Hiểu & Viết Đề Thi Chuẩn GDPT 2018",
+        content: `<strong>Cấu trúc đề thi Tốt nghiệp THPT Ngữ Văn mới:</strong><br><br>
+        1. <strong>Phần I: Đọc hiểu (4.0 điểm):</strong><br>
+        - Ngữ liệu ngoài SGK (Văn bản nghệ thuật, văn bản nghị luận hoặc văn bản thông tin).<br>
+        - 4 câu hỏi nhận biết, thông hiểu, vận dụng.<br><br>
+        2. <strong>Phần II: Viết (6.0 điểm):</strong><br>
+        - Viết đoạn văn nghị luận xã hội (2.0 điểm).<br>
+        - Viết bài văn nghị luận văn học (4.0 điểm).`,
+        target: "🎯 Đạt được: Nắm vững cấu trúc đề thi, kỹ năng phân tích ngữ liệu ngoài SGK và phân bổ thời gian làm bài hợp lý.",
+        quiz: "💡 Luyện tập ngay: Mở QuizScanner Pro hoặc Sổ tay ghi chú để thực hành viết đề minh họa!"
+      }
+    ];
+
+    var currentPage = 0;
+
+    function renderFlipBook() {
+      var p1 = NGUVAN12_TAP1_PAGES[currentPage] || {
+        chapter: "KẾT THÚC",
+        title: "Trang Cuối",
+        content: "Bạn đã hoàn thành các bài học trong Sách Giáo Khoa Ngữ Văn 12 - Tập 1.",
+        target: "",
+        quiz: ""
+      };
+
+      var p2 = NGUVAN12_TAP1_PAGES[currentPage + 1] || {
+        chapter: "GHI CHÚ",
+        title: "Sổ Tay Đọc Hiểu",
+        content: "Học sinh tự rèn luyện kỹ năng đọc hiểu văn bản ngoài SGK và viết đoạn văn nghị luận ngắn.",
+        target: "",
+        quiz: ""
+      };
+
+      // Trang trái
+      document.getElementById('leftChapter').textContent = p1.chapter;
+      document.getElementById('leftBody').innerHTML = `
+        <h3>${p1.title}</h3>
+        <p>${p1.content}</p>
+        ${p1.target ? `<div class="box-target">${p1.target}</div>` : ''}
+      `;
+      document.getElementById('leftPageNum').textContent = "Trang " + (currentPage + 1);
+
+      // Trang phải
+      document.getElementById('rightChapter').textContent = p2.chapter;
+      document.getElementById('rightBody').innerHTML = `
+        <h3>${p2.title}</h3>
+        <p>${p2.content}</p>
+        ${p2.quiz ? `<div class="box-quiz">${p2.quiz}</div>` : ''}
+      `;
+      document.getElementById('rightPageNum').textContent = "Trang " + (currentPage + 2);
+
+      document.getElementById('pageIndicator').textContent = `Trang ${currentPage + 1} - ${currentPage + 2} / ${NGUVAN12_TAP1_PAGES.length}`;
+      buildTocUI();
+    }
+
+    function buildTocUI() {
+      var container = document.getElementById('tocListContainer');
+      container.innerHTML = '';
+      NGUVAN12_TAP1_PAGES.forEach(function (item, idx) {
+        var el = document.createElement('div');
+        el.className = 'toc-item ' + (Math.floor(currentPage / 2) * 2 === idx ? 'active' : '');
+        el.innerHTML = `<strong>Bài ${idx + 1}:</strong> ${item.title}`;
+        el.addEventListener('click', function () {
+          currentPage = Math.floor(idx / 2) * 2;
+          renderFlipBook();
+          document.getElementById('tocSidebar').classList.remove('open');
+        });
+        container.appendChild(el);
+      });
+    }
+
+    // Events
+    document.getElementById('prevBtn').addEventListener('click', function () {
+      if (currentPage >= 2) { currentPage -= 2; renderFlipBook(); }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', function () {
+      if (currentPage + 2 < NGUVAN12_TAP1_PAGES.length) { currentPage += 2; renderFlipBook(); }
+    });
+
+    document.getElementById('firstPageBtn').addEventListener('click', function () {
+      currentPage = 0; renderFlipBook();
+    });
+
+    document.getElementById('lastPageBtn').addEventListener('click', function () {
+      currentPage = Math.floor((NGUVAN12_TAP1_PAGES.length - 1) / 2) * 2; renderFlipBook();
+    });
+
+    document.getElementById('toggleTocBtn').addEventListener('click', function () {
+      document.getElementById('tocSidebar').classList.toggle('open');
+    });
+
+    document.getElementById('closeTocBtn').addEventListener('click', function () {
+      document.getElementById('tocSidebar').classList.remove('open');
+    });
+
+    // Run Initial
+    renderFlipBook();
+  </script>
+</body>
+</html>
