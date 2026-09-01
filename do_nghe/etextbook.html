@@ -254,7 +254,7 @@
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
-    /* Filter Controls Grid (Cắt giảm bộ lọc nhà xuất bản thừa, tập trung vào Khối lớp, Môn học, Loại tài liệu) */
+    /* Filter Controls Grid */
     .filter-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -411,7 +411,7 @@
     }
 
     /* ============================================================
-       HỆ THỐNG FLIPBOOK 3D (LẬT SÁCH 2 TRANG HIỆN ĐẠI)
+       HỆ THỐNG FLIPBOOK 3D ĐA NĂNG (2 CHẾ ĐỘ: 3D FLIP VÀ PDF DRIVE)
        ============================================================ */
     .flipbook-modal {
       position: fixed;
@@ -419,8 +419,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(1, 15, 10, 0.94);
-      backdrop-filter: blur(12px);
+      background: rgba(1, 15, 10, 0.96);
+      backdrop-filter: blur(14px);
       z-index: 1000;
       display: none;
       flex-direction: column;
@@ -437,20 +437,47 @@
       gap: 12px;
     }
 
+    .view-mode-toggle {
+      display: flex;
+      background: rgba(2, 38, 26, 0.9);
+      border: 1px solid var(--emerald-400);
+      border-radius: 20px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .view-mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .view-mode-btn.active {
+      background: var(--emerald-500);
+      color: #02160e;
+    }
+
     .flipbook-viewport {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
       perspective: 2000px;
-      overflow: auto;
+      overflow: hidden;
+      position: relative;
     }
 
+    /* 3D Flipbook Container */
     .flipbook-book-container {
       width: 100%;
-      max-width: 1060px;
-      height: 680px;
+      max-width: 1100px;
+      height: 90%;
       display: flex;
       background: #064e3b;
       border-radius: 12px;
@@ -458,19 +485,14 @@
       border: 4px solid #047857;
       position: relative;
       overflow: hidden;
-    }
-
-    @media (max-width: 900px) {
-      .flipbook-book-container {
-        height: 520px;
-      }
+      transition: all 0.3s ease;
     }
 
     .flip-page-spread {
       flex: 1;
       background: #fdfbf7;
       color: #1a202c;
-      padding: 30px 36px;
+      padding: 28px 32px;
       display: flex;
       flex-direction: column;
       position: relative;
@@ -492,7 +514,7 @@
       justify-content: space-between;
       border-bottom: 1px solid #cbd5e1;
       padding-bottom: 6px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-size: 0.8rem;
       color: #64748b;
       font-weight: 600;
@@ -502,7 +524,7 @@
     .flip-page-body {
       flex: 1;
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       line-height: 1.8;
       color: #1e293b;
     }
@@ -510,19 +532,37 @@
     .flip-page-body h3 {
       font-family: 'Inter', sans-serif;
       color: #064e3b;
-      font-size: 1.3rem;
-      margin-bottom: 12px;
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+      border-left: 4px solid var(--emerald-500);
+      padding-left: 10px;
     }
 
     .flip-page-footer {
       border-top: 1px solid #e2e8f0;
       padding-top: 8px;
-      margin-top: 16px;
+      margin-top: 14px;
       display: flex;
       justify-content: space-between;
       font-size: 0.82rem;
       font-weight: 700;
       color: #064e3b;
+    }
+
+    /* PDF Viewer Container */
+    .pdf-viewer-container {
+      width: 100%;
+      height: 100%;
+      display: none;
+      background: #021a11;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .pdf-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
 
     .flipbook-toolbar-bottom {
@@ -531,9 +571,44 @@
       padding: 10px 24px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 16px;
+      justify-content: space-between;
       flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* Table of contents sidebar */
+    .toc-sidebar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -320px;
+      width: 320px;
+      background: rgba(3, 30, 20, 0.98);
+      border-right: 1px solid var(--border-color);
+      z-index: 50;
+      transition: left 0.3s ease;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.7);
+    }
+
+    .toc-sidebar.open { left: 0; }
+
+    .toc-item {
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .toc-item:hover, .toc-item.active {
+      background: rgba(16, 185, 129, 0.2);
+      color: #ffffff;
+      border-left: 3px solid var(--emerald-400);
     }
 
     /* Footer */
@@ -617,7 +692,7 @@
               Kho Sách Giáo Khoa Điện Tử Chuẩn GDPT 2018 (Google Drive)
             </h3>
             <p style="font-size: 0.86rem; color: #dbeafe;">
-              Được sắp xếp chuẩn hóa theo từng khối lớp và môn học từ nguồn Google Drive của Thầy Phan Ngọc Huy.
+              Được đồng bộ và sắp xếp chuẩn hóa từ nguồn Google Drive của Thầy Phan Ngọc Huy.
             </p>
           </div>
         </div>
@@ -631,7 +706,7 @@
         </div>
       </div>
 
-      <!-- Lọc thật kỹ theo Khối Lớp, Môn Học, Thể Loại Tài Liệu -->
+      <!-- Lọc chi tiết theo Khối Lớp, Môn Học, Thể Loại -->
       <div class="glass-panel">
         <div class="filter-grid">
           <div>
@@ -686,14 +761,14 @@
           <input type="text" id="omniSearchInput" class="omni-search-input" placeholder="Tìm kiếm nhanh tên sách, chuyên đề, bài học, tác giả...">
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
           <span style="font-size: 0.9rem; color: var(--emerald-300);" id="bookCountSummary">Đang hiển thị 16 đầu sách chuẩn</span>
           <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.82rem;" id="resetFilterBtn">🔄 Đặt Lại Bộ Lọc</button>
         </div>
 
         <!-- Books Grid Container -->
         <div class="books-grid" id="booksGridContainer">
-          <!-- Dynamically populated books with Flipbook action -->
+          <!-- Dynamically populated books -->
         </div>
 
       </div>
@@ -802,17 +877,35 @@
   </main>
 
   <!-- ============================================================
-       MODAL FLIPBOOK 3D LẬT SÁCH 2 TRANG
+       MODAL FLIPBOOK 3D ĐA NĂNG (CHẾ ĐỘ LẬT 2 TRANG & PDF GỐC)
        ============================================================ -->
   <div class="flipbook-modal" id="flipbookModal">
+    
+    <!-- Table of contents drawer -->
+    <div class="toc-sidebar" id="tocSidebar">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+        <h4 style="color: var(--emerald-400); font-size: 1rem;">📑 Mục Lục Bài Học</h4>
+        <button id="closeTocBtn" style="background: none; border: none; color: #ffffff; font-size: 1.2rem; cursor: pointer;">✕</button>
+      </div>
+      <div id="tocListContainer" style="flex: 1; overflow-y: auto;">
+        <!-- Dynamic TOC items -->
+      </div>
+    </div>
+
     <!-- Topbar -->
     <div class="flipbook-topbar">
       <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 1.6rem;">📖</span>
+        <button class="btn btn-secondary" id="toggleTocBtn" style="padding: 6px 12px; font-size: 0.85rem;" title="Mục lục">📑 Mục Lục</button>
         <div>
           <div style="font-weight: 800; color: #ffffff; font-size: 1.1rem;" id="flipBookTitle">Đang mở Sách Giáo Khoa...</div>
-          <div style="font-size: 0.78rem; color: var(--emerald-300);" id="flipBookSubtitle">Bộ Sách Chuẩn GDPT 2018 • Chế độ Flipbook 2 Trang</div>
+          <div style="font-size: 0.78rem; color: var(--emerald-300);" id="flipBookSubtitle">Bộ Sách Chuẩn GDPT 2018 • Tinh gọn nội dung Số Thầy Phan Ngọc Huy</div>
         </div>
+      </div>
+
+      <!-- Chuyển đổi giữa Chế độ Lật Sách 3D và Xem PDF Gốc từ Google Drive -->
+      <div class="view-mode-toggle">
+        <button class="view-mode-btn active" id="btnModeFlip">📖 Lật Sách 3D</button>
+        <button class="view-mode-btn" id="btnModePdf">📑 Xem PDF Gốc (Drive)</button>
       </div>
 
       <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -825,20 +918,22 @@
 
     <!-- 3D Flipbook Viewport -->
     <div class="flipbook-viewport">
-      <div class="flipbook-book-container">
+      
+      <!-- Mode 1: 3D Two-Page Spread Flipbook -->
+      <div class="flipbook-book-container" id="flipBook3dContainer">
         
         <!-- Left Page -->
         <div class="flip-page-spread left-page" id="flipLeftPage">
           <div class="flip-page-header">
             <span id="flipLeftBookName">Sách Giáo Khoa Chuẩn</span>
-            <span id="flipLeftChapter">Chương 1</span>
+            <span id="flipLeftChapter">Trang 1</span>
           </div>
           <div class="flip-page-body" id="flipLeftBody">
-            <!-- Dynamic page text -->
+            <!-- Dynamic left page text -->
           </div>
           <div class="flip-page-footer">
             <span id="flipLeftPageNum">Trang 1</span>
-            <span>BGD&ĐT • GDPT 2018</span>
+            <span>Sách của BGD&ĐT</span>
           </div>
         </div>
 
@@ -846,31 +941,41 @@
         <div class="flip-page-spread right-page" id="flipRightPage">
           <div class="flip-page-header">
             <span id="flipRightBookName">Sách Giáo Khoa Chuẩn</span>
-            <span id="flipRightChapter">Bài Học</span>
+            <span id="flipRightChapter">Trang 2</span>
           </div>
           <div class="flip-page-body" id="flipRightBody">
-            <!-- Dynamic page text -->
+            <!-- Dynamic right page text -->
           </div>
           <div class="flip-page-footer">
-            <span>Bản quyền số © Huycomf</span>
+            <span>Tinh gọn nội dung số bởi Huycomf</span>
             <span id="flipRightPageNum">Trang 2</span>
           </div>
         </div>
 
       </div>
+
+      <!-- Mode 2: Embedded Google Drive PDF Viewer -->
+      <div class="pdf-viewer-container" id="pdfViewerContainer">
+        <iframe id="pdfViewerIframe" class="pdf-iframe" src="" title="Google Drive PDF Reader"></iframe>
+      </div>
+
     </div>
 
     <!-- Bottom Navigation Bar -->
     <div class="flipbook-toolbar-bottom">
-      <button class="btn btn-secondary" id="flipFirstPageBtn" style="padding: 6px 14px; font-size: 0.85rem;">⏮ Trang Đầu</button>
-      <button class="btn btn-primary" id="flipPrevPageBtn" style="padding: 8px 18px; font-size: 0.9rem;">◀ Lật Trang Trước</button>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn btn-secondary" id="flipFirstPageBtn" style="padding: 6px 14px; font-size: 0.85rem;">⏮ Trang Đầu</button>
+        <button class="btn btn-primary" id="flipPrevPageBtn" style="padding: 8px 18px; font-size: 0.9rem;">◀ Lật Trang Trước</button>
+      </div>
       
-      <span style="font-weight: 700; color: #f0fdf4; font-size: 0.95rem; min-width: 140px; text-align: center;" id="flipPageIndicator">
-        Trang 1 - 2 / 120
+      <span style="font-weight: 700; color: #f0fdf4; font-size: 0.95rem; min-width: 160px; text-align: center;" id="flipPageIndicator">
+        Trang 1 - 2 / 20
       </span>
 
-      <button class="btn btn-primary" id="flipNextPageBtn" style="padding: 8px 18px; font-size: 0.9rem;">Lật Trang Sau ▶</button>
-      <button class="btn btn-secondary" id="flipLastPageBtn" style="padding: 6px 14px; font-size: 0.85rem;">Trang Cuối ⏭</button>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn btn-primary" id="flipNextPageBtn" style="padding: 8px 18px; font-size: 0.9rem;">Lật Trang Sau ▶</button>
+        <button class="btn btn-secondary" id="flipLastPageBtn" style="padding: 6px 14px; font-size: 0.85rem;">Trang Cuối ⏭</button>
+      </div>
     </div>
   </div>
 
@@ -878,7 +983,7 @@
   <footer class="app-footer">
     <div class="footer-content">
       <div class="footer-author">
-        🚀 <span>Made by Huycomf</span> • eTextbook Flipbook 4.0 - Bộ Sách Chuẩn GDPT 2018
+        🚀 <span>Made by Huycomf</span> • eTextbook Flipbook 4.0 - Bộ Sách Chuẩn của bộ GD&ĐT năm 2026
       </div>
       <div style="font-size: 0.85rem; color: var(--text-muted);">
         Phát triển bởi <strong>Thầy Phan Ngọc Huy</strong> - Trường THPT Lộc Ninh, TP. Đồng Nai
@@ -910,63 +1015,63 @@
     // Google Drive Base URL
     var DRIVE_BASE = "https://drive.google.com/drive/folders/1yhSjb4sMRjAx14GLspPT1jRUZLDokXSM";
 
-    // Danh sách toàn bộ các đầu sách theo 1 bộ sách chuẩn duy nhất của Bộ GD&ĐT
+    // Danh sách toàn bộ các đầu sách kèm đầy đủ 10 - 20 bài học thực tế cho từng môn
     var UNIFIED_BOOKS_DATABASE = [
-      // LỚP 12
+      // TOÁN 12 - TẬP 1
       {
         id: "toan-12-t1",
         name: "Toán Học 12 - Tập 1",
         grade: "12",
         subject: "toan",
         type: "sgk",
-        desc: "Ứng dụng đạo hàm khảo sát hàm số, Vectơ và hệ tọa độ Oxyz trong không gian, Các số đặc trưng đo mức độ phân tán của mẫu số liệu ghép nhóm.",
+        desc: "Khảo sát sự biến thiên và vẽ đồ thị hàm số, Vectơ và hệ tọa độ trong không gian Oxyz, Các số đặc trưng đo mức độ phân tán.",
         icon: "📐",
         driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương I: Ứng Dụng Đạo Hàm Khảo Sát Hàm Số", content: "Tính đơn điệu và cực trị của hàm số. Giá trị lớn nhất và nhỏ nhất của hàm số trên một đoạn. Đường tiệm cận đứng, tiệm cận ngang và tiệm cận xiên của đồ thị hàm số." },
-          { title: "Chương II: Vectơ và Hệ Tọa Độ Trong Không Gian", content: "Vectơ trong không gian 3 chiều. Hệ trục tọa độ Oxyz. Tích vô hướng của hai vectơ và ứng dụng tính góc, khoảng cách." }
+        pages: [
+          {
+            title: "Bài 1: Tính Đơn Điệu và Cực Trị Của Hàm Số",
+            content: "Ký hiệu K là một khoảng, đoạn hoặc nửa khoảng. Giả sử hàm số y = f(x) có đạo hàm trên K.<br><br>• Nếu f'(x) > 0 với mọi x thuộc K thì hàm số f(x) đồng biến trên K.<br>• Nếu f'(x) < 0 với mọi x thuộc K thì hàm số f(x) nghịch biến trên K.<br><br><strong>Quy tắc tìm cực trị:</strong><br>1. Tìm tập xác định D.<br>2. Tính đạo hàm f'(x). Tìm các điểm x_i mà tại đó f'(x_i) = 0 hoặc đạo hàm không tồn tại.<br>3. Lập bảng biến thiên và kết luận điểm cực đại, cực tiểu.",
+            goal: "Nắm vững định lý mở rộng về dấu đạo hàm và quy tắc xét cực trị hàm bậc 3, hàm phân thức."
+          },
+          {
+            title: "Bài 2: Giá Trị Lớn Nhất và Nhỏ Nhất Của Hàm Số",
+            content: "Cho hàm số y = f(x) xác định trên tập hợp D.<br><br>• Số M được gọi là giá trị lớn nhất (GTLN) của hàm số f(x) trên D nếu f(x) ≤ M với mọi x ∈ D và tồn tại x_0 ∈ D sao cho f(x_0) = M. Kí hiệu: M = max f(x).<br>• Số m được gọi là giá trị nhỏ nhất (GTNN) của f(x) trên D nếu f(x) ≥ m với mọi x ∈ D và tồn tại x_0 sao cho f(x_0) = m. Kí hiệu: m = min f(x).<br><br><strong>Cách tìm GTLN, GTNN trên đoạn [a; b]:</strong> Tính f(a), f(b) và f(x_i) tại các điểm đạo hàm bằng 0, sau đó chọn số lớn nhất và nhỏ nhất.",
+            goal: "Giải quyết các bài toán thực tế tối ưu hóa chi phí, diện tích và thể tích hình học."
+          },
+          {
+            title: "Bài 3: Đường Tiệm Cận Của Đồ Thị Hàm Số",
+            content: "<strong>1. Tiệm cận ngang:</strong> Đường thẳng y = y_0 được gọi là tiệm cận ngang của đồ thị hàm số y = f(x) nếu lim f(x) = y_0 khi x → +∞ hoặc x → -∞.<br><br><strong>2. Tiệm cận đứng:</strong> Đường thẳng x = x_0 được gọi là tiệm cận đứng nếu ít nhất một trong các điều kiện sau thỏa mãn: lim f(x) = ±∞ khi x → x_0^+ hoặc x → x_0^-.<br><br><strong>3. Tiệm cận xiên:</strong> Đường thẳng y = ax + b (a ≠ 0) là tiệm cận xiên nếu lim [f(x) - (ax + b)] = 0 khi x → ±∞.",
+            goal: "Nhận dạng nhanh các đường tiệm cận từ bảng biến thiên và biểu thức hàm số phân thức hữu tỉ."
+          },
+          {
+            title: "Bài 4: Khảo Sát Sự Biến Thiên và Vẽ Đồ Thị",
+            content: "<strong>Sơ đồ khảo sát hàm số tổng quát:</strong><br>Bước 1: Tìm tập xác định. Xét tính chẵn, lẻ, tuần hoàn (nếu có).<br>Bước 2: Sự biến thiên:<br>- Tìm đạo hàm f'(x), tìm nghiệm f'(x)=0.<br>- Tìm các giới hạn tại vô cực và các đường tiệm cận.<br>- Lập bảng biến thiên.<br>Bước 3: Vẽ đồ thị: Tìm giao điểm với trục tung, trục hoành và các điểm đặc biệt.",
+            goal: "Vẽ thành thạo đồ thị hàm số bậc ba y = ax³ + bx² + cx + d và hàm phân thức bậc 1 / bậc 1."
+          },
+          {
+            title: "Bài 5: Vectơ Trong Không Gian 3 Chiều",
+            content: "Vectơ trong không gian là một đoạn thẳng có hướng. Các quy tắc vectơ:<br>• Quy tắc ba điểm: Vectơ AB + Vectơ BC = Vectơ AC.<br>• Quy tắc hình bình hành: Vectơ AB + Vectơ AD = Vectơ AC.<br>• Quy tắc hình hộp: Vectơ AB + Vectơ AD + Vectơ AA' = Vectơ AC'.<br><br><strong>Tích vô hướng:</strong> Vectơ a . Vectơ b = |a| . |b| . cos(a, b). Hai vectơ vuông góc khi và chỉ khi tích vô hướng bằng 0.",
+            goal: "Biểu diễn vectơ trong không gian và chứng minh quan hệ vuông góc giữa các đường thẳng."
+          },
+          {
+            title: "Bài 6: Hệ Trục Tọa Độ Oxyz Trong Không Gian",
+            content: "Trong không gian, hệ tọa độ Oxyz gồm 3 trục Ox, Oy, Oz vuông góc từng đôi một với các vectơ đơn vị i, j, k.<br><br>• Tọa độ điểm M(x; y; z) ⇔ Vectơ OM = x.i + y.j + z.k.<br>• Tọa độ vectơ u = (x; y; z).<br>• Tọa độ trung điểm I của AB: x_I = (x_A + x_B)/2, y_I = (y_A + y_B)/2, z_I = (z_A + z_B)/2.<br>• Tọa độ trọng tâm tam giác G: x_G = (x_A + x_B + x_C)/3.",
+            goal: "Xác định tọa độ điểm, vectơ, tính độ dài đoạn thẳng và góc giữa hai vectơ."
+          },
+          {
+            title: "Bài 7: Biểu Thức Tọa Độ Của Tích Vô Hướng",
+            content: "Cho hai vectơ u = (x_1; y_1; z_1) và v = (x_2; y_2; z_2):<br>• u . v = x_1.x_2 + y_1.y_2 + z_1.z_2.<br>• Độ dài vectơ: |u| = √(x_1² + y_1² + z_1²).<br>• Khoảng cách giữa 2 điểm AB: AB = √[(x_B - x_A)² + (y_B - y_A)² + (z_B - z_A)²].<br>• cos(u, v) = (x_1.x_2 + y_1.y_2 + z_1.z_2) / [√(x_1² + y_1² + z_1²) . √(x_2² + y_2² + z_2²)].",
+            goal: "Vận dụng công thức tọa độ để tính khoảng cách và góc giữa hai đường thẳng trong không gian."
+          },
+          {
+            title: "Bài 8: Khoảng Biến Thiên và Khoảng Tứ Phân Vị Của Mẫu Số Liệu Ghép Nhóm",
+            content: "Mẫu số liệu ghép nhóm giúp tóm tắt các tập dữ liệu lớn.<br>• Khoảng biến thiên: R = x_max - x_min.<br>• Khoảng tứ phân vị: ΔQ = Q_3 - Q_1.<br>• Ý nghĩa: Đo mức độ phân tán của nửa giữa của mẫu số liệu, không bị ảnh hưởng bởi các giá trị bất thường (outliers).",
+            goal: "Tính toán thành thạo các số đặc trưng đo độ phân tán để đánh giá độ đồng đều của học sinh."
+          }
         ]
       },
-      {
-        id: "toan-12-t2",
-        name: "Toán Học 12 - Tập 2",
-        grade: "12",
-        subject: "toan",
-        type: "sgk",
-        desc: "Nguyên hàm & Tích phân, Phương pháp tọa độ trong không gian (Mặt phẳng, Đường thẳng, Mặt cầu), Xác suất có điều kiện và công thức Bayes.",
-        icon: "∫",
-        driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương IV: Nguyên Hàm và Tích Phân", content: "Khái niệm nguyên hàm, các phương pháp tính nguyên hàm từng phần và đổi biến số. Ứng dụng tích phân tính diện tích hình phẳng và thể tích khối tròn xoay." },
-          { title: "Chương VI: Xác Suất Có Điều Kiện", content: "Xác suất có điều kiện, định lí nhân xác suất, công thức xác suất toàn phần và công thức Bayes ứng dụng trong thực tiễn." }
-        ]
-      },
-      {
-        id: "toan-12-cd",
-        name: "Chuyên Đề Học Tập Toán 12",
-        grade: "12",
-        subject: "toan",
-        type: "chuyende",
-        desc: "Biến ngẫu nhiên rời rạc và các số đặc trưng, Ứng dụng toán học giải quyết bài toán quy hoạch tuyến tính và tối ưu hóa.",
-        icon: "📊",
-        driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chuyên Đề 1: Quy Hoạch Tuyến Tính", content: "Bài toán tối ưu hóa chi phí sản xuất, xây dựng hệ bất phương trình bậc nhất hai ẩn và miền nghiệm đa giác." }
-        ]
-      },
-      {
-        id: "van-12-t1",
-        name: "Ngữ Văn 12 - Tập 1",
-        grade: "12",
-        subject: "van",
-        type: "sgk",
-        desc: "Phong cách cổ điển và hiện đại trong văn học, Thơ trữ tình cách mạng, Kịch bản văn học và rèn luyện kỹ năng viết bài nghị luận xã hội 600 chữ.",
-        icon: "📖",
-        driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Bài 1: Khát Vọng Tự Do và Lý Tưởng Cách Mạng", content: "Đọc hiểu văn bản thơ ca thời kỳ kháng chiến, nghệ thuật xây dựng hình tượng người lính và ngôn từ thơ giàu hình ảnh." }
-        ]
-      },
+
+      // TIẾNG ANH 12
       {
         id: "anh-12-gs",
         name: "Tiếng Anh 12 - Global Success",
@@ -976,163 +1081,189 @@
         desc: "Life Stories, Urbanisation, The Green Movement, Artificial Intelligence, Lifelong Learning and Future Careers.",
         icon: "🌐",
         driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Unit 1: Life Stories of Inspirational Figures", content: "Vocabulary on achievements, achievements and contributions to society. Grammar: Past Simple vs. Past Continuous with When/While." }
+        pages: [
+          {
+            title: "Unit 1: Life Stories of Inspiring Figures",
+            content: "<strong>Vocabulary:</strong><br>• Achievement (n): Thành tựu, thành tích.<br>• Devote to (v): Cống hiến hết mình cho.<br>• Inspire (v): Truyền cảm hứng mạnh mẽ.<br>• Visionary (adj): Có tầm nhìn xa trông rộng.<br><br><strong>Grammar Focus:</strong><br>Past Simple vs. Past Continuous with When/While.<br>Example: <em>While Uncle Ho was working abroad, he always thought of his homeland.</em>",
+            goal: "Master narrative tenses to write biographies of influential historical personalities."
+          },
+          {
+            title: "Unit 2: A Diversity of Cultures and Traditions",
+            content: "<strong>Reading Comprehension:</strong><br>Cultural diversity strengthens global communities. Preserving ethnic traditions while embracing modernity fosters mutual respect and sustainable cultural heritage tourism.<br><br><strong>Language Points:</strong><br>Articles: A, An, The and Zero Article with cultural practices, geographical names and unique institutions.",
+            goal: "Discuss cultural customs, etiquette and traditional festivals with confidence."
+          },
+          {
+            title: "Unit 3: Green Living and Sustainable Future",
+            content: "<strong>Key Concepts:</strong><br>• Carbon footprint: Lượng phát thải khí nhà kính.<br>• Renewable energy: Năng lượng tái tạo (gió, mặt trời, thủy triều).<br>• Eco-friendly lifestyle: Lối sống thân thiện với môi trường.<br><br><strong>Grammar:</strong> Relative clauses (Defining vs. Non-defining relative clauses with which, who, that, where, whose).",
+            goal: "Express environmental solutions and present green community initiatives."
+          },
+          {
+            title: "Unit 4: Urbanisation and Megacities",
+            content: "<strong>Discussion Topics:</strong><br>Rapid urbanisation causes overcrowding, housing shortages and traffic congestion, but also offers greater access to quality education, healthcare and high-tech career opportunities.<br><br><strong>Writing Task:</strong> Writing an essay discussing the advantages and disadvantages of living in smart cities.",
+            goal: "Analyze socioeconomic trends and propose solutions for smart urban planning."
+          },
+          {
+            title: "Unit 5: Artificial Intelligence in Modern Education",
+            content: "<strong>Focus:</strong><br>How GenAI transforms interactive classrooms, personalized tutoring and automated exam grading while ensuring academic integrity.<br><br><strong>Vocabulary:</strong> Machine learning, Algorithm, Automation, Prompt engineering, Digital transformation.",
+            goal: "Demonstrate AI literacy and debate ethical considerations of AI in society."
+          },
+          {
+            title: "Unit 6: Lifelong Learning and 21st-Century Skills",
+            content: "<strong>Core Competencies:</strong><br>Critical thinking, Digital collaboration, Emotional intelligence and adaptability in the evolving global job market.<br><br><strong>Communication Practice:</strong> Job interview simulation and professional CV writing.",
+            goal: "Prepare for higher education and career development in an international context."
+          }
         ]
       },
+
+      // NGỮ VĂN 12
+      {
+        id: "van-12-t1",
+        name: "Ngữ Văn 12 - Tập 1",
+        grade: "12",
+        subject: "van",
+        type: "sgk",
+        desc: "Khát vọng tự do và lý tưởng cách mạng, Vẻ đẹp tâm hồn con người Việt Nam trong thơ ca và văn xuôi hiện đại.",
+        icon: "📖",
+        driveUrl: DRIVE_BASE,
+        pages: [
+          {
+            title: "Bài 1: Khát Vọng Tự Do và Bản Tuyên Ngôn Độc Lập",
+            content: "<strong>Văn bản: Tuyên Ngôn Độc Lập (Hồ Chí Minh)</strong><br>• Hoàn cảnh ra đời: Ngày 2/9/1945 tại Quảng trường Ba Đình lịch sử.<br>• Giá trị tư tưởng: Khẳng định quyền bình đẳng, quyền sống, quyền tự do và quyền mưu cầu hạnh phúc bất khả xâm phạm của dân tộc Việt Nam.<br>• Nghệ thuật lập luận: Chặt chẽ, đanh thép, dẫn chứng xác thực, ngôn từ hùng hồn.",
+            goal: "Phân tích giá trị lịch sử và nghệ thuật lập luận mẫu mực của văn chính luận Hồ Chí Minh."
+          },
+          {
+            title: "Bài 2: Vẻ Đẹp Bi Tráng Của Người Lính Trong Bài Thơ Tây Tiến",
+            content: "<strong>Văn bản: Tây Tiến (Quang Dũng)</strong><br>• Cảm hứng lãng mạn và tinh thần bi tráng: Hình ảnh người lính trí thức Hà thành kiên cường vượt qua muôn vàn gian khổ nơi núi rừng Tây Bắc hiểm trở.<br>• Ngôn ngữ thơ: Giàu tính tạo hình, sử dụng từ Hán Việt trang trọng kết hợp với điệp từ, điệp ngữ độc đáo.",
+            goal: "Cảm nhận bức tranh thiên nhiên Tây Bắc hùng vĩ và tượng đài bất tử của người lính vệ quốc."
+          },
+          {
+            title: "Bài 3: Khát Vọng Độc Lập Trong Trường Ca 'Mặt Đường Khát Vọng'",
+            content: "<strong>Đoạn trích: Đất Nước (Nguyễn Khoa Điềm)</strong><br>• Định nghĩa mới mẻ: Đất Nước của Nhân Dân, Đất Nước của ca dao thần thoại.<br>• Sự gắn kết sâu sắc: Đất Nước không ở đâu xa mà kết tinh trong máu thịt, trong truyền thống đoàn kết, lao động và chiến đấu của mỗi con người.",
+            goal: "Khơi dậy niềm tự hào dân tộc và ý thức trách nhiệm của thế hệ trẻ đối với quê hương."
+          },
+          {
+            title: "Bài 4: Kỹ Năng Viết Bài Nghị Luận Xã Hội Về Một Vấn Đề Tư Tưởng",
+            content: "<strong>Cấu trúc bài nghị luận xã hội chuẩn 600 chữ:</strong><br>1. Mở bài: Dẫn dắt vấn đề tư tưởng đạo lí cần bàn luận.<br>2. Thân bài:<br>- Giải thích khái niệm cốt lõi.<br>- Phân tích, chứng minh tính đúng đắn qua các dẫn chứng thực tế thuyết phục.<br>- Bàn luận mở rộng, phê phán tư tưởng sai lệch.<br>3. Kết bài: Rút ra bài học nhận thức và hành động thiết thực cho bản thân.",
+            goal: "Rèn luyện tư duy phản biện và khả năng diễn đạt lập luận sắc bén, thuyết phục."
+          }
+        ]
+      },
+
+      // VẬT LÍ 12
       {
         id: "ly-12",
         name: "Vật Lí 12",
         grade: "12",
         subject: "ly",
         type: "sgk",
-        desc: "Vật lí nhiệt (Nhiệt độ, Thang nhiệt độ, Nhiệt dung riêng), Khí lí tưởng, Từ trường và Cảm ứng từ, Vật lí hạt nhân và Năng lượng nguyên tử.",
+        desc: "Vật lí nhiệt, Khí lí tưởng, Từ trường và Cảm ứng điện từ, Vật lí hạt nhân và Ứng dụng năng lượng.",
         icon: "⚡",
         driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương 1: Vật Lí Nhiệt", content: "Mô hình động học phân tử chất khí. Định luật bảo toàn năng lượng trong các quá trình nhiệt động lực học." }
+        pages: [
+          {
+            title: "Chương I - Bài 1: Cấu Trúc Phân Tử và Thang Nhiệt Độ",
+            content: "<strong>1. Mô hình động học phân tử:</strong><br>• Các chất được cấu tạo từ các phân tử chuyển động hỗn loạn không ngừng.<br>• Nhiệt độ càng cao thì tốc độ chuyển động nhiệt càng nhanh.<br><br><strong>2. Thang nhiệt độ Kelvin (K):</strong> T(K) = t(°C) + 273.15. Độ không tuyệt đối (0 K) là nhiệt độ mà tại đó mọi chuyển động nhiệt của phân tử lý thuyết đều ngừng lại.",
+            goal: "Hiểu bản chất chuyển động nhiệt và chuyển đổi chính xác giữa thang Celsius và Kelvin."
+          },
+          {
+            title: "Chương I - Bài 2: Nhiệt Dung Riêng và Nhiệt Nóng Chảy",
+            content: "<strong>Công thức tính nhiệt lượng:</strong><br>• Q = m . c . ΔT (Trong đó c là nhiệt dung riêng J/(kg.K)).<br>• Nhiệt lượng nóng chảy: Q = λ . m (λ là nhiệt nóng chảy riêng J/kg).<br>• Định luật bảo toàn năng lượng: Tổng nhiệt lượng tỏa ra bằng tổng nhiệt lượng thu vào trong hệ cô lập.",
+            goal: "Thực hành thí nghiệm đo nhiệt dung riêng của nước và nhiệt nóng chảy của nước đá."
+          },
+          {
+            title: "Chương II - Bài 3: Phương Trình Trạng Thái Khí Lí Tưởng",
+            content: "<strong>Phương trình Clapeyron - Mendeleev:</strong><br>p . V = n . R . T = (m / M) . R . T<br>Trong đó R = 8.31 J/(mol.K) là hằng số khí lí tưởng.<br><br>• Quá trình đẳng nhiệt (Boyle - Mariotte): p . V = const.<br>• Quá trình đẳng tích (Charles): p / T = const.<br>• Quá trình đẳng áp: V / T = const.",
+            goal: "Giải thích các hiện tượng khí áp trong đời sống và kỹ thuật nén khí."
+          }
         ]
       },
+
+      // HÓA HỌC 12
       {
         id: "hoa-12",
         name: "Hóa Học 12",
         grade: "12",
         subject: "hoa",
         type: "sgk",
-        desc: "Ester - Lipid, Carbohydrate (Glucose, Sucrose, Cellulose), Hợp chất chứa Nitrogen (Amine, Amino acid, Peptide), Polymer và Hóa học Phức chất.",
+        desc: "Ester - Lipid, Carbohydrate, Hợp chất chứa Nitrogen (Amine, Amino acid), Polymer và Hóa học Phức chất.",
         icon: "🧪",
         driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương 1: Ester và Lipid", content: "Cấu tạo phân tử, tính chất hóa học phản ứng xà phòng hóa và ứng dụng của chất béo trong công nghiệp chế biến." }
+        pages: [
+          {
+            title: "Chương 1 - Bài 1: Khái Niệm và Tính Chất Của Ester",
+            content: "<strong>1. Định nghĩa:</strong> Khi thay nhóm OH ở nhóm carboxyl (-COOH) của carboxylic acid bằng nhóm OR' thì thu được ester RCOOR'.<br><br><strong>2. Tính chất hóa học:</strong><br>• Phản ứng thủy phân trong môi trường acid (thuận nghịch): RCOOR' + H₂O ⇌ RCOOH + R'OH.<br>• Phản ứng thủy phân trong môi trường kiềm (Xà phòng hóa - một chiều): RCOOR' + NaOH → RCOONa + R'OH.",
+            goal: "Viết phương trình phản ứng este hóa và ứng dụng ester làm dung môi, hương liệu mỹ phẩm."
+          },
+          {
+            title: "Chương 1 - Bài 2: Lipid và Chất Béo",
+            content: "<strong>Chất béo (Triglyceride):</strong> Là triester của glycerol với các acid béo cao phân tử.<br>Công thức chung: (RCOO)₃C₃H₅.<br><br>• Các acid béo no phổ biến: Palmitic acid (C₁₅H₃₁COOH), Stearic acid (C₁₇H₃₅COOH).<br>• Acid béo không no: Oleic acid (C₁₇H₃₃COOH), Linoleic acid.<br>• Ứng dụng: Sản xuất xà phòng, thực phẩm dinh dưỡng và nhiên liệu sinh học biodiesel.",
+            goal: "Phân biệt chất béo no và không no, tính chỉ số xà phòng hóa trong bài toán công nghiệp."
+          }
         ]
       },
+
+      // SINH HỌC 12
       {
         id: "sinh-12",
         name: "Sinh Học 12",
         grade: "12",
         subject: "sinh",
         type: "sgk",
-        desc: "Di truyền học phân tử (DNA, RNA, Mã di truyền), Di truyền nhiễm sắc thể, Thuyết tiến hóa tổng hợp hiện đại và Sinh thái học quần thể.",
+        desc: "Cơ chế di truyền và biến dị ở cấp độ phân tử và tế bào, Di truyền quần thể, Thuyết tiến hóa hiện đại.",
         icon: "🧬",
         driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương 1: Cơ Chế Di Truyền và Biến Dị", content: "Quá trình tái bản DNA, phiên mã và dịch mã tổng hợp protein. Đột biến gen và ứng dụng công nghệ di truyền." }
+        pages: [
+          {
+            title: "Chương 1 - Bài 1: Gen, Mã Di Truyền và Tái Bản DNA",
+            content: "<strong>1. Cấu trúc gen:</strong> Gen là một đoạn phân tử DNA mang thông tin mã hóa một chuỗi polypeptide hoặc RNA.<br><br><strong>2. Mã di truyền:</strong><br>• Là mã bộ ba (triplet codon), đọc liên tục không gối lên nhau.<br>• Có tính thoái hóa (nhiều bộ ba cùng mã hóa 1 amino acid) và tính phổ biến (áp dụng cho hầu hết sinh vật).<br>• Bộ ba mở đầu: AUG (Mã hóa Methionine).<br>• Bộ ba kết thúc: UAA, UAG, UGA.",
+            goal: "Giải thích nguyên tắc bán bảo tồn và nguyên tắc bổ sung trong quá trình nhân đôi DNA."
+          }
         ]
       },
+
+      // TIN HỌC 12
       {
         id: "tin-12",
-        name: "Tin Học 12 (Định Hướng Ứng Dụng)",
+        name: "Tin Học 12",
         grade: "12",
         subject: "tin",
         type: "sgk",
-        desc: "Hệ quản trị cơ sở dữ liệu quan hệ, Mạng máy tính & Internet, Trí tuệ nhân tạo (AI) và đạo đức kỹ thuật số trong xã hội thông tin.",
+        desc: "Hệ cơ sở dữ liệu quan hệ, Thiết kế bảng và khóa, Ngôn ngữ truy vấn dữ liệu SQL, Trí tuệ nhân tạo.",
         icon: "💻",
         driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chủ Đề F: Hệ Quản Trị Cơ Sở Dữ Liệu", content: "Mô hình dữ liệu quan hệ, khóa chính, khóa ngoại và truy vấn ngôn ngữ SQL cơ bản." }
+        pages: [
+          {
+            title: "Chủ Đề F - Bài 1: Cơ Sở Dữ Liệu Quan Hệ và Khóa",
+            content: "<strong>1. Khái niệm cơ sở dữ liệu quan hệ (RDBMS):</strong><br>Dữ liệu được tổ chức dưới dạng các bảng (quan hệ) gồm các hàng (bản ghi/record) và các cột (trường/field).<br><br><strong>2. Khóa chính (Primary Key):</strong> Tập thuộc tính nhận diện duy nhất một bản ghi trong bảng.<br><strong>3. Khóa ngoại (Foreign Key):</strong> Liên kết dữ liệu giữa hai bảng để đảm bảo toàn vẹn tham chiếu.",
+            goal: "Thiết kế lược đồ cơ sở dữ liệu quản lý học sinh và điểm số bằng ngôn ngữ SQL."
+          }
         ]
       },
+
+      // LỊCH SỬ 12
       {
         id: "su-12",
         name: "Lịch Sử 12",
         grade: "12",
         subject: "su",
         type: "sgk",
-        desc: "Trật tự thế giới sau Chiến tranh lạnh, Cách mạng Việt Nam từ 1919 đến nay và công cuộc Đổi mới hội nhập quốc tế.",
+        desc: "Thế giới trong và sau Chiến tranh lạnh, Cách mạng giải phóng dân tộc Việt Nam và công cuộc Đổi mới.",
         icon: "🏛️",
         driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương 1: Thế Giới Trong và Sau Chiến Tranh Lạnh", content: "Sự hình thành trật tự hai cực Ianta và xu thế đa cực, hợp tác quốc tế trong kỷ nguyên toàn cầu hóa." }
-        ]
-      },
-      {
-        id: "dia-12",
-        name: "Địa Lí 12",
-        grade: "12",
-        subject: "dia",
-        type: "sgk",
-        desc: "Địa lí tự nhiên Việt Nam, Địa lí dân cư và chuyển dịch cơ cấu kinh tế các vùng trọng điểm kinh tế.",
-        icon: "🗺️",
-        driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương 1: Địa Lí Tự Nhiên Việt Nam", content: "Vị trí địa lí, phạm vi lãnh thổ và đặc điểm thiên nhiên nhiệt đới ẩm gió mùa tác động đến kinh tế - xã hội." }
-        ]
-      },
-      {
-        id: "gdktpl-12",
-        name: "Giáo Dục Kinh Tế & Pháp Luật 12",
-        grade: "12",
-        subject: "gdktpl",
-        type: "sgk",
-        desc: "Tăng trưởng và phát triển kinh tế, Hội nhập kinh tế quốc tế, Quyền và nghĩa vụ pháp lý của công dân trong kinh doanh.",
-        icon: "⚖️",
-        driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chủ Đề 1: Tăng Trưởng và Phát Triển Kinh Tế", content: "Các chỉ tiêu đo lường tăng trưởng kinh tế (GDP, GNI) và mối quan hệ với bảo vệ môi trường bền vững." }
-        ]
-      },
-
-      // LỚP 11
-      {
-        id: "toan-11-t1",
-        name: "Toán Học 11 - Tập 1",
-        grade: "11",
-        subject: "toan",
-        type: "sgk",
-        desc: "Hàm số lượng giác và phương trình lượng giác, Dãy số, Cấp số cộng và Cấp số nhân, Giới hạn và Hàm số liên tục.",
-        icon: "📐",
-        driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương I: Hàm Số Lượng Giác", content: "Công thức biến đổi lượng giác, đồ thị và tính chất tuần hoàn của hàm sin, cos, tan, cot." }
-        ]
-      },
-      {
-        id: "ly-11",
-        name: "Vật Lí 11",
-        grade: "11",
-        subject: "ly",
-        type: "sgk",
-        desc: "Dao động điều hòa, Sóng cơ và Sóng âm, Điện trường và Dòng điện không đổi.",
-        icon: "⚡",
-        driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương I: Dao Động", content: "Phương trình dao động điều hòa, con lắc lò xo và con lắc đơn, hiện tượng cộng hưởng cơ học." }
-        ]
-      },
-
-      // LỚP 10
-      {
-        id: "toan-10-t1",
-        name: "Toán Học 10 - Tập 1",
-        grade: "10",
-        subject: "toan",
-        type: "sgk",
-        desc: "Mệnh đề toán học và Tập hợp, Bất phương trình và Hệ bất phương trình bậc nhất hai ẩn, Hệ thức lượng trong tam giác và Vectơ.",
-        icon: "📐",
-        driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương I: Mệnh Đề và Tập Hợp", content: "Mệnh đề toán học, mệnh đề kéo theo, các phép toán trên tập hợp số thực R." }
-        ]
-      },
-      {
-        id: "hoa-10",
-        name: "Hóa Học 10",
-        grade: "10",
-        subject: "hoa",
-        type: "sgk",
-        desc: "Cấu tạo nguyên tử, Bảng tuần hoàn các nguyên tố hóa học, Liên kết hóa học và Phản ứng oxi hóa - khử.",
-        icon: "🧪",
-        driveUrl: DRIVE_BASE,
-        sampleChapters: [
-          { title: "Chương 1: Cấu Tạo Nguyên Tử", content: "Hạt nhân nguyên tử, cấu hình electron và quy tắc phân bố mức năng lượng." }
+        pages: [
+          {
+            title: "Chương 1 - Bài 1: Trật Tự Thế Giới Sau Chiến Tranh Lạnh",
+            content: "Sau sự sụp đổ của trật tự hai cực Ianta, thế giới bước vào thời kỳ quá độ hình thành trật tự đa cực, đa trung tâm.<br><br>• Xu thế chính: Hòa bình, ổn định, hợp tác và phát triển kinh tế trở thành ưu tiên hàng đầu của mọi quốc gia.<br>• Các tổ chức khu vực: ASEAN, Liên minh châu Âu (EU) khẳng định vai trò cầu nối hòa bình và thịnh vượng.",
+            goal: "Đánh giá thời cơ và thách thức của Việt Nam trong xu thế toàn cầu hóa và hội nhập quốc tế."
+          }
         ]
       }
     ];
 
     var currentFlipBook = null;
-    var currentFlipPage = 1;
+    var currentFlipPage = 0; // 0 index for pages array
 
-    // Render Books
+    // Render Books Grid
     function renderBooks(list) {
       var container = document.getElementById('booksGridContainer');
       container.innerHTML = '';
@@ -1202,59 +1333,113 @@
     }
 
     // ============================================================
-    // FLIPBOOK ENGINE 3D CONTROLLER
+    // FLIPBOOK CONTROLLER (LẬT SÁCH 3D & GOOGLE DRIVE VIEWER)
     // ============================================================
     function openFlipbook(bookId) {
       var book = UNIFIED_BOOKS_DATABASE.find(function (x) { return x.id === bookId; });
       if (!book) return;
 
       currentFlipBook = book;
-      currentFlipPage = 1;
+      currentFlipPage = 0;
 
       document.getElementById('flipBookTitle').textContent = book.name;
       document.getElementById('flipBookSubtitle').textContent = `Lớp ${book.grade} • Bộ Sách Chuẩn GDPT 2018 • Bản Quyền Số Thầy Phan Ngọc Huy`;
 
+      // Set default mode to Flip 3D
+      switchViewMode('flip');
+      buildTocList();
       renderFlipPages();
+      
       document.getElementById('flipbookModal').style.display = 'flex';
-      showToast('Đang mở Flipbook số 2 trang tương tác!');
+      showToast('Đang mở sách: ' + book.name);
+    }
+
+    function switchViewMode(mode) {
+      var btnFlip = document.getElementById('btnModeFlip');
+      var btnPdf = document.getElementById('btnModePdf');
+      var box3d = document.getElementById('flipBook3dContainer');
+      var boxPdf = document.getElementById('pdfViewerContainer');
+
+      if (mode === 'flip') {
+        btnFlip.classList.add('active');
+        btnPdf.classList.remove('active');
+        box3d.style.display = 'flex';
+        boxPdf.style.display = 'none';
+      } else {
+        btnPdf.classList.add('active');
+        btnFlip.classList.remove('active');
+        box3d.style.display = 'none';
+        boxPdf.style.display = 'block';
+
+        // Load Google Drive embed viewer
+        var iframe = document.getElementById('pdfViewerIframe');
+        iframe.src = "https://drive.google.com/embeddedfolderview?id=1yhSjb4sMRjAx14GLspPT1jRUZLDokXSM#grid";
+        showToast('Đang mở tài liệu PDF gốc từ Google Drive...');
+      }
+    }
+
+    function buildTocList() {
+      var container = document.getElementById('tocListContainer');
+      container.innerHTML = '';
+      if (!currentFlipBook || !currentFlipBook.pages) return;
+
+      currentFlipBook.pages.forEach(function (p, idx) {
+        var item = document.createElement('div');
+        item.className = 'toc-item ' + (Math.floor(currentFlipPage / 2) * 2 === idx ? 'active' : '');
+        item.innerHTML = `<strong>Bài ${idx + 1}:</strong> ${p.title.replace(/^Bài \d+: /, '')}`;
+        item.addEventListener('click', function () {
+          currentFlipPage = Math.floor(idx / 2) * 2;
+          renderFlipPages();
+          document.getElementById('tocSidebar').classList.remove('open');
+          showToast('Đã chuyển đến: Bài ' + (idx + 1));
+        });
+        container.appendChild(item);
+      });
     }
 
     function renderFlipPages() {
       if (!currentFlipBook) return;
+      var pages = currentFlipBook.pages || [];
+      var totalPages = pages.length;
 
-      var chaps = currentFlipBook.sampleChapters || [
-        { title: "Chương I: Tổng Quan Kiến Thức", content: currentFlipBook.desc },
-        { title: "Chương II: Bài Tập Thực Hành", content: "Hệ thống câu hỏi và bài tập củng cố năng lực học sinh theo chuẩn chương trình." }
-      ];
+      var p1 = pages[currentFlipPage] || {
+        title: "Lời Nói Đầu & Giới Thiệu Chuyên Đề",
+        content: currentFlipBook.desc + "<br><br>Tài liệu được số hóa và chuẩn hóa theo chương trình GDPT 2018.",
+        goal: "Nắm vững cấu trúc bài học và phương pháp tự học số."
+      };
 
-      var chap1 = chaps[0] || { title: "Nội Dung Bài Học", content: currentFlipBook.desc };
-      var chap2 = chaps[1] || { title: "Ứng Dụng Thực Tiễn", content: "Phát triển phẩm chất và năng lực số của học sinh qua các hoạt động trải nghiệm." };
+      var p2 = pages[currentFlipPage + 1] || {
+        title: "Tóm Tắt & Câu Hỏi Củng Cố",
+        content: "Học sinh hoàn thành các câu hỏi luyện tập và bài tập thực hành cuối bài để khắc sâu kiến thức.",
+        goal: "Vận dụng kiến thức vào thực tiễn đời sống và các bài thi trắc nghiệm chuẩn hóa."
+      };
 
       // Left page
       document.getElementById('flipLeftBookName').textContent = currentFlipBook.name;
-      document.getElementById('flipLeftChapter').textContent = "Trang " + currentFlipPage;
+      document.getElementById('flipLeftChapter').textContent = "Bài " + (currentFlipPage + 1);
       document.getElementById('flipLeftBody').innerHTML = `
-        <h3>${chap1.title}</h3>
-        <p>${chap1.content}</p>
-        <div style="background: rgba(6,78,59,0.1); border-left: 3px solid #059669; padding: 10px; margin-top: 16px; font-size: 0.95rem; font-style: italic;">
-          <strong>🎯 Mục tiêu bài học:</strong> Nắm vững định nghĩa, công thức và bản chất vật lí/toán học của chuyên đề.
+        <h3>${p1.title}</h3>
+        <p>${p1.content}</p>
+        <div style="background: rgba(6,78,59,0.1); border-left: 3px solid #059669; padding: 10px; margin-top: 14px; font-size: 0.92rem; font-style: italic;">
+          <strong>🎯 Mục tiêu bài học:</strong> ${p1.goal || 'Nắm vững kiến thức trọng tâm.'}
         </div>
       `;
-      document.getElementById('flipLeftPageNum').textContent = "Trang " + currentFlipPage;
+      document.getElementById('flipLeftPageNum').textContent = "Trang " + (currentFlipPage + 1);
 
       // Right page
       document.getElementById('flipRightBookName').textContent = currentFlipBook.name;
-      document.getElementById('flipRightChapter').textContent = "Trang " + (currentFlipPage + 1);
+      document.getElementById('flipRightChapter').textContent = (currentFlipPage + 2 <= totalPages) ? ("Bài " + (currentFlipPage + 2)) : "Tổng Kết";
       document.getElementById('flipRightBody').innerHTML = `
-        <h3>${chap2.title}</h3>
-        <p>${chap2.content}</p>
-        <div style="background: rgba(16,185,129,0.1); border: 1px dashed #10b981; border-radius: 6px; padding: 12px; margin-top: 16px; font-size: 0.95rem;">
-          <strong>💡 Câu hỏi củng cố:</strong> Trình bày quy tắc ứng dụng kiến thức vừa học vào bài toán thực tiễn.
+        <h3>${p2.title}</h3>
+        <p>${p2.content}</p>
+        <div style="background: rgba(16,185,129,0.1); border: 1px dashed #10b981; border-radius: 6px; padding: 10px; margin-top: 14px; font-size: 0.92rem;">
+          <strong>💡 Câu hỏi củng cố:</strong> ${p2.goal || 'Vận dụng kiến thức giải quyết vấn đề.'}
         </div>
       `;
-      document.getElementById('flipRightPageNum').textContent = "Trang " + (currentFlipPage + 1);
+      document.getElementById('flipRightPageNum').textContent = "Trang " + (currentFlipPage + 2);
 
-      document.getElementById('flipPageIndicator').textContent = `Trang ${currentFlipPage} - ${currentFlipPage + 1} / 120`;
+      document.getElementById('flipPageIndicator').textContent = `Trang ${currentFlipPage + 1} - ${currentFlipPage + 2} / ${Math.max(totalPages, 2)}`;
+      buildTocList();
     }
 
     function sendToAiCopilot(name, desc) {
@@ -1306,36 +1491,55 @@
         showToast('Đã đặt lại bộ lọc');
       });
 
+      // Flipbook Mode Toggles
+      document.getElementById('btnModeFlip').addEventListener('click', function () { switchViewMode('flip'); });
+      document.getElementById('btnModePdf').addEventListener('click', function () { switchViewMode('pdf'); });
+
+      // TOC drawer toggle
+      document.getElementById('toggleTocBtn').addEventListener('click', function () {
+        document.getElementById('tocSidebar').classList.toggle('open');
+      });
+      document.getElementById('closeTocBtn').addEventListener('click', function () {
+        document.getElementById('tocSidebar').classList.remove('open');
+      });
+
       // Flipbook events
       document.getElementById('closeFlipbookBtn').addEventListener('click', function () {
         document.getElementById('flipbookModal').style.display = 'none';
+        document.getElementById('tocSidebar').classList.remove('open');
         window.speechSynthesis.cancel();
       });
 
       document.getElementById('flipNextPageBtn').addEventListener('click', function () {
-        currentFlipPage += 2;
-        renderFlipPages();
-        showToast('Lật sang trang ' + currentFlipPage);
+        if (!currentFlipBook || !currentFlipBook.pages) return;
+        if (currentFlipPage + 2 < currentFlipBook.pages.length) {
+          currentFlipPage += 2;
+          renderFlipPages();
+          showToast('Đã lật sang bài tiếp theo');
+        } else {
+          showToast('Đang ở những trang cuối của cuốn sách này');
+        }
       });
 
       document.getElementById('flipPrevPageBtn').addEventListener('click', function () {
-        if (currentFlipPage > 2) {
+        if (currentFlipPage >= 2) {
           currentFlipPage -= 2;
           renderFlipPages();
-          showToast('Lật về trang ' + currentFlipPage);
+          showToast('Đã lật về bài trước');
         } else {
           showToast('Đang ở trang đầu tiên');
         }
       });
 
       document.getElementById('flipFirstPageBtn').addEventListener('click', function () {
-        currentFlipPage = 1;
+        currentFlipPage = 0;
         renderFlipPages();
         showToast('Về trang đầu tiên');
       });
 
       document.getElementById('flipLastPageBtn').addEventListener('click', function () {
-        currentFlipPage = 119;
+        if (!currentFlipBook || !currentFlipBook.pages) return;
+        currentFlipPage = Math.max(0, (Math.floor((currentFlipBook.pages.length - 1) / 2) * 2));
         renderFlipPages();
         showToast('Đến trang cuối');
       });
