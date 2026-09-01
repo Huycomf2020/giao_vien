@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flipbook Tiếng Anh 12 - Global Success | Thầy Phan Ngọc Huy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #02160e;
+      --bg-card: rgba(6, 44, 30, 0.92);
+      --border-color: rgba(16, 185, 129, 0.28);
+      --emerald-300: #6ee7b7;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --emerald-600: #059669;
+      --text-main: #f0fdf4;
+      --text-muted: #a7f3d0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(5, 150, 105, 0.15) 0%, transparent 50%),
+        linear-gradient(180deg, #021a11 0%, #010f09 100%);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Topbar Header */
+    .topbar {
+      background: rgba(3, 30, 20, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover { background: linear-gradient(135deg, var(--emerald-400), var(--emerald-500)); transform: translateY(-1px); }
+    .btn-secondary { background: rgba(6, 78, 59, 0.6); border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-secondary:hover { background: rgba(6, 78, 59, 0.9); }
+
+    /* Viewport Flipbook */
+    .viewport {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .book-container {
+      width: 100%;
+      max-width: 1180px;
+      height: 92%;
+      display: flex;
+      background: #064e3b;
+      border-radius: 12px;
+      border: 4px solid #047857;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page-spread {
+      flex: 1;
+      background: #fdfbf7;
+      color: #1e293b;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .page-spread.left {
+      border-right: 2px solid #e2e8f0;
+      box-shadow: inset -15px 0 20px rgba(0,0,0,0.05);
+    }
+
+    .page-spread.right {
+      box-shadow: inset 15px 0 20px rgba(0,0,0,0.05);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 6px;
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .page-body {
+      flex: 1;
+      margin-top: 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.98rem;
+      line-height: 1.7;
+      color: #1e293b;
+    }
+
+    .page-body h3 {
+      font-family: 'Inter', sans-serif;
+      color: #064e3b;
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--emerald-500);
+      padding-left: 10px;
+    }
+
+    .vocab-list {
+      background: #f1f5f9;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      font-size: 0.9rem;
+    }
+
+    .vocab-item {
+      margin-bottom: 6px;
+    }
+
+    .box-target {
+      background: rgba(6, 78, 59, 0.08);
+      border-left: 3px solid #059669;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      font-style: italic;
+      border-radius: 4px;
+    }
+
+    .box-quiz {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px dashed #10b981;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.9rem;
+    }
+
+    .page-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 8px;
+      margin-top: 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #064e3b;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Bottom Control Bar */
+    .bottombar {
+      background: rgba(3, 30, 20, 0.95);
+      border-top: 1px solid var(--border-color);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    /* Sidebar Mục Lục */
+    .toc-sidebar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -320px;
+      width: 320px;
+      background: rgba(3, 30, 20, 0.98);
+      border-right: 1px solid var(--border-color);
+      z-index: 50;
+      transition: left 0.3s ease;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.7);
+    }
+
+    .toc-sidebar.open { left: 0; }
+
+    .toc-item {
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .toc-item:hover, .toc-item.active {
+      background: rgba(16, 185, 129, 0.2);
+      color: #ffffff;
+      border-left: 3px solid var(--emerald-400);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <div class="topbar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="etextbook.html" class="btn btn-secondary">⬅️ Thư Viện Sách</a>
+      <button class="btn btn-secondary" id="toggleTocBtn">📑 Mục Lục Units</button>
+      <div>
+        <h3 style="font-size: 1.1rem; color: #ffffff;">Tiếng Anh 12 - Global Success (Tập 1)</h3>
+        <p style="font-size: 0.78rem; color: var(--emerald-300);">Bộ Sách Chuẩn GDPT 2018 • Biên soạn số bởi Thầy Phan Ngọc Huy</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <a href="https://drive.google.com/file/d/184Um0Zbjk2iJh8VHgOs5NY5jyLkcTcrN/view?usp=drive_link" target="_blank" class="btn btn-secondary">☁️ File Drive Gốc PDF</a>
+    </div>
+  </div>
+
+  <!-- Sidebar Mục Lục -->
+  <div class="toc-sidebar" id="tocSidebar">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+      <h4 style="color: var(--emerald-400); font-size: 1rem;">📑 Units & Lessons</h4>
+      <button id="closeTocBtn" style="background: none; border: none; color: #ffffff; font-size: 1.2rem; cursor: pointer;">✕</button>
+    </div>
+    <div id="tocListContainer" style="flex: 1; overflow-y: auto;"></div>
+  </div>
+
+  <!-- Viewport Flipbook 3D -->
+  <div class="viewport">
+    <div class="book-container">
+      <!-- Trang bên trái -->
+      <div class="page-spread left">
+        <div class="page-header">
+          <span>ENGLISH 12 - GLOBAL SUCCESS</span>
+          <span id="leftChapter">Unit 1</span>
+        </div>
+        <div class="page-body" id="leftBody"></div>
+        <div class="page-footer">
+          <span id="leftPageNum">Trang 1</span>
+          <span>NXB Giáo Dục Việt Nam</span>
+        </div>
+      </div>
+
+      <!-- Trang bên phải -->
+      <div class="page-spread right">
+        <div class="page-header">
+          <span>ENGLISH 12 - GLOBAL SUCCESS</span>
+          <span id="rightChapter">Grammar & Skills</span>
+        </div>
+        <div class="page-body" id="rightBody"></div>
+        <div class="page-footer">
+          <span>Bản quyền số © Huycomf</span>
+          <span id="rightPageNum">Trang 2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Controller -->
+  <div class="bottombar">
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-secondary" id="firstPageBtn">⏮ Trang Đầu</button>
+      <button class="btn" id="prevBtn">◀ Lật Trang Trước</button>
+    </div>
+    <span id="pageIndicator" style="font-weight: 700; color: var(--emerald-400); font-size: 0.95rem;">Trang 1 - 2 / 10</span>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn" id="nextBtn">Lật Trang Sau ▶</button>
+      <button class="btn btn-secondary" id="lastPageBtn">Trang Cuối ⏭</button>
+    </div>
+  </div>
+
+  <script>
+    // Database nội dung chuẩn hoá các Unit Tiếng Anh 12 Global Success
+    var ENGLISH12_PAGES = [
+      {
+        unit: "UNIT 1: LIFE STORIES OF INSPIRING FIGURES",
+        title: "Getting Started & Vocabulary",
+        content: `<strong>Core Vocabulary:</strong>
+        <div class="vocab-list">
+          <div class="vocab-item">• <strong>Achievement</strong> (n): Thành tựu, thành tích đáng nể.</div>
+          <div class="vocab-item">• <strong>Devote to</strong> (v): Cống hiến, tận tụy hết mình.</div>
+          <div class="vocab-item">• <strong>Inspire</strong> (v): Truyền cảm hứng mạnh mẽ.</div>
+          <div class="vocab-item">• <strong>Visionary</strong> (adj/n): Có tầm nhìn xa trông rộng.</div>
+          <div class="vocab-item">• <strong>Perseverance</strong> (n): Tính kiên trì, nhẫn nại.</div>
+        </div>
+        <strong>Reading Context:</strong> Biographies of historical leaders and modern innovators who overcome immense obstacles to bring extraordinary changes to society.`,
+        target: "🎯 Learning Objective: Talk about life achievements, personal qualities and inspiring role models.",
+        quiz: "💡 Quick Quiz: Choose the correct synonym for 'perseverance': A. Determination | B. Hesitation | C. Reluctance"
+      },
+      {
+        unit: "UNIT 1: LIFE STORIES OF INSPIRING FIGURES",
+        title: "Language: Past Simple vs. Past Continuous",
+        content: `<strong>Grammar Focus: Past Simple & Past Continuous with When/While</strong><br><br>
+        • <strong>Past Continuous (was/were + V-ing):</strong> Emphasises an action in progress in the past.<br>
+        • <strong>Past Simple (V2/ed):</strong> Intercepts an ongoing action or details completed sequential events.<br><br>
+        <em>Example:</em> While Uncle Ho <strong>was working</strong> abroad, he always <strong>thought</strong> of his beloved homeland.`,
+        target: "🎯 Skill Practice: Combine sentences smoothly using 'when' and 'while' for biography writing.",
+        quiz: "💡 Grammar Check: When I (arrive) _____ home yesterday, my sister (read) _____ a book about General Vo Nguyen Giap."
+      },
+      {
+        unit: "UNIT 2: A DIVERSITY OF CULTURES",
+        title: "Getting Started & Cultural Customs",
+        content: `<strong>Key Vocabulary & Expressions:</strong>
+        <div class="vocab-list">
+          <div class="vocab-item">• <strong>Cultural heritage</strong> (n): Di sản văn hóa.</div>
+          <div class="vocab-item">• <strong>Preserve</strong> (v): Bảo tồn, gìn giữ truyền thống.</div>
+          <div class="vocab-item">• <strong>Custom & Etiquette</strong> (n): Phong tục và quy tắc ứng xử.</div>
+          <div class="vocab-item">• <strong>Assimilation</strong> (n): Sự đồng hóa văn hóa.</div>
+        </div>
+        <strong>Topic Discussion:</strong> Respecting cultural differences in a globalised era while maintaining ethnic identity.`,
+        target: "🎯 Learning Objective: Describe traditional festivals and social etiquette around the world.",
+        quiz: "💡 Quick Quiz: Which article is used before unique national monuments? (A, An, The, Zero article)"
+      },
+      {
+        unit: "UNIT 2: A DIVERSITY OF CULTURES",
+        title: "Language Focus: Articles (A, An, The & Zero Article)",
+        content: `<strong>Grammar Rules:</strong><br><br>
+        • Use <strong>a / an</strong> for singular countable nouns mentioned for the first time.<br>
+        • Use <strong>the</strong> for specific or unique entities (e.g., <em>the Sun, the Mekong River, the Eiffel Tower</em>).<br>
+        • Use <strong>Zero Article (∅)</strong> with plural nouns, abstract concepts or general sports and meals.`,
+        target: "🎯 Skill Practice: Master article usage in university entrance exams and academic essays.",
+        quiz: "💡 Grammar Check: Fill in the blank: _____ Tet holiday is _____ most important traditional festival in Vietnam."
+      },
+      {
+        unit: "UNIT 3: GREEN LIVING",
+        title: "Getting Started & Environmental Issues",
+        content: `<strong>Key Vocabulary:</strong>
+        <div class="vocab-list">
+          <div class="vocab-item">• <strong>Carbon footprint</strong> (n): Lượng phát thải khí nhà kính.</div>
+          <div class="vocab-item">• <strong>Renewable energy</strong> (n): Năng lượng tái tạo (mặt trời, gió).</div>
+          <div class="vocab-item">• <strong>Biodegradable</strong> (adj): Phân hủy sinh học tự nhiên.</div>
+          <div class="vocab-item">• <strong>Eco-friendly lifestyle</strong> (n): Lối sống xanh thân thiện môi trường.</div>
+        </div>
+        <strong>Discussion:</strong> Practical green initiatives in schools and local communities.`,
+        target: "🎯 Learning Objective: Propose environmental protection solutions and promote sustainable living.",
+        quiz: "💡 Quick Quiz: Plastic bags are NOT _____ because they take hundreds of years to decompose."
+      },
+      {
+        unit: "UNIT 3: GREEN LIVING",
+        title: "Language Focus: Relative Clauses",
+        content: `<strong>Defining vs. Non-Defining Relative Clauses:</strong><br><br>
+        • <strong>Defining:</strong> Essential information without commas.<br>
+        <em>Example:</em> The students <strong>who clean up the beach</strong> receive extra credit.<br><br>
+        • <strong>Non-Defining:</strong> Extra information separated by commas (cannot use 'that').<br>
+        <em>Example:</em> Solar energy, <strong>which is clean and renewable</strong>, is becoming more popular.`,
+        target: "🎯 Skill Practice: Combine sentences accurately using who, whom, which, whose, and where.",
+        quiz: "💡 Grammar Check: Rewrite: Mr. Huy bought a new solar panel system. It helps reduce electricity bills."
+      },
+      {
+        unit: "UNIT 4: URBANISATION",
+        title: "Getting Started & Megacities",
+        content: `<strong>Key Vocabulary:</strong>
+        <div class="vocab-list">
+          <div class="vocab-item">• <strong>Urbanisation</strong> (n): Quá trình đô thị hóa.</div>
+          <div class="vocab-item">• <strong>Overcrowding</strong> (n): Tình trạng quá tải dân số.</div>
+          <div class="vocab-item">• <strong>Infrastructure</strong> (n): Cơ sở hạ tầng (giao thông, điện nước).</div>
+          <div class="vocab-item">• <strong>Slum area</strong> (n): Khu ổ chuột đô thị.</div>
+        </div>
+        <strong>Writing Task:</strong> Discussing advantages and disadvantages of moving from rural areas to big cities.`,
+        target: "🎯 Learning Objective: Analyze urbanisation trends and write balanced opinion essays.",
+        quiz: "💡 Quick Quiz: Rapid urbanisation often leads to severe traffic _____ during peak hours."
+      },
+      {
+        unit: "UNIT 5: ARTIFICIAL INTELLIGENCE",
+        title: "Getting Started & AI in Modern Life",
+        content: `<strong>Key Vocabulary:</strong>
+        <div class="vocab-list">
+          <div class="vocab-item">• <strong>Artificial Intelligence (AI)</strong>: Trí tuệ nhân tạo.</div>
+          <div class="vocab-item">• <strong>Automation</strong> (n): Tự động hóa quy trình.</div>
+          <div class="vocab-item">• <strong>Machine Learning</strong> (n): Học máy.</div>
+          <div class="vocab-item">• <strong>Prompt engineering</strong> (n): Kỹ thuật đặt câu lệnh cho AI.</div>
+        </div>
+        <strong>Future Careers:</strong> How AI transforms interactive classrooms, automated exam grading and digital transformation.`,
+        target: "🎯 Learning Objective: Discuss technological advancements, AI ethics and 21st-century digital skills.",
+        quiz: "💡 Quick Quiz: AI-powered tools can help teachers save time by _____ routine administrative tasks."
+      },
+      {
+        unit: "SEMESTER 1 REVIEW & EXAMINATION",
+        title: "National High School Exam Preparation",
+        content: `<strong>Core Exam Components:</strong><br><br>
+        1. Phonetics (Pronunciation & Stress).<br>
+        2. Vocabulary & Grammar Error Identification.<br>
+        3. Reading Comprehension & Cloze Test.<br>
+        4. Sentence Transformation & Combination.<br><br>
+        <strong>Teacher's Tip:</strong> Pay special attention to collocation, phrasal verbs and reading tips.`,
+        target: "🎯 Goal: Achieve 9+ scores in English High School Graduation Examinations.",
+        quiz: "💡 Practice Now: Open QuizScanner Pro to test your vocabulary & grammar knowledge!"
+      }
+    ];
+
+    var currentPage = 0;
+
+    function renderFlipBook() {
+      var p1 = ENGLISH12_PAGES[currentPage] || {
+        unit: "FINISH",
+        title: "End of Book",
+        content: "You have completed all units in English 12 Global Success (Volume 1).",
+        target: "",
+        quiz: ""
+      };
+
+      var p2 = ENGLISH12_PAGES[currentPage + 1] || {
+        unit: "NOTES",
+        title: "Teacher's Self-Study Notes",
+        content: "Review key vocabulary lists and complete workbook exercises.",
+        target: "",
+        quiz: ""
+      };
+
+      // Trang trái
+      document.getElementById('leftChapter').textContent = p1.unit;
+      document.getElementById('leftBody').innerHTML = `
+        <h3>${p1.title}</h3>
+        <p>${p1.content}</p>
+        ${p1.target ? `<div class="box-target">${p1.target}</div>` : ''}
+      `;
+      document.getElementById('leftPageNum').textContent = "Trang " + (currentPage + 1);
+
+      // Trang phải
+      document.getElementById('rightChapter').textContent = p2.unit;
+      document.getElementById('rightBody').innerHTML = `
+        <h3>${p2.title}</h3>
+        <p>${p2.content}</p>
+        ${p2.quiz ? `<div class="box-quiz">${p2.quiz}</div>` : ''}
+      `;
+      document.getElementById('rightPageNum').textContent = "Trang " + (currentPage + 2);
+
+      document.getElementById('pageIndicator').textContent = `Trang ${currentPage + 1} - ${currentPage + 2} / ${ENGLISH12_PAGES.length}`;
+      buildTocUI();
+    }
+
+    function buildTocUI() {
+      var container = document.getElementById('tocListContainer');
+      container.innerHTML = '';
+      ENGLISH12_PAGES.forEach(function (item, idx) {
+        var el = document.createElement('div');
+        el.className = 'toc-item ' + (Math.floor(currentPage / 2) * 2 === idx ? 'active' : '');
+        el.innerHTML = `<strong>Part ${idx + 1}:</strong> ${item.title}`;
+        el.addEventListener('click', function () {
+          currentPage = Math.floor(idx / 2) * 2;
+          renderFlipBook();
+          document.getElementById('tocSidebar').classList.remove('open');
+        });
+        container.appendChild(el);
+      });
+    }
+
+    // Events
+    document.getElementById('prevBtn').addEventListener('click', function () {
+      if (currentPage >= 2) { currentPage -= 2; renderFlipBook(); }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', function () {
+      if (currentPage + 2 < ENGLISH12_PAGES.length) { currentPage += 2; renderFlipBook(); }
+    });
+
+    document.getElementById('firstPageBtn').addEventListener('click', function () {
+      currentPage = 0; renderFlipBook();
+    });
+
+    document.getElementById('lastPageBtn').addEventListener('click', function () {
+      currentPage = Math.floor((ENGLISH12_PAGES.length - 1) / 2) * 2; renderFlipBook();
+    });
+
+    document.getElementById('toggleTocBtn').addEventListener('click', function () {
+      document.getElementById('tocSidebar').classList.toggle('open');
+    });
+
+    document.getElementById('closeTocBtn').addEventListener('click', function () {
+      document.getElementById('tocSidebar').classList.remove('open');
+    });
+
+    // Run Initial
+    renderFlipBook();
+  </script>
+</body>
+</html>
