@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flipbook Tiếng Anh 12 - Global Success | Thầy Phan Ngọc Huy</title>
+  <title>Flipbook Tiếng Anh 12 Global Success - Từ Vựng & Đề Thi 2026 | Thầy Phan Ngọc Huy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -36,7 +36,6 @@
       overflow: hidden;
     }
 
-    /* Topbar Header */
     .topbar {
       background: rgba(3, 30, 20, 0.95);
       border-bottom: 1px solid var(--border-color);
@@ -68,7 +67,6 @@
     .btn-secondary { background: rgba(6, 78, 59, 0.6); border: 1px solid var(--border-color); color: var(--text-main); }
     .btn-secondary:hover { background: rgba(6, 78, 59, 0.9); }
 
-    /* Viewport Flipbook */
     .viewport {
       flex: 1;
       display: flex;
@@ -80,7 +78,7 @@
 
     .book-container {
       width: 100%;
-      max-width: 1180px;
+      max-width: 1240px;
       height: 92%;
       display: flex;
       background: #064e3b;
@@ -95,7 +93,7 @@
       flex: 1;
       background: #fdfbf7;
       color: #1e293b;
-      padding: 28px 32px;
+      padding: 26px 30px;
       display: flex;
       flex-direction: column;
       position: relative;
@@ -124,57 +122,67 @@
 
     .page-body {
       flex: 1;
-      margin-top: 14px;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.98rem;
-      line-height: 1.7;
+      margin-top: 12px;
+      font-size: 0.94rem;
+      line-height: 1.65;
       color: #1e293b;
     }
 
     .page-body h3 {
       font-family: 'Inter', sans-serif;
       color: #064e3b;
-      font-size: 1.2rem;
-      margin-bottom: 12px;
+      font-size: 1.18rem;
+      margin-bottom: 10px;
       border-left: 4px solid var(--emerald-500);
       padding-left: 10px;
     }
 
-    .vocab-list {
+    .vocab-grid {
       background: #f1f5f9;
       border-radius: 6px;
-      padding: 10px 14px;
-      margin-bottom: 12px;
-      font-size: 0.9rem;
+      padding: 10px 12px;
+      margin-bottom: 10px;
     }
 
     .vocab-item {
-      margin-bottom: 6px;
+      margin-bottom: 5px;
+      font-size: 0.89rem;
     }
 
-    .box-target {
-      background: rgba(6, 78, 59, 0.08);
-      border-left: 3px solid #059669;
-      padding: 12px;
-      margin-top: 14px;
-      font-size: 0.9rem;
-      font-style: italic;
+    .vocab-item strong { color: #0f172a; }
+
+    .box-phrasal {
+      background: #e0f2fe;
+      border-left: 3px solid #0284c7;
+      padding: 10px 12px;
+      margin-top: 10px;
+      font-size: 0.88rem;
       border-radius: 4px;
     }
 
-    .box-quiz {
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px dashed #10b981;
+    .box-tips {
+      background: #fef3c7;
+      border-left: 3px solid #d97706;
+      padding: 10px 12px;
+      margin-top: 10px;
+      font-size: 0.88rem;
+      border-radius: 4px;
+      color: #78350f;
+    }
+
+    .box-exam {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      padding: 10px 12px;
+      margin-top: 10px;
       border-radius: 6px;
-      padding: 12px;
-      margin-top: 14px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
 
     .page-footer {
       border-top: 1px solid #e2e8f0;
       padding-top: 8px;
-      margin-top: 14px;
+      margin-top: 12px;
       font-size: 0.82rem;
       font-weight: 700;
       color: #064e3b;
@@ -182,7 +190,6 @@
       justify-content: space-between;
     }
 
-    /* Bottom Control Bar */
     .bottombar {
       background: rgba(3, 30, 20, 0.95);
       border-top: 1px solid var(--border-color);
@@ -193,13 +200,12 @@
       z-index: 10;
     }
 
-    /* Sidebar Mục Lục */
     .toc-sidebar {
       position: absolute;
       top: 0;
       bottom: 0;
-      left: -320px;
-      width: 320px;
+      left: -330px;
+      width: 330px;
       background: rgba(3, 30, 20, 0.98);
       border-right: 1px solid var(--border-color);
       z-index: 50;
@@ -213,10 +219,10 @@
     .toc-sidebar.open { left: 0; }
 
     .toc-item {
-      padding: 10px 12px;
+      padding: 9px 11px;
       border-radius: 6px;
       color: var(--text-muted);
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       cursor: pointer;
       transition: all 0.2s ease;
       border-bottom: 1px solid rgba(16, 185, 129, 0.1);
@@ -231,13 +237,12 @@
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
   <div class="topbar">
     <div style="display: flex; align-items: center; gap: 12px;">
       <a href="etextbook.html" class="btn btn-secondary">⬅️ Thư Viện Sách</a>
-      <button class="btn btn-secondary" id="toggleTocBtn">📑 Mục Lục Units</button>
+      <button class="btn btn-secondary" id="toggleTocBtn">📑 Mục Lục Units & Exam</button>
       <div>
-        <h3 style="font-size: 1.1rem; color: #ffffff;">Tiếng Anh 12 - Global Success (Tập 1)</h3>
+        <h3 style="font-size: 1.1rem; color: #ffffff;">Tiếng Anh 12 Global Success - Từ Vựng & Đề Thi 2026</h3>
         <p style="font-size: 0.78rem; color: var(--emerald-300);">Bộ Sách Chuẩn GDPT 2018 • Biên soạn số bởi Thầy Phan Ngọc Huy</p>
       </div>
     </div>
@@ -246,19 +251,16 @@
     </div>
   </div>
 
-  <!-- Sidebar Mục Lục -->
   <div class="toc-sidebar" id="tocSidebar">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-      <h4 style="color: var(--emerald-400); font-size: 1rem;">📑 Units & Lessons</h4>
+      <h4 style="color: var(--emerald-400); font-size: 1rem;">📑 10 Units & Đề Thi TN 2026</h4>
       <button id="closeTocBtn" style="background: none; border: none; color: #ffffff; font-size: 1.2rem; cursor: pointer;">✕</button>
     </div>
     <div id="tocListContainer" style="flex: 1; overflow-y: auto;"></div>
   </div>
 
-  <!-- Viewport Flipbook 3D -->
   <div class="viewport">
     <div class="book-container">
-      <!-- Trang bên trái -->
       <div class="page-spread left">
         <div class="page-header">
           <span>ENGLISH 12 - GLOBAL SUCCESS</span>
@@ -267,32 +269,30 @@
         <div class="page-body" id="leftBody"></div>
         <div class="page-footer">
           <span id="leftPageNum">Trang 1</span>
-          <span>NXB Giáo Dục Việt Nam</span>
+          <span>Sách của Bộ GD&ĐT 2026</span>
         </div>
       </div>
 
-      <!-- Trang bên phải -->
       <div class="page-spread right">
         <div class="page-header">
           <span>ENGLISH 12 - GLOBAL SUCCESS</span>
-          <span id="rightChapter">Grammar & Skills</span>
+          <span id="rightChapter">Expressions & Exam</span>
         </div>
         <div class="page-body" id="rightBody"></div>
         <div class="page-footer">
-          <span>Tinh gọn nội dung bởi Huycomf</span>
+          <span>Tinh gọn bởi Huycomf</span>
           <span id="rightPageNum">Trang 2</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Bottom Navigation Controller -->
   <div class="bottombar">
     <div style="display: flex; gap: 8px;">
       <button class="btn btn-secondary" id="firstPageBtn">⏮ Trang Đầu</button>
       <button class="btn" id="prevBtn">◀ Lật Trang Trước</button>
     </div>
-    <span id="pageIndicator" style="font-weight: 700; color: var(--emerald-400); font-size: 0.95rem;">Trang 1 - 2 / 10</span>
+    <span id="pageIndicator" style="font-weight: 700; color: var(--emerald-400); font-size: 0.95rem;">Trang 1 - 2 / 12</span>
     <div style="display: flex; gap: 8px;">
       <button class="btn" id="nextBtn">Lật Trang Sau ▶</button>
       <button class="btn btn-secondary" id="lastPageBtn">Trang Cuối ⏭</button>
@@ -300,172 +300,349 @@
   </div>
 
   <script>
-    // Database nội dung chuẩn hoá các Unit Tiếng Anh 12 Global Success
-    var ENGLISH12_PAGES = [
+    var ENGLISH12_FULL_DATABASE = [
+      // UNIT 1
       {
-        unit: "UNIT 1: LIFE STORIES OF INSPIRING FIGURES",
-        title: "Getting Started & Vocabulary",
-        content: `<strong>Core Vocabulary:</strong>
-        <div class="vocab-list">
-          <div class="vocab-item">• <strong>Achievement</strong> (n): Thành tựu, thành tích đáng nể.</div>
-          <div class="vocab-item">• <strong>Devote to</strong> (v): Cống hiến, tận tụy hết mình.</div>
-          <div class="vocab-item">• <strong>Inspire</strong> (v): Truyền cảm hứng mạnh mẽ.</div>
+        chapter: "UNIT 1: LIFE STORIES OF INSPIRING FIGURES",
+        title: "Key Vocabulary & Phrasal Verbs",
+        content: `<strong>Target Vocabulary:</strong>
+        <div class="vocab-grid">
+          <div class="vocab-item">• <strong>Biography</strong> (n): Tiểu sử, sự nghiệp.</div>
+          <div class="vocab-item">• <strong>Perseverance</strong> (n): Sự kiên trì, bền chí vượt khó.</div>
           <div class="vocab-item">• <strong>Visionary</strong> (adj/n): Có tầm nhìn xa trông rộng.</div>
-          <div class="vocab-item">• <strong>Perseverance</strong> (n): Tính kiên trì, nhẫn nại.</div>
+          <div class="vocab-item">• <strong>Distinguished</strong> (adj): Xuất sắc, kiệt xuất.</div>
+          <div class="vocab-item">• <strong>Devote ones-self to V-ing</strong>: Cống hiến trọn đời cho.</div>
         </div>
-        <strong>Reading Context:</strong> Biographies of historical leaders and modern innovators who overcome immense obstacles to bring extraordinary changes to society.`,
-        target: "🎯 Learning Objective: Talk about life achievements, personal qualities and inspiring role models.",
-        quiz: "💡 Quick Quiz: Choose the correct synonym for 'perseverance': A. Determination | B. Hesitation | C. Reluctance"
+        <div class="box-phrasal">
+          <strong>Useful Phrasal Verbs & Expressions:</strong><br>
+          • <strong>Pass away</strong>: Qua đời, từ trần.<br>
+          • <strong>Bring about</strong>: Mang lại, dẫn đến sự thay đổi.<br>
+          • <strong>Look up to someone</strong>: Ngưỡng mộ, kính trọng ai đó.<br>
+          • <strong>Set a good example for</strong>: Nêu gương sáng cho ai.
+        </div>`,
+        extra: `<strong>Grammar & Usage Notes:</strong><br>
+        Phân biệt thì <strong>Past Simple</strong> (hành động cắt ngang/chuỗi sự kiện tiểu sử) và <strong>Past Continuous</strong> (hành động đang diễn ra tại thời điểm quá khứ).<br><br>
+        <div class="box-tips">
+          💡 <strong>Tip học từ vựng nhanh:</strong> Nhớ từ đi theo Collocation cố định: <em>achieve success, overcome obstacles, dedicate one's life to, play a vital role in</em>.
+        </div>`
       },
+
+      // UNIT 2
       {
-        unit: "UNIT 1: LIFE STORIES OF INSPIRING FIGURES",
-        title: "Language: Past Simple vs. Past Continuous",
-        content: `<strong>Grammar Focus: Past Simple & Past Continuous with When/While</strong><br><br>
-        • <strong>Past Continuous (was/were + V-ing):</strong> Emphasises an action in progress in the past.<br>
-        • <strong>Past Simple (V2/ed):</strong> Intercepts an ongoing action or details completed sequential events.<br><br>
-        <em>Example:</em> While Uncle Ho <strong>was working</strong> abroad, he always <strong>thought</strong> of his beloved homeland.`,
-        target: "🎯 Skill Practice: Combine sentences smoothly using 'when' and 'while' for biography writing.",
-        quiz: "💡 Grammar Check: When I (arrive) _____ home yesterday, my sister (read) _____ a book about General Vo Nguyen Giap."
-      },
-      {
-        unit: "UNIT 2: A DIVERSITY OF CULTURES",
-        title: "Getting Started & Cultural Customs",
-        content: `<strong>Key Vocabulary & Expressions:</strong>
-        <div class="vocab-list">
-          <div class="vocab-item">• <strong>Cultural heritage</strong> (n): Di sản văn hóa.</div>
-          <div class="vocab-item">• <strong>Preserve</strong> (v): Bảo tồn, gìn giữ truyền thống.</div>
-          <div class="vocab-item">• <strong>Custom & Etiquette</strong> (n): Phong tục và quy tắc ứng xử.</div>
-          <div class="vocab-item">• <strong>Assimilation</strong> (n): Sự đồng hóa văn hóa.</div>
+        chapter: "UNIT 2: A DIVERSITY OF CULTURES",
+        title: "Cultural Heritage & Customs",
+        content: `<strong>Target Vocabulary:</strong>
+        <div class="vocab-grid">
+          <div class="vocab-item">• <strong>Cultural assimilation</strong> (n): Sự đồng hóa văn hóa.</div>
+          <div class="vocab-item">• <strong>Heritage preservation</strong> (n): Bảo tồn di sản văn hóa.</div>
+          <div class="vocab-item">• <strong>Etiquette</strong> (n): Quy tắc ứng xử, nghi thức.</div>
+          <div class="vocab-item">• <strong>Identity</strong> (n): Bản sắc văn hóa dân tộc.</div>
+          <div class="vocab-item">• <strong>Customary</strong> (adj): Theo phong tục truyền thống.</div>
         </div>
-        <strong>Topic Discussion:</strong> Respecting cultural differences in a globalised era while maintaining ethnic identity.`,
-        target: "🎯 Learning Objective: Describe traditional festivals and social etiquette around the world.",
-        quiz: "💡 Quick Quiz: Which article is used before unique national monuments? (A, An, The, Zero article)"
+        <div class="box-phrasal">
+          <strong>Useful Phrasal Verbs & Expressions:</strong><br>
+          • <strong>Pass down</strong>: Truyền lại qua các thế hệ.<br>
+          • <strong>Hand over</strong>: Bàn giao, trao lại quyền sở hữu.<br>
+          • <strong>Show respect for</strong>: Tỏ lòng kính trọng đối với.<br>
+          • <strong>Derive from</strong>: Bắt nguồn từ, có nguồn gốc từ.
+        </div>`,
+        extra: `<strong>Grammar & Usage Notes:</strong><br>
+        Sử dụng mạo từ <strong>A, An, The & Zero Article (∅)</strong> trước các địa danh, di sản văn hóa và phong tục tập quán.<br><br>
+        <div class="box-tips">
+          💡 <strong>Tip thi THPT:</strong> Dùng mạo từ <em>"The"</em> trước tên các sông, dãy núi, quần đảo, di sản độc nhất (e.g., <em>The Mekong River, The Imperial Citadel</em>).
+        </div>`
       },
+
+      // UNIT 3
       {
-        unit: "UNIT 2: A DIVERSITY OF CULTURES",
-        title: "Language Focus: Articles (A, An, The & Zero Article)",
-        content: `<strong>Grammar Rules:</strong><br><br>
-        • Use <strong>a / an</strong> for singular countable nouns mentioned for the first time.<br>
-        • Use <strong>the</strong> for specific or unique entities (e.g., <em>the Sun, the Mekong River, the Eiffel Tower</em>).<br>
-        • Use <strong>Zero Article (∅)</strong> with plural nouns, abstract concepts or general sports and meals.`,
-        target: "🎯 Skill Practice: Master article usage in university entrance exams and academic essays.",
-        quiz: "💡 Grammar Check: Fill in the blank: _____ Tet holiday is _____ most important traditional festival in Vietnam."
-      },
-      {
-        unit: "UNIT 3: GREEN LIVING",
-        title: "Getting Started & Environmental Issues",
-        content: `<strong>Key Vocabulary:</strong>
-        <div class="vocab-list">
-          <div class="vocab-item">• <strong>Carbon footprint</strong> (n): Lượng phát thải khí nhà kính.</div>
-          <div class="vocab-item">• <strong>Renewable energy</strong> (n): Năng lượng tái tạo (mặt trời, gió).</div>
+        chapter: "UNIT 3: GREEN LIVING & SUSTAINABILITY",
+        title: "Eco-Friendly Lifestyle & Environment",
+        content: `<strong>Target Vocabulary:</strong>
+        <div class="vocab-grid">
+          <div class="vocab-item">• <strong>Carbon footprint</strong> (n): Lượng phát thải CO2.</div>
           <div class="vocab-item">• <strong>Biodegradable</strong> (adj): Phân hủy sinh học tự nhiên.</div>
-          <div class="vocab-item">• <strong>Eco-friendly lifestyle</strong> (n): Lối sống xanh thân thiện môi trường.</div>
+          <div class="vocab-item">• <strong>Depletion</strong> (n): Sự cạn kiệt tài nguyên.</div>
+          <div class="vocab-item">• <strong>Sustainability</strong> (n): Tính bền vững môi trường.</div>
+          <div class="vocab-item">• <strong>Eco-friendly</strong> (adj): Thân thiện với hệ sinh thái.</div>
         </div>
-        <strong>Discussion:</strong> Practical green initiatives in schools and local communities.`,
-        target: "🎯 Learning Objective: Propose environmental protection solutions and promote sustainable living.",
-        quiz: "💡 Quick Quiz: Plastic bags are NOT _____ because they take hundreds of years to decompose."
+        <div class="box-phrasal">
+          <strong>Useful Phrasal Verbs & Expressions:</strong><br>
+          • <strong>Cut down on</strong>: Cắt giảm (phát thải, rác thải).<br>
+          • <strong>Phase out</strong>: Dần loại bỏ hoàn toàn (đồ nhựa 1 lần).<br>
+          • <strong>Dispose of</strong>: Vứt bỏ, xử lý rác thải.<br>
+          • <strong>Go green</strong>: Thực hiện lối sống xanh.
+        </div>`,
+        extra: `<strong>Grammar & Usage Notes:</strong><br>
+        Mệnh đề quan hệ xác định và không xác định (<strong>Relative Clauses</strong>: who, whom, which, whose, where, that).<br><br>
+        <div class="box-tips">
+          💡 <strong>Tip làm bài:</strong> Sau dấu phẩy (,) tuyệt đối <strong>KHÔNG</strong> dùng <em>"that"</em> trong mệnh đề quan hệ không xác định.
+        </div>`
       },
+
+      // UNIT 4
       {
-        unit: "UNIT 3: GREEN LIVING",
-        title: "Language Focus: Relative Clauses",
-        content: `<strong>Defining vs. Non-Defining Relative Clauses:</strong><br><br>
-        • <strong>Defining:</strong> Essential information without commas.<br>
-        <em>Example:</em> The students <strong>who clean up the beach</strong> receive extra credit.<br><br>
-        • <strong>Non-Defining:</strong> Extra information separated by commas (cannot use 'that').<br>
-        <em>Example:</em> Solar energy, <strong>which is clean and renewable</strong>, is becoming more popular.`,
-        target: "🎯 Skill Practice: Combine sentences accurately using who, whom, which, whose, and where.",
-        quiz: "💡 Grammar Check: Rewrite: Mr. Huy bought a new solar panel system. It helps reduce electricity bills."
-      },
-      {
-        unit: "UNIT 4: URBANISATION",
-        title: "Getting Started & Megacities",
-        content: `<strong>Key Vocabulary:</strong>
-        <div class="vocab-list">
+        chapter: "UNIT 4: URBANISATION & MEGACITIES",
+        title: "Urban Planning & Social Trends",
+        content: `<strong>Target Vocabulary:</strong>
+        <div class="vocab-grid">
           <div class="vocab-item">• <strong>Urbanisation</strong> (n): Quá trình đô thị hóa.</div>
-          <div class="vocab-item">• <strong>Overcrowding</strong> (n): Tình trạng quá tải dân số.</div>
-          <div class="vocab-item">• <strong>Infrastructure</strong> (n): Cơ sở hạ tầng (giao thông, điện nước).</div>
-          <div class="vocab-item">• <strong>Slum area</strong> (n): Khu ổ chuột đô thị.</div>
+          <div class="vocab-item">• <strong>Overcrowding</strong> (n): Sự quá tải dân số đô thị.</div>
+          <div class="vocab-item">• <strong>Infrastructure</strong> (n): Cơ sở hạ tầng đô thị.</div>
+          <div class="vocab-item">• <strong>Inflow</strong> (n): Dòng người di cư đổ về thành phố.</div>
+          <div class="vocab-item">• <strong>Congestion</strong> (n): Sự ách tắc, kẹt xe.</div>
         </div>
-        <strong>Writing Task:</strong> Discussing advantages and disadvantages of moving from rural areas to big cities.`,
-        target: "🎯 Learning Objective: Analyze urbanisation trends and write balanced opinion essays.",
-        quiz: "💡 Quick Quiz: Rapid urbanisation often leads to severe traffic _____ during peak hours."
+        <div class="box-phrasal">
+          <strong>Useful Phrasal Verbs & Expressions:</strong><br>
+          • <strong>Flock to / Inflow to</strong>: Đổ xô về các đô thị lớn.<br>
+          • <strong>Pop up</strong>: Mọc lên nhanh chóng (tòa nhà, trung tâm).<br>
+          • <strong>Cope with</strong>: Đương đầu với ô nhiễm, ách tắc.<br>
+          • <strong>Lead to / Result in</strong>: Dẫn đến hậu quả đô thị hóa.
+        </div>`,
+        extra: `<strong>Grammar & Usage Notes:</strong><br>
+        Thể giả định (<strong>Subjunctive Mood</strong>: It is essential that + S + V-bare) dùng trong kiến nghị quy hoạch đô thị.<br><br>
+        <div class="box-tips">
+          💡 <strong>Tip làm bài:</strong> Đứng sau các từ <em>essential, crucial, recommended, suggested + that + S</em> thì động từ luôn ở dạng nguyên mẫu không "to" (V-bare).
+        </div>`
       },
+
+      // UNIT 5
       {
-        unit: "UNIT 5: ARTIFICIAL INTELLIGENCE",
-        title: "Getting Started & AI in Modern Life",
-        content: `<strong>Key Vocabulary:</strong>
-        <div class="vocab-list">
+        chapter: "UNIT 5: ARTIFICIAL INTELLIGENCE & EDUCATION",
+        title: "AI & Digital Transformation",
+        content: `<strong>Target Vocabulary:</strong>
+        <div class="vocab-grid">
           <div class="vocab-item">• <strong>Artificial Intelligence (AI)</strong>: Trí tuệ nhân tạo.</div>
-          <div class="vocab-item">• <strong>Automation</strong> (n): Tự động hóa quy trình.</div>
-          <div class="vocab-item">• <strong>Machine Learning</strong> (n): Học máy.</div>
-          <div class="vocab-item">• <strong>Prompt engineering</strong> (n): Kỹ thuật đặt câu lệnh cho AI.</div>
+          <div class="vocab-item">• <strong>Automation</strong> (n): Tự động hóa công việc.</div>
+          <div class="vocab-item">• <strong>Algorithm</strong> (n): Thuật toán máy tính.</div>
+          <div class="vocab-item">• <strong>Prompt engineering</strong> (n): Kỹ thuật đặt câu lệnh AI.</div>
+          <div class="vocab-item">• <strong>Digital literacy</strong> (n): Năng lực công nghệ số.</div>
         </div>
-        <strong>Future Careers:</strong> How AI transforms interactive classrooms, automated exam grading and digital transformation.`,
-        target: "🎯 Learning Objective: Discuss technological advancements, AI ethics and 21st-century digital skills.",
-        quiz: "💡 Quick Quiz: AI-powered tools can help teachers save time by _____ routine administrative tasks."
+        <div class="box-phrasal">
+          <strong>Useful Phrasal Verbs & Expressions:</strong><br>
+          • <strong>Carry out</strong>: Tiến hành, thực thi thuật toán.<br>
+          • <strong>Take over</strong>: Đảm nhận, tiếp quản công việc thủ công.<br>
+          • <strong>Keep up with</strong>: Bắt kịp tốc độ phát triển AI.<br>
+          • <strong>Pave the way for</strong>: Mở đường cho kỷ nguyên số.
+        </div>`,
+        extra: `<strong>Grammar & Usage Notes:</strong><br>
+        Câu bị động nâng cao (<strong>Advanced Passive Voice</strong>: It is reported that... / S + is believed to V).<br><br>
+        <div class="box-tips">
+          💡 <strong>Tip thi THPT:</strong> Nếu hành động ở mệnh đề sau xảy ra trước mệnh đề trước thì biến đổi thành: <em>S + is said + to HAVE V3/ed</em>.
+        </div>`
       },
+
+      // UNIT 6
       {
-        unit: "SEMESTER 1 REVIEW & EXAMINATION",
-        title: "National High School Exam Preparation",
-        content: `<strong>Core Exam Components:</strong><br><br>
-        1. Phonetics (Pronunciation & Stress).<br>
-        2. Vocabulary & Grammar Error Identification.<br>
-        3. Reading Comprehension & Cloze Test.<br>
-        4. Sentence Transformation & Combination.<br><br>
-        <strong>Teacher's Tip:</strong> Pay special attention to collocation, phrasal verbs and reading tips.`,
-        target: "🎯 Goal: Achieve 9+ scores in English High School Graduation Examinations.",
-        quiz: "💡 Practice Now: Open QuizScanner Pro to test your vocabulary & grammar knowledge!"
+        chapter: "UNIT 6: LIFELONG LEARNING",
+        title: "Career Paths & Continuous Education",
+        content: `<strong>Target Vocabulary:</strong>
+        <div class="vocab-grid">
+          <div class="vocab-item">• <strong>Lifelong learning</strong> (n): Học tập suốt đời.</div>
+          <div class="vocab-item">• <strong>Adaptability</strong> (n): Khả năng thích ứng nghề nghiệp.</div>
+          <div class="vocab-item">• <strong>Up-skilling</strong> (n): Nâng cao kỹ năng nghề nghiệp.</div>
+          <div class="vocab-item">• <strong>Qualification</strong> (n): Bằng cấp, chứng chỉ.</div>
+          <div class="vocab-item">• <strong>Self-motivated</strong> (adj): Có động lực tự học cao.</div>
+        </div>
+        <div class="box-phrasal">
+          <strong>Useful Phrasal Verbs & Expressions:</strong><br>
+          • <strong>Catch up on</strong>: Bổ sung kiến thức còn thiếu.<br>
+          • <strong>Sign up for / Enrol in</strong>: Đăng ký khóa học mới.<br>
+          • <strong>Brush up on</strong>: Ôn lại, trau dồi kỹ năng cũ.<br>
+          • <strong>Broaden one's horizons</strong>: Mở rộng tầm nhìn.
+        </div>`,
+        extra: `<strong>Grammar & Usage Notes:</strong><br>
+        Động từ nguyên mẫu có to (To-V) và Danh động từ (V-ing) sau các động từ chỉ mục đích học tập.<br><br>
+        <div class="box-tips">
+          💡 <strong>Tip ghi nhớ:</strong> <em>Remember/Forget + V-ing</em> (hành động đã làm trong quá khứ); <em>Remember/Forget + To-V</em> (việc phải làm trong tương lai).
+        </div>`
+      },
+
+      // UNIT 7
+      {
+        chapter: "UNIT 7: WORLD OF WORK & FUTURE CAREERS",
+        title: "Employment & 21st-Century Skills",
+        content: `<strong>Target Vocabulary:</strong>
+        <div class="vocab-grid">
+          <div class="vocab-item">• <strong>Employability</strong> (n): Khả năng tuyển dụng.</div>
+          <div class="vocab-item">• <strong>Remote working</strong> (n): Làm việc từ xa.</div>
+          <div class="vocab-item">• <strong>Job satisfaction</strong> (n): Sự hài lòng trong công việc.</div>
+          <div class="vocab-item">• <strong>Hands-on experience</strong> (n): Kinh nghiệm thực tế.</div>
+          <div class="vocab-item">• <strong>Competitive market</strong> (n): Thị trường lao động cạnh tranh.</div>
+        </div>
+        <div class="box-phrasal">
+          <strong>Useful Phrasal Verbs & Expressions:</strong><br>
+          • <strong>Take on</strong>: Tuyển dụng nhân sự mới / Đảm nhận dự án.<br>
+          • <strong>Lay off</strong>: Cắt giảm nhân sự do khủng hoảng.<br>
+          • <strong>Burn out</strong>: Kiệt sức do áp lực công việc quá tải.<br>
+          • <strong>Apply for a position</strong>: Nộp đơn ứng tuyển.
+        </div>`,
+        extra: `<strong>Grammar & Usage Notes:</strong><br>
+        Câu điều kiện hỗn hợp (<strong>Mixed Conditionals</strong>) đánh giá các quyết định nghề nghiệp.<br><br>
+        <div class="box-tips">
+          💡 <strong>Tip làm bài:</strong> Điều kiện loại 3 kết hợp loại 2: <em>If + S + had V3/ed (quá khứ), S + would/could + V-bare (hiện tại)</em>.
+        </div>`
+      },
+
+      // UNIT 8
+      {
+        chapter: "UNIT 8: WILDLIFE CONSERVATION",
+        title: "Biodiversity & Endangered Species",
+        content: `<strong>Target Vocabulary:</strong>
+        <div class="vocab-grid">
+          <div class="vocab-item">• <strong>Endangered species</strong> (n): Loài có nguy cơ tuyệt chủng.</div>
+          <div class="vocab-item">• <strong>Poaching</strong> (n): Nạn săn bắt trái phép.</div>
+          <div class="vocab-item">• <strong>Natural habitat</strong> (n): Môi trường sống tự nhiên.</div>
+          <div class="vocab-item">• <strong>Biodiversity loss</strong> (n): Suy giảm đa dạng sinh học.</div>
+          <div class="vocab-item">• <strong>Reserve / Sanctuary</strong> (n): Khu bảo tồn thiên nhiên.</div>
+        </div>
+        <div class="box-phrasal">
+          <strong>Useful Phrasal Verbs & Expressions:</strong><br>
+          • <strong>Die out / Become extinct</strong>: Tuyệt chủng hoàn toàn.<br>
+          • <strong>Wipe out</strong>: Tàn phá, hủy diệt hệ sinh thái.<br>
+          • <strong>Stand up for</strong>: Đứng lên bảo vệ động vật hoang dã.<br>
+          • <strong>On the brink of extinction</strong>: Trên bờ vực tuyệt chủng.
+        </div>`,
+        extra: `<strong>Grammar & Usage Notes:</strong><br>
+        Đảo ngữ với các trạng từ phủ định (<strong>Inversion</strong>: Never, Seldom, Hardly, Barely, Only when).<br><br>
+        <div class="box-tips">
+          💡 <strong>Tip làm bài:</strong> Khi trạng từ phủ định đứng đầu câu, trợ động từ phải được đảo lên trước chủ ngữ: <em>Only when + S + V..., AUX + S + V</em>.
+        </div>`
+      },
+
+      // UNIT 9
+      {
+        chapter: "UNIT 9: INTERNATIONAL ORGANISATIONS",
+        title: "Global Cooperation & Diplomacy",
+        content: `<strong>Target Vocabulary:</strong>
+        <div class="vocab-grid">
+          <div class="vocab-item">• <strong>Humanitarian aid</strong> (n): Viện trợ nhân đạo.</div>
+          <div class="vocab-item">• <strong>Peacekeeping</strong> (adj/n): Gìn giữ hòa bình thế giới.</div>
+          <div class="vocab-item">• <strong>Non-governmental (NGO)</strong>: Tổ chức phi chính phủ.</div>
+          <div class="vocab-item">• <strong>Socio-economic development</strong>: Phát triển kinh tế - xã hội.</div>
+          <div class="vocab-item">• <strong>Multilateral agreement</strong>: Hiệp định đa phương.</div>
+        </div>
+        <div class="box-phrasal">
+          <strong>Useful Phrasal Verbs & Expressions:</strong><br>
+          • <strong>Set up / Establish</strong>: Thành lập tổ chức quốc tế.<br>
+          • <strong>Call for</strong>: Kêu gọi viện trợ khẩn cấp.<br>
+          • <strong>Join hands</strong>: Chung tay giải quyết vấn đề toàn cầu.<br>
+          • <strong>Aimed at V-ing</strong>: Nhắm tới mục tiêu hòa bình.
+        </div>`,
+        extra: `<strong>Grammar & Usage Notes:</strong><br>
+        Rút gọn mệnh đề quan hệ bằng V-ing (chủ động) hoặc V3/ed (bị động).<br><br>
+        <div class="box-tips">
+          💡 <strong>Tip làm bài:</strong> Nếu danh từ trước có các từ so sánh nhất, <em>the first, the last, the only</em> thì rút gọn mệnh đề thành <strong>To-V</strong>.
+        </div>`
+      },
+
+      // UNIT 10
+      {
+        chapter: "UNIT 10: MULTICULTURALISM & GLOBAL CITIZENSHIP",
+        title: "Global Integration & Mindset",
+        content: `<strong>Target Vocabulary:</strong>
+        <div class="vocab-grid">
+          <div class="vocab-item">• <strong>Global citizen</strong> (n): Công dân toàn cầu.</div>
+          <div class="vocab-item">• <strong>Multiculturalism</strong> (n): Chủ nghĩa đa văn hóa.</div>
+          <div class="vocab-item">• <strong>Cross-cultural competence</strong>: Năng lực giao tiếp liên văn hóa.</div>
+          <div class="vocab-item">• <strong>Open-mindedness</strong> (n): Tư duy cởi mở.</div>
+          <div class="vocab-item">• <strong>Mutual understanding</strong> (n): Sự thấu hiểu lẫn nhau.</div>
+        </div>
+        <div class="box-phrasal">
+          <strong>Useful Phrasal Verbs & Expressions:</strong><br>
+          • <strong>Blend in</strong>: Hòa nhập vào môi trường mới.<br>
+          • <strong>Break down barriers</strong>: Xóa bỏ rào cản ngôn ngữ/văn hóa.<br>
+          • <strong>Adapt to</strong>: Thích nghi với sự thay đổi toàn cầu.<br>
+          • <strong>Bridge the gap</strong>: Thu hẹp khoảng cách văn hóa.
+        </div>`,
+        extra: `<strong>Grammar & Usage Notes:</strong><br>
+        Liên từ nối mệnh đề (<strong>Conjunctions & Adverbial Clauses</strong>: Although, In spite of, Furthermore, Otherwise, Provided that).<br><br>
+        <div class="box-tips">
+          💡 <strong>Tip phân biệt:</strong> <em>Although / Even though + S + V</em>; trong khi <em>In spite of / Despite + Noun / V-ing</em>.
+        </div>`
+      },
+
+      // NATIONAL HIGH SCHOOL EXAM PREPARATION 2026 - PART 1
+      {
+        chapter: "NATIONAL HIGH SCHOOL EXAM PREPARATION 2026",
+        title: "Phần I: Quảng Cáo & Thông Báo + Sắp Xếp Đoạn Văn (Câu 1-12)",
+        content: `<div class="box-exam">
+          <strong>1. Quảng cáo & Thông báo (Quảng cáo tuyển dụng, Thông báo khóa học):</strong><br>
+          Tập trung kiểm tra từ vựng cơ bản, giới từ đi kèm, danh động từ và từ loại (Noun/Adj/Verb/Adv).<br><br>
+          <strong>2. Sắp xếp câu & Đoạn văn / Hội thoại logic:</strong><br>
+          • Đề thi yêu cầu sắp xếp các câu a, b, c, d, e thành đoạn văn hoàn chỉnh.<br>
+          • <strong>Tips giải nhanh:</strong><br>
+          - Tìm <strong>câu mở đầu (Topic Sentence)</strong>: Thường chứa danh từ chung, không chứa từ nối chỉ kết quả (Therefore, So) hay đại từ thay thế chưa rõ nghĩa (He, They, It).<br>
+          - Chú ý các <strong>từ nối tín hiệu (Cohesive Devices)</strong>: <em>First, Secondly, Furthermore, In addition, Finally, On the one hand...</em>
+        </div>`,
+        extra: `<div class="box-tips">
+          🎯 <strong>Mẹo thi TN THPT 2026:</strong> Đối với dạng bài Hội thoại giao tiếp ngắn, hãy chú ý từ phản hồi lịch sự như: <em>"You're welcome", "I Couldn't agree more", "Never mind", "That sounds great!"</em>.
+        </div>`
+      },
+
+      // NATIONAL HIGH SCHOOL EXAM PREPARATION 2026 - PART 2
+      {
+        chapter: "NATIONAL HIGH SCHOOL EXAM PREPARATION 2026",
+        title: "Phần II: Điền Khuyết Đoạn Văn + Đọc Hiểu Chuyên Đề 1 & 2 (Câu 13-40)",
+        content: `<div class="box-exam">
+          <strong>3. Điền khuyết đoạn văn (Cloze Text):</strong><br>
+          Kiểm tra Liên từ (However, Therefore, Although), Đại từ quan hệ (Which, Who, That) và Cụm từ cố định (Collocations).<br><br>
+          <strong>4. Đọc hiểu Chuyên đề 1 (8 câu - Đoạn văn ngắn 300 từ):</strong><br>
+          Hỏi về Ý chính (Main idea), Từ đồng nghĩa (Closest in meaning), Từ quy chiếu (It/They) và Chi tiết có/không đề cập.<br><br>
+          <strong>5. Đọc hiểu Chuyên đề 2 (10 câu - Đoạn văn dài 450-500 từ):</strong><br>
+          Dạng câu hỏi suy luận (Inference question), Thái độ tác giả (Author's attitude) và Tìm vị trí đặt câu thích hợp.
+        </div>`,
+        extra: `<div class="box-tips">
+          🎯 <strong>Mẹo làm Đọc Hiểu đạt điểm 9+:</strong><br>
+          • <strong>Bước 1:</strong> Đọc câu hỏi trước để xác định từ khóa (Keywords).<br>
+          • <strong>Bước 2:</strong> Dùng kỹ năng <em>Scanning</em> tìm đoạn chứa Keywords trong bài.<br>
+          • <strong>Bước 3:</strong> Loại trừ phương án nhiễu có chứa thông tin quá tuyệt đối (<em>Always, Never, All, Only</em>) nếu bài gốc không khẳng định chắc chắn.
+        </div>`
       }
     ];
 
     var currentPage = 0;
 
     function renderFlipBook() {
-      var p1 = ENGLISH12_PAGES[currentPage] || {
-        unit: "FINISH",
+      var p1 = ENGLISH12_FULL_DATABASE[currentPage] || {
+        chapter: "FINISH",
         title: "End of Book",
-        content: "You have completed all units in English 12 Global Success (Volume 1).",
-        target: "",
-        quiz: ""
+        content: "You have completed English 12 Global Success - Vocabulary & National High School Exam Prep 2026.",
+        extra: ""
       };
 
-      var p2 = ENGLISH12_PAGES[currentPage + 1] || {
-        unit: "NOTES",
+      var p2 = ENGLISH12_FULL_DATABASE[currentPage + 1] || {
+        chapter: "NOTES",
         title: "Teacher's Self-Study Notes",
-        content: "Review key vocabulary lists and complete workbook exercises.",
-        target: "",
-        quiz: ""
+        content: "Review key vocabulary lists, phrasal verbs and practice with QuizScanner Pro.",
+        extra: ""
       };
 
-      // Trang trái
-      document.getElementById('leftChapter').textContent = p1.unit;
+      document.getElementById('leftChapter').textContent = p1.chapter;
       document.getElementById('leftBody').innerHTML = `
         <h3>${p1.title}</h3>
-        <p>${p1.content}</p>
-        ${p1.target ? `<div class="box-target">${p1.target}</div>` : ''}
+        <div>${p1.content}</div>
       `;
       document.getElementById('leftPageNum').textContent = "Trang " + (currentPage + 1);
 
-      // Trang phải
-      document.getElementById('rightChapter').textContent = p2.unit;
+      document.getElementById('rightChapter').textContent = p2.chapter;
       document.getElementById('rightBody').innerHTML = `
         <h3>${p2.title}</h3>
-        <p>${p2.content}</p>
-        ${p2.quiz ? `<div class="box-quiz">${p2.quiz}</div>` : ''}
+        <div>${p2.content || p1.extra}</div>
+        ${p2.extra ? `<div style="margin-top:10px;">${p2.extra}</div>` : ''}
       `;
       document.getElementById('rightPageNum').textContent = "Trang " + (currentPage + 2);
 
-      document.getElementById('pageIndicator').textContent = `Trang ${currentPage + 1} - ${currentPage + 2} / ${ENGLISH12_PAGES.length}`;
+      document.getElementById('pageIndicator').textContent = `Trang ${currentPage + 1} - ${currentPage + 2} / ${ENGLISH12_FULL_DATABASE.length}`;
       buildTocUI();
     }
 
     function buildTocUI() {
       var container = document.getElementById('tocListContainer');
       container.innerHTML = '';
-      ENGLISH12_PAGES.forEach(function (item, idx) {
+      ENGLISH12_FULL_DATABASE.forEach(function (item, idx) {
         var el = document.createElement('div');
         el.className = 'toc-item ' + (Math.floor(currentPage / 2) * 2 === idx ? 'active' : '');
-        el.innerHTML = `<strong>Part ${idx + 1}:</strong> ${item.title}`;
+        el.innerHTML = `<strong>Section ${idx + 1}:</strong> ${item.title}`;
         el.addEventListener('click', function () {
           currentPage = Math.floor(idx / 2) * 2;
           renderFlipBook();
@@ -475,13 +652,12 @@
       });
     }
 
-    // Events
     document.getElementById('prevBtn').addEventListener('click', function () {
       if (currentPage >= 2) { currentPage -= 2; renderFlipBook(); }
     });
 
     document.getElementById('nextBtn').addEventListener('click', function () {
-      if (currentPage + 2 < ENGLISH12_PAGES.length) { currentPage += 2; renderFlipBook(); }
+      if (currentPage + 2 < ENGLISH12_FULL_DATABASE.length) { currentPage += 2; renderFlipBook(); }
     });
 
     document.getElementById('firstPageBtn').addEventListener('click', function () {
@@ -489,7 +665,7 @@
     });
 
     document.getElementById('lastPageBtn').addEventListener('click', function () {
-      currentPage = Math.floor((ENGLISH12_PAGES.length - 1) / 2) * 2; renderFlipBook();
+      currentPage = Math.floor((ENGLISH12_FULL_DATABASE.length - 1) / 2) * 2; renderFlipBook();
     });
 
     document.getElementById('toggleTocBtn').addEventListener('click', function () {
@@ -500,7 +676,6 @@
       document.getElementById('tocSidebar').classList.remove('open');
     });
 
-    // Run Initial
     renderFlipBook();
   </script>
 </body>
