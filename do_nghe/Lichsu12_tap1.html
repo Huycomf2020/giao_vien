@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flipbook Lịch Sử 12 - Tập 1 | Thầy Phan Ngọc Huy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #02160e;
+      --bg-card: rgba(6, 44, 30, 0.92);
+      --border-color: rgba(16, 185, 129, 0.28);
+      --emerald-300: #6ee7b7;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --emerald-600: #059669;
+      --text-main: #f0fdf4;
+      --text-muted: #a7f3d0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(5, 150, 105, 0.15) 0%, transparent 50%),
+        linear-gradient(180deg, #021a11 0%, #010f09 100%);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      background: rgba(3, 30, 20, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover { background: linear-gradient(135deg, var(--emerald-400), var(--emerald-500)); transform: translateY(-1px); }
+    .btn-secondary { background: rgba(6, 78, 59, 0.6); border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-secondary:hover { background: rgba(6, 78, 59, 0.9); }
+
+    .viewport {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .book-container {
+      width: 100%;
+      max-width: 1180px;
+      height: 92%;
+      display: flex;
+      background: #064e3b;
+      border-radius: 12px;
+      border: 4px solid #047857;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page-spread {
+      flex: 1;
+      background: #fdfbf7;
+      color: #1e293b;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .page-spread.left {
+      border-right: 2px solid #e2e8f0;
+      box-shadow: inset -15px 0 20px rgba(0,0,0,0.05);
+    }
+
+    .page-spread.right {
+      box-shadow: inset 15px 0 20px rgba(0,0,0,0.05);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 6px;
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .page-body {
+      flex: 1;
+      margin-top: 14px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.02rem;
+      line-height: 1.8;
+      color: #1e293b;
+    }
+
+    .page-body h3 {
+      font-family: 'Inter', sans-serif;
+      color: #064e3b;
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--emerald-500);
+      padding-left: 10px;
+    }
+
+    .box-target {
+      background: rgba(6, 78, 59, 0.08);
+      border-left: 3px solid #059669;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.92rem;
+      font-style: italic;
+      font-family: 'Inter', sans-serif;
+      border-radius: 4px;
+    }
+
+    .box-quiz {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px dashed #10b981;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .page-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 8px;
+      margin-top: 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #064e3b;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .bottombar {
+      background: rgba(3, 30, 20, 0.95);
+      border-top: 1px solid var(--border-color);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .toc-sidebar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -320px;
+      width: 320px;
+      background: rgba(3, 30, 20, 0.98);
+      border-right: 1px solid var(--border-color);
+      z-index: 50;
+      transition: left 0.3s ease;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.7);
+    }
+
+    .toc-sidebar.open { left: 0; }
+
+    .toc-item {
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .toc-item:hover, .toc-item.active {
+      background: rgba(16, 185, 129, 0.2);
+      color: #ffffff;
+      border-left: 3px solid var(--emerald-400);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <div class="topbar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="etextbook.html" class="btn btn-secondary">⬅️ Thư Viện Sách</a>
+      <button class="btn btn-secondary" id="toggleTocBtn">📑 Mục Lục Sách</button>
+      <div>
+        <h3 style="font-size: 1.1rem; color: #ffffff;">Sách Giáo Khoa Lịch Sử 12 - Tập 1</h3>
+        <p style="font-size: 0.78rem; color: var(--emerald-300);">Bộ Sách Chuẩn GDPT 2018 • Biên soạn số bởi Thầy Phan Ngọc Huy</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <a href="https://drive.google.com/file/d/16wLEo4iUkFQuRKAZmx7RlmIC2cN8XOaB/view?usp=drive_link" target="_blank" class="btn btn-secondary">☁️ File Drive Gốc PDF</a>
+    </div>
+  </div>
+
+  <!-- Sidebar Mục Lục -->
+  <div class="toc-sidebar" id="tocSidebar">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+      <h4 style="color: var(--emerald-400); font-size: 1rem;">📑 Mục Lục Bài Học</h4>
+      <button id="closeTocBtn" style="background: none; border: none; color: #ffffff; font-size: 1.2rem; cursor: pointer;">✕</button>
+    </div>
+    <div id="tocListContainer" style="flex: 1; overflow-y: auto;"></div>
+  </div>
+
+  <!-- Viewport Flipbook 3D -->
+  <div class="viewport">
+    <div class="book-container">
+      <!-- Trang bên trái -->
+      <div class="page-spread left">
+        <div class="page-header">
+          <span>LỊCH SỬ 12 - TẬP 1</span>
+          <span id="leftChapter">Chủ đề 1</span>
+        </div>
+        <div class="page-body" id="leftBody"></div>
+        <div class="page-footer">
+          <span id="leftPageNum">Trang 1</span>
+          <span>Sách của Bộ GD&ĐT 2026</span>
+        </div>
+      </div>
+
+      <!-- Trang bên phải -->
+      <div class="page-spread right">
+        <div class="page-header">
+          <span>LỊCH SỬ 12 - TẬP 1</span>
+          <span id="rightChapter">Nội Dung Bài Học</span>
+        </div>
+        <div class="page-body" id="rightBody"></div>
+        <div class="page-footer">
+          <span>Tinh gọn bởi Huycomf</span>
+          <span id="rightPageNum">Trang 2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Controller -->
+  <div class="bottombar">
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-secondary" id="firstPageBtn">⏮ Trang Đầu</button>
+      <button class="btn" id="prevBtn">◀ Lật Trang Trước</button>
+    </div>
+    <span id="pageIndicator" style="font-weight: 700; color: var(--emerald-400); font-size: 0.95rem;">Trang 1 - 2 / 8</span>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn" id="nextBtn">Lật Trang Sau ▶</button>
+      <button class="btn btn-secondary" id="lastPageBtn">Trang Cuối ⏭</button>
+    </div>
+  </div>
+
+  <script>
+    // Database nội dung các bài học Lịch Sử 12 Tập 1 chuẩn GDPT 2018
+    var LICHSU12_TAP1_PAGES = [
+      {
+        chapter: "CHỦ ĐỀ 1: THẾ GIỚI TRONG VÀ SAU CHIẾN TRANH LẠNH",
+        title: "Bài 1: Trật Tự Thế Giới Trong Chiến Tranh Lạnh",
+        content: `<strong>1. Sự hình thành Trật tự hai cực I-an-ta (Yalta):</strong><br>
+        • Hội nghị I-an-ta (2/1945): Thỏa thuận phân chia phạm vi ảnh hưởng giữa Mỹ và Liên Xô ở châu Âu và châu Á.<br>
+        • Thiết lập hệ thống hai phe: Tự do chủ nghĩa (Mỹ đứng đầu) và Xã hội chủ nghĩa (Liên Xô đứng đầu).<br><br>
+        <strong>2. Nguyên nhân và Biểu hiện của Chiến tranh Lạnh:</strong><br>
+        • <strong>Mục tiêu:</strong> Mỹ phát động Học thuyết Trun-man (1947) nhằm ngăn chặn Liên Xô và phong trào cách mạng thế giới.<br>
+        • <strong>Biểu hiện:</strong> Chạy đua vũ trang, thành lập các khối quân sự đối đầu (NATO và Vac-sava), và các cuộc chiến tranh cục bộ ủy nhiệm (Triều Tiên, Việt Nam).`,
+        target: "🎯 Mục tiêu: Trình bày được quá trình hình thành, đặc điểm và tác động của Trật tự hai cực I-an-ta đối với thế giới.",
+        quiz: "💡 Câu hỏi củng cố: Hội nghị I-an-ta (2/1945) đã đưa ra những quyết định quan trọng nào ảnh hưởng đến cục diện thế giới?"
+      },
+      {
+        chapter: "CHỦ ĐỀ 1: THẾ GIỚI TRONG VÀ SAU CHIẾN TRANH LẠNH",
+        title: "Bài 2: Trật Tự Thế Giới Sau Chiến Tranh Lạnh",
+        content: `<strong>1. Sự sụp đổ của Trật tự hai cực I-an-ta:</strong><br>
+        • Nguyên nhân: Khủng hoảng mô hình XHCN ở Liên Xô và Đông Âu, sự suy giảm vị thế kinh tế do chạy đua vũ trang.<br>
+        • Tháng 12/1989: Mỹ và Liên Xô tuyên bố chấm dứt Chiến tranh Lạnh.<br><br>
+        <strong>2. Xu thế phát triển của thế giới sau Chiến tranh Lạnh:</strong><br>
+        • <strong>Xu thế đa cực:</strong> Hình thành các trung tâm kinh tế - chính trị lớn (Mỹ, EU, Nhật Bản, Trung Quốc, Nga, Ấn Độ).<br>
+        • <strong>Tập trung phát triển kinh tế:</strong> Trở thành trọng tâm trong quan hệ quốc tế.<br>
+        • <strong>Hòa bình, hợp tác và hội nhập:</strong> Gia tăng vai trò của các tổ chức khu vực và quốc tế (LHQ, ASEAN, WTO).`,
+        target: "🎯 Mục tiêu: Đánh giá được thời cơ và thách thức của Việt Nam trong xu thế đa cực và toàn cầu hóa.",
+        quiz: "💡 Câu hỏi củng cố: Tại sao sau Chiến tranh Lạnh, kinh tế lại trở thành trọng tâm trong quan hệ quốc tế?"
+      },
+      {
+        chapter: "CHỦ ĐỀ 2: A-XÊ-AN (ASEAN): NHỮNG CHẶNG ĐƯỜNG LỊCH SỬ",
+        title: "Bài 3: Sự Thành Lập và Phát Triển Của ASEAN",
+        content: `<strong>1. Hoàn cảnh ra đời:</strong><br>
+        • Ngày 8/8/1967: Hiệp hội các quốc gia Đông Nam Á (ASEAN) được thành lập tại Băng Cốc (Thái Lan) với 5 nước sáng lập (In-đô-nê-xi-a, Ma-lay-xi-a, Phi-lip-pin, Xing-ga-po, Thái Lan).<br><br>
+        <strong>2. Các giai đoạn phát triển chính:</strong><br>
+        • <strong>1967 - 1976:</strong> Hợp tác ban đầu sơ khai, ký Hiệp ước Bali (1976) mở ra thời kỳ hợp tác mới.<br>
+        • <strong>1976 - 1999:</strong> Mở rộng thành viên từ ASEAN 5 thành ASEAN 10 (Việt Nam gia nhập ngày 28/7/1995).<br>
+        • <strong>2015 - nay:</strong> Chính thức thành lập Cộng đồng ASEAN (3 trụ cột: An ninh - Chính trị, Kinh tế, Văn hóa - Xã hội).`,
+        target: "🎯 Mục tiêu: Phân tích được các mốc lịch sử quan trọng và ý nghĩa của việc thành lập Cộng đồng ASEAN.",
+        quiz: "💡 Câu hỏi củng cố: Việc Việt Nam gia nhập ASEAN năm 1995 có ý nghĩa lịch sử như thế nào đối với khu vực?"
+      },
+      {
+        chapter: "CHỦ ĐỀ 3: CÁCH MẠNG THÁNG TÁM NĂM 1945 VÀ CHIẾN TRANH GIẢI PHÓNG DÂN TỘC VIỆT NAM (1945 - 1975)",
+        title: "Bài 4: Cách Mạng Tháng Tám Năm 1945",
+        content: `<strong>1. Bối cảnh lịch sử và Bùng nổ Tổng khởi nghĩa:</strong><br>
+        • Thời cơ ngàn năm có một: Phát xít Nhật đầu hàng đồng minh không điều kiện (8/1945).<br>
+        • Đảng Cộng sản Đông Dương phát động Tổng khởi nghĩa giành chính quyền trong cả nước từ 14 đến 28/8/1945.<br><br>
+        <strong>2. Ý nghĩa lịch sử và Nguyên nhân thắng lợi:</strong><br>
+        • <strong>Đổi đời dân tộc:</strong> Đập tan ách thống trị của Pháp - Nhật và chế độ phong kiến, lập ra nước VNDCCH (2/9/1945).<br>
+        • <strong>Bài học kinh nghiệm:</strong> Nhận định thời cơ, chớp thời cơ, kết hợp lực lượng chính trị với lực lượng vũ trang.`,
+        target: "🎯 Mục tiêu: Giải thích được nguyên nhân thắng lợi, ý nghĩa lịch sử và bài học kinh nghiệm về chớp thời cơ của Cách mạng Tháng Tám.",
+        quiz: "💡 Câu hỏi suy ngẫm: Nghệ thuật chớp thời cơ trong Cách mạng Tháng Tám năm 1945 được thể hiện như thế nào?"
+      },
+      {
+        chapter: "CHỦ ĐỀ 3: CÁCH MẠNG THÁNG TÁM NĂM 1945 VÀ CHIẾN TRANH GIẢI PHÓNG DÂN TỘC VIỆT NAM (1945 - 1975)",
+        title: "Bài 5: Cuộc Kháng Chiến Chống Thực Dân Pháp (1945 - 1954)",
+        content: `<strong>1. Đường lối kháng chiến toàn dân, toàn diện, trường kỳ, tự lực cánh sinh:</strong><br>
+        • Lời kêu gọi toàn quốc kháng chiến của Chủ tịch Hồ Chí Minh (19/12/1946).<br><br>
+        <strong>2. Các chiến dịch quân sự quyết định:</strong><br>
+        • <strong>Việt Bắc Thu - Đông (1947):</strong> Bẻ gãy chiến lược "đánh nhanh thắng nhanh" của Pháp.<br>
+        • <strong>Biên giới Thu - Đông (1950):</strong> Giành thế chủ động trên chiến trường chính Bắc Bộ.<br>
+        • <strong>Đông - Xuân 1953 - 1954 & Điện Biên Phủ (1954):</strong> Lập nên kỳ tích "lừng lẫy năm châu, chấn động địa cầu", buộc Pháp ký Hiệp định Giơ-ne-vơ.`,
+        target: "🎯 Mục tiêu: Phân tích được bước phát triển của cuộc kháng chiến và ý nghĩa lịch sử của chiến thắng Điện Biên Phủ.",
+        quiz: "💡 Câu hỏi củng cố: Phân tích ý nghĩa bước ngoặt của chiến dịch Biên giới Thu - Đông năm 1950."
+      },
+      {
+        chapter: "CHỦ ĐỀ 3: CÁCH MẠNG THÁNG TÁM NĂM 1945 VÀ CHIẾN TRANH GIẢI PHÓNG DÂN TỘC VIỆT NAM (1945 - 1975)",
+        title: "Bài 6: Cuộc Kháng Chiến Chống Mỹ, Cứu Nước (1954 - 1975)",
+        content: `<strong>1. Đánh bại các chiến lược chiến tranh của Mỹ:</strong><br>
+        • Phong trào "Đồng khởi" (1959 - 1960) làm phá sản Chiến tranh một phía.<br>
+        • Đánh bại chiến lược "Chiến tranh đặc biệt" (1961 - 1965) và "Chiến tranh cục bộ" (1965 - 1968).<br>
+        • Tổng tiến công và nổi dậy Tết Mậu Thân 1968 buộc Mỹ phải đàm phán tại Pa-ri.<br><br>
+        <strong>2. Tổng tiến công và nổi dậy Mùa Xuân 1975:</strong><br>
+        • 3 chiến dịch lớn: Tây Nguyên, Huế - Đà Nẵng, và Chiến dịch Hồ Chí Minh lịch sử giải phóng hoàn toàn Miền Nam (30/4/1975).`,
+        target: "🎯 Mục tiêu: Trình bày được các giai đoạn phát triển của cuộc kháng chiến chống Mỹ và nguyên nhân quyết định thắng lợi.",
+        quiz: "💡 Câu hỏi củng cố: Ý nghĩa chiến lược của Hiệp định Pa-ri năm 1973 đối với cục diện chiến trường Miền Nam?"
+      },
+      {
+        chapter: "CHỦ ĐỀ 4: BẢO VỆ TỔ QUỐC SAU CHIẾN TRANH GIẢI PHÓNG DÂN TỘC (1975 ĐẾN NAY)",
+        title: "Bài 7: Cuộc Đấu Tranh Bảo Vệ Biên Giới Và Lao Động Hòa Bình",
+        content: `<strong>1. Khôi phục kinh tế và bảo vệ chủ quyền biên giới:</strong><br>
+        • Cuộc đấu tranh bảo vệ biên giới Tây Nam (1975 - 1979) chống lại tập đoàn diệt chủng Pol Pot.<br>
+        • Cuộc đấu tranh bảo vệ biên giới phía Bắc (1979 - 1989) khẳng định chủ quyền lãnh thổ thiêng liêng.<br><br>
+        <strong>2. Công cuộc Đổi mới đất nước (1986 đến nay):</strong><br>
+        • Đại hội VI (12/1986): Đề ra đường lối Đổi mới toàn diện, phát triển kinh tế thị trường định hướng XHCN, đưa Việt Nam bước vào thời kỳ phát triển mới.`,
+        target: "🎯 Mục tiêu: Hiểu rõ ý nghĩa của cuộc đấu tranh bảo vệ biên giới và thành tựu của công cuộc Đổi mới.",
+        quiz: "💡 Câu hỏi suy ngẫm: Đường lối Đổi mới năm 1986 đã mang lại những bước ngoặt gì cho vị thế đất nước?"
+      },
+      {
+        chapter: "TỔNG ÔN LỊCH SỬ 12 - TẬP 1",
+        title: "Hướng Dẫn Ôn Thi Tốt Nghiệp THPT Kỷ Nguyên Số 2026",
+        content: `<strong>Cấu trúc đề thi Lịch Sử TN THPT 2026 chuẩn Bộ GD&ĐT:</strong><br><br>
+        1. <strong>Phần I:</strong> Trắc nghiệm nhiều lựa chọn (24 câu - 6.0 điểm).<br>
+        2. <strong>Phần II:</strong> Trắc nghiệm Đúng / Sai theo tư liệu lịch sử (4 câu - 16 ý - 4.0 điểm).<br><br>
+        <strong>Mẹo làm bài:</strong> Nắm vững từ khóa thời gian, phân tích bản chất sự kiện, tư duy nguyên nhân - kết quả và kỹ năng đọc hiểu tư liệu gốc.`,
+        target: "🎯 Đạt được: Làm chủ kiến thức Lịch Sử 12 Tập 1 và sẵn sàng chinh phục điểm 9+.",
+        quiz: "💡 Luyện tập ngay: Mở công cụ QuizScanner Pro để giải các bộ đề thi thử Lịch Sử 2026 mới nhất!"
+      }
+    ];
+
+    var currentPage = 0;
+
+    function renderFlipBook() {
+      var p1 = LICHSU12_TAP1_PAGES[currentPage] || {
+        chapter: "KẾT THÚC",
+        title: "Trang Cuối",
+        content: "Bạn đã hoàn thành các bài học trong Sách Giáo Khoa Lịch Sử 12 - Tập 1.",
+        target: "",
+        quiz: ""
+      };
+
+      var p2 = LICHSU12_TAP1_PAGES[currentPage + 1] || {
+        chapter: "GHI CHÚ",
+        title: "Sổ Tay Ôn Tập",
+        content: "Học sinh tự hệ thống sơ đồ tư duy thời gian sự kiện và luyện bài tập tự trắc nghiệm.",
+        target: "",
+        quiz: ""
+      };
+
+      // Trang trái
+      document.getElementById('leftChapter').textContent = p1.chapter;
+      document.getElementById('leftBody').innerHTML = `
+        <h3>${p1.title}</h3>
+        <p>${p1.content}</p>
+        ${p1.target ? `<div class="box-target">${p1.target}</div>` : ''}
+      `;
+      document.getElementById('leftPageNum').textContent = "Trang " + (currentPage + 1);
+
+      // Trang phải
+      document.getElementById('rightChapter').textContent = p2.chapter;
+      document.getElementById('rightBody').innerHTML = `
+        <h3>${p2.title}</h3>
+        <p>${p2.content}</p>
+        ${p2.quiz ? `<div class="box-quiz">${p2.quiz}</div>` : ''}
+      `;
+      document.getElementById('rightPageNum').textContent = "Trang " + (currentPage + 2);
+
+      document.getElementById('pageIndicator').textContent = `Trang ${currentPage + 1} - ${currentPage + 2} / ${LICHSU12_TAP1_PAGES.length}`;
+      buildTocUI();
+    }
+
+    function buildTocUI() {
+      var container = document.getElementById('tocListContainer');
+      container.innerHTML = '';
+      LICHSU12_TAP1_PAGES.forEach(function (item, idx) {
+        var el = document.createElement('div');
+        el.className = 'toc-item ' + (Math.floor(currentPage / 2) * 2 === idx ? 'active' : '');
+        el.innerHTML = `<strong>Bài ${idx + 1}:</strong> ${item.title}`;
+        el.addEventListener('click', function () {
+          currentPage = Math.floor(idx / 2) * 2;
+          renderFlipBook();
+          document.getElementById('tocSidebar').classList.remove('open');
+        });
+        container.appendChild(el);
+      });
+    }
+
+    // Events
+    document.getElementById('prevBtn').addEventListener('click', function () {
+      if (currentPage >= 2) { currentPage -= 2; renderFlipBook(); }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', function () {
+      if (currentPage + 2 < LICHSU12_TAP1_PAGES.length) { currentPage += 2; renderFlipBook(); }
+    });
+
+    document.getElementById('firstPageBtn').addEventListener('click', function () {
+      currentPage = 0; renderFlipBook();
+    });
+
+    document.getElementById('lastPageBtn').addEventListener('click', function () {
+      currentPage = Math.floor((LICHSU12_TAP1_PAGES.length - 1) / 2) * 2; renderFlipBook();
+    });
+
+    document.getElementById('toggleTocBtn').addEventListener('click', function () {
+      document.getElementById('tocSidebar').classList.toggle('open');
+    });
+
+    document.getElementById('closeTocBtn').addEventListener('click', function () {
+      document.getElementById('tocSidebar').classList.remove('open');
+    });
+
+    // Run Initial
+    renderFlipBook();
+  </script>
+</body>
+</html>
