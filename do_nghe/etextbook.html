@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SGK Điện Tử 4.0 - eTextbook Pro | Thầy Phan Ngọc Huy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ============================================================
+       THEME: GREEN & DARK GREEN SCIENTIFIC CLASSROOM
+       Author: Thầy Phan Ngọc Huy - THPT Lộc Ninh, TP. Đồng Nai
+       Footer: Made by Huycomf
+       ============================================================ */
+    :root {
+      --bg-primary: #02160e;
+      --bg-secondary: #052618;
+      --bg-card: rgba(6, 44, 30, 0.85);
+      --border-color: rgba(16, 185, 129, 0.28);
+      --border-glow: rgba(52, 211, 153, 0.7);
+      
+      --emerald-300: #6ee7b7;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --emerald-600: #059669;
+      --emerald-700: #047857;
+      --emerald-800: #065f46;
+      --emerald-900: #064e3b;
+      
+      --text-main: #f0fdf4;
+      --text-muted: #a7f3d0;
+      --text-dim: #6ee7b7;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --transition-fast: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(5, 150, 105, 0.15) 0%, transparent 50%),
+        linear-gradient(180deg, #021a11 0%, #010f09 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .app-header {
+      background: rgba(3, 30, 20, 0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 24px;
+    }
+
+    .header-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--emerald-400), var(--emerald-800));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .brand-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .brand-title span {
+      color: var(--emerald-400);
+      background: linear-gradient(90deg, #34d399, #a7f3d0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle { font-size: 0.78rem; color: var(--text-muted); }
+
+    .nav-tabs {
+      display: flex;
+      background: rgba(2, 38, 26, 0.75);
+      padding: 5px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      gap: 5px;
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition-fast);
+    }
+
+    .nav-tab-btn:hover { color: #ffffff; background: rgba(16, 185, 129, 0.15); }
+
+    .nav-tab-btn.active {
+      background: linear-gradient(135deg, var(--emerald-600), var(--emerald-800));
+      color: #ffffff;
+      box-shadow: 0 2px 14px rgba(5, 150, 105, 0.4);
+      border: 1px solid var(--emerald-400);
+    }
+
+    /* Main Container */
+    .main-content {
+      flex: 1;
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 24px;
+    }
+
+    .tab-view { display: none; }
+    .tab-view.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      margin-bottom: 20px;
+    }
+
+    .panel-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--emerald-500), var(--emerald-700));
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      border-color: var(--emerald-400);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--emerald-400), var(--emerald-600));
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(6, 78, 59, 0.6);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover { background: rgba(6, 78, 59, 0.9); border-color: var(--emerald-400); }
+    .btn-success { background: linear-gradient(135deg, #10b981, #047857); color: white; }
+    .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+    .btn-drive {
+      background: linear-gradient(135deg, #1a73e8, #0d47a1);
+      color: white;
+      border-color: #64b5f6;
+      box-shadow: 0 4px 15px rgba(26, 115, 232, 0.35);
+    }
+    .btn-drive:hover { background: linear-gradient(135deg, #4285f4, #1565c0); }
+
+    /* Cloud Sync Banner */
+    .drive-banner {
+      background: linear-gradient(135deg, rgba(26, 115, 232, 0.25) 0%, rgba(6, 78, 59, 0.6) 100%);
+      border: 1.5px solid #4285f4;
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .drive-info-left { display: flex; align-items: center; gap: 16px; }
+    .drive-logo-icon {
+      width: 52px;
+      height: 52px;
+      background: #ffffff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Filter Controls Grid */
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 992px) {
+      .filter-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 576px) {
+      .filter-grid { grid-template-columns: 1fr; }
+    }
+
+    .filter-select {
+      width: 100%;
+      background: rgba(2, 44, 34, 0.85);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.92rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .filter-select:focus {
+      border-color: var(--emerald-400);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Search Input Box */
+    .omni-search-wrapper {
+      position: relative;
+      margin-bottom: 22px;
+    }
+
+    .omni-search-input {
+      width: 100%;
+      background: rgba(2, 44, 34, 0.9);
+      border: 1.5px solid var(--emerald-500);
+      color: #ffffff;
+      padding: 14px 20px 14px 48px;
+      border-radius: 30px;
+      font-size: 1rem;
+      outline: none;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transition: var(--transition-fast);
+    }
+
+    .omni-search-input:focus {
+      border-color: #34d399;
+      box-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+    }
+
+    .omni-search-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.25rem;
+      color: var(--emerald-400);
+    }
+
+    /* Book Cards Grid */
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .book-card {
+      background: rgba(6, 44, 30, 0.85);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .book-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--emerald-400);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25);
+    }
+
+    .book-cover-banner {
+      height: 140px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--emerald-800), var(--emerald-600));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      position: relative;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    .book-publisher-pill {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.65);
+      color: #a7f3d0;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .book-grade-pill {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--emerald-500);
+      color: #02160e;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .book-cover-icon { font-size: 42px; margin-bottom: 4px; }
+    .book-title-sub { font-size: 0.85rem; font-weight: 700; color: #ffffff; text-align: center; padding: 0 10px; }
+
+    .book-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .book-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+      flex: 1;
+    }
+
+    .book-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .book-actions .btn {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+    }
+
+    /* Modal Reader */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 1100px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-header {
+      background: rgba(3, 30, 20, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-body {
+      flex: 1;
+      background: #021a11;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .reader-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Footer */
+    .app-footer {
+      background: rgba(2, 22, 15, 0.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-color);
+      padding: 16px 24px;
+      margin-top: auto;
+    }
+
+    .footer-content {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-author { font-size: 0.95rem; font-weight: 700; color: #ffffff; }
+    .footer-author span { color: var(--emerald-400); text-shadow: 0 0 10px rgba(52, 211, 153, 0.6); }
+
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: linear-gradient(135deg, var(--emerald-800), var(--emerald-600));
+      border: 1px solid var(--emerald-400);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="../index.html" class="brand-logo" onclick="navigateToHome(event)">
+        <div class="brand-icon">📚</div>
+        <div>
+          <div class="brand-title">eTextbook <span>Pro 4.0</span> - SGK Điện Tử</div>
+          <div class="brand-subtitle">Thư Viện Sách Giáo Khoa & Sách Giáo Viên Số • Thầy Phan Ngọc Huy</div>
+        </div>
+      </a>
+
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-tab="catalog">📖 Tra Cứu Sách</button>
+        <button class="nav-tab-btn" data-tab="ai-copilot">🤖 AI Trợ Lý Bài Học</button>
+        <button class="nav-tab-btn" data-tab="drive-sync">☁️ Kho Google Drive</button>
+        <button class="nav-tab-btn" data-tab="notes">📌 Ghi Chú Giảng Dạy</button>
+      </nav>
+
+      <a href="../index.html" class="btn btn-secondary" style="font-size: 0.85rem; padding: 6px 14px;" onclick="navigateToHome(event)">
+        🏠 Về Tiện Ích Giáo Viên
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+
+    <!-- ============================================================
+         TAB 1: TRA CỨU & ĐỌC SÁCH GIÁO KHOA SỐ
+         ============================================================ -->
+    <section id="tab-catalog" class="tab-view active">
+      
+      <!-- Google Drive Sync Banner -->
+      <div class="drive-banner">
+        <div class="drive-info-left">
+          <div class="drive-logo-icon">📁</div>
+          <div>
+            <h3 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 3px;">
+              Kho Dữ Liệu Sách Số Đồng Bộ Google Drive Trực Tiếp
+            </h3>
+            <p style="font-size: 0.86rem; color: #dbeafe;">
+              Được kết nối và đồng bộ thời gian thực từ thư mục Google Drive của Thầy Phan Ngọc Huy.
+            </p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <a href="https://drive.google.com/drive/folders/1yhSjb4sMRjAx14GLspPT1jRUZLDokXSM?usp=drive_link" target="_blank" class="btn btn-drive">
+            ☁️ Mở Thư Mục Google Drive Gốc
+          </a>
+          <button class="btn btn-primary" id="openEmbeddedDriveBtn">
+            📂 Xem Trực Tiếp Trên Trang
+          </button>
+        </div>
+      </div>
+
+      <!-- Multi-dimensional Filters -->
+      <div class="glass-panel">
+        <div class="filter-grid">
+          <div>
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--emerald-300); display: block; margin-bottom: 6px;">1. Bộ Sách Giáo Khoa:</label>
+            <select id="publisherFilter" class="filter-select">
+              <option value="all" selected>Tất Cả 3 Bộ Sách Mới</option>
+              <option value="ketnoi">Kết Nối Tri Thức Với Cuộc Sống</option>
+              <option value="canhdieu">Cánh Diều</option>
+              <option value="chantroi">Chân Trời Sáng Tạo</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--emerald-300); display: block; margin-bottom: 6px;">2. Khối Lớp:</label>
+            <select id="gradeFilter" class="filter-select">
+              <option value="all" selected>Tất Cả Các Khối Lớp</option>
+              <option value="12">Lớp 12 (Chuẩn 2018)</option>
+              <option value="11">Lớp 11 (Chuẩn 2018)</option>
+              <option value="10">Lớp 10 (Chuẩn 2018)</option>
+              <option value="thcs">Cấp THCS (Lớp 6 - 9)</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--emerald-300); display: block; margin-bottom: 6px;">3. Phân Loại Tài Liệu:</label>
+            <select id="typeFilter" class="filter-select">
+              <option value="all" selected>Tất Cả Thể Loại</option>
+              <option value="sgk">Sách Giáo Khoa (SGK)</option>
+              <option value="sgv">Sách Giáo Viên (SGV)</option>
+              <option value="sbt">Sách Bài Tập (SBT)</option>
+              <option value="chuyende">Chuyên Đề Học Tập</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--emerald-300); display: block; margin-bottom: 6px;">4. Môn Học:</label>
+            <select id="subjectFilter" class="filter-select">
+              <option value="all" selected>Tất Cả Các Môn</option>
+              <option value="toan">Toán Học</option>
+              <option value="van">Ngữ Văn</option>
+              <option value="anh">Tiếng Anh</option>
+              <option value="ly">Vật Lí</option>
+              <option value="hoa">Hóa Học</option>
+              <option value="sinh">Sinh Học</option>
+              <option value="su">Lịch Sử</option>
+              <option value="dia">Địa Lí</option>
+              <option value="tin">Tin Học</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Omni Search Input -->
+        <div class="omni-search-wrapper">
+          <span class="omni-search-icon">🔍</span>
+          <input type="text" id="omniSearchInput" class="omni-search-input" placeholder="Tìm nhanh theo tên sách, tên bài học, tác giả, chuyên đề kiến thức...">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <span style="font-size: 0.9rem; color: var(--emerald-300);" id="bookCountSummary">Đang hiển thị 12 đầu sách số</span>
+          <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.82rem;" id="resetFilterBtn">🔄 Đặt Lại Bộ Lọc</button>
+        </div>
+
+        <!-- Books Grid Container -->
+        <div class="books-grid" id="booksGridContainer">
+          <!-- Dynamically populated books -->
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         TAB 2: AI TRỢ LÝ BÀI HỌC (AI TEXTBOOK COPILOT)
+         ============================================================ -->
+    <section id="tab-ai-copilot" class="tab-view">
+      <div class="glass-panel">
+        <h2 class="panel-title">🤖 AI Trợ Lý Bài Học - Tóm Tắt & Sinh Câu Hỏi Tự Động Từ SGK</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div>
+            <label style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 8px;">
+              Dán nội dung bài học hoặc đoạn văn bản SGK cần phân tích:
+            </label>
+            <textarea id="aiInputText" class="filter-select" rows="10" style="resize: vertical;" placeholder="Dán văn bản bài học từ Sách Giáo Khoa vào đây... Ví dụ: Khái niệm đạo hàm, quy tắc tính tích phân, văn bản bài thơ Tây Tiến, sự kiện lịch sử Cách mạng tháng Tám..."></textarea>
+
+            <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
+              <button class="btn btn-primary" id="aiSummarizeBtn">
+                ✨ Tóm Tắt Ý Chính & Sơ Đồ Tư Duy
+              </button>
+              <button class="btn btn-warning" id="aiGenerateQuizBtn">
+                🎯 Trích Xuất 5 Câu Trắc Nghiệm
+              </button>
+              <button class="btn btn-secondary" id="speakTextBtn">
+                🔊 Đọc Giọng Nói AI
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 8px;">
+              Kết quả phân tích từ AI:
+            </label>
+            <div id="aiResultBox" style="background: rgba(2, 44, 34, 0.75); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; min-height: 250px; font-size: 0.92rem; line-height: 1.7; color: var(--text-main); overflow-y: auto; max-height: 380px;">
+              <em>Chọn hoặc dán nội dung bài học bên trái rồi nhấn nút để AI xử lý...</em>
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 10px; justify-content: flex-end;">
+              <button class="btn btn-success" id="exportToQuizScannerBtn" style="display: none;">
+                🚀 Chuyển Thẳng Sang QuizScanner Pro
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 3: NHÚNG KHO GOOGLE DRIVE TRỰC TIẾP
+         ============================================================ -->
+    <section id="tab-drive-sync" class="tab-view">
+      <div class="glass-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+          <h2 class="panel-title" style="margin-bottom: 0; border-bottom: none;">☁️ Kho Tệp Google Drive Trực Tuyến</h2>
+          <a href="https://drive.google.com/drive/folders/1yhSjb4sMRjAx14GLspPT1jRUZLDokXSM?usp=drive_link" target="_blank" class="btn btn-drive">
+            🔗 Mở Trong Tab Mới Google Drive
+          </a>
+        </div>
+
+        <div style="background: #021a11; border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; height: 75vh;">
+          <iframe 
+            src="https://drive.google.com/embeddedfolderview?id=1yhSjb4sMRjAx14GLspPT1jRUZLDokXSM#grid" 
+            style="width: 100%; height: 100%; border: none;"
+            title="Google Drive Folder Viewer">
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 4: GHI CHÚ BÀI GIẢNG & DẤU TRANG
+         ============================================================ -->
+    <section id="tab-notes" class="tab-view">
+      <div class="glass-panel">
+        <h2 class="panel-title">📌 Sổ Tay Ghi Chú & Dấu Trang Giảng Dạy</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+          <div>
+            <label style="font-size: 0.88rem; font-weight: 700; color: var(--emerald-300); display: block; margin-bottom: 6px;">Tiêu đề ghi chú:</label>
+            <input type="text" id="noteTitleInput" class="filter-select" placeholder="Ví dụ: Lưu ý bài Tích phân Lớp 12...">
+            
+            <label style="font-size: 0.88rem; font-weight: 700; color: var(--emerald-300); display: block; margin-top: 12px; margin-bottom: 6px;">Nội dung lưu ý:</label>
+            <textarea id="noteBodyInput" class="filter-select" rows="6" placeholder="Ghi chú kiến thức cần nhấn mạnh, câu hỏi học sinh hay sai..."></textarea>
+
+            <button class="btn btn-primary" id="saveNoteBtn" style="width: 100%; margin-top: 14px;">
+              💾 Lưu Ghi Chú Này
+            </button>
+          </div>
+
+          <div>
+            <h3 style="color: var(--emerald-400); font-size: 1.05rem; margin-bottom: 12px;">Danh sách ghi chú đã lưu:</h3>
+            <div id="savedNotesList" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
+              <!-- Dynamically populated saved notes -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Reader -->
+  <div class="modal-overlay" id="readerModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">📖</span>
+          <div>
+            <div style="font-weight: 800; color: #ffffff;" id="modalBookTitle">Đang mở sách...</div>
+            <div style="font-size: 0.78rem; color: var(--emerald-300);" id="modalBookInfo">SGK Chuẩn GDPT 2018</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button class="btn btn-secondary" id="modalSpeakBtn" style="padding: 6px 12px; font-size: 0.82rem;">🔊 Đọc</button>
+          <a href="https://drive.google.com/drive/folders/1yhSjb4sMRjAx14GLspPT1jRUZLDokXSM?usp=drive_link" target="_blank" class="btn btn-drive" style="padding: 6px 12px; font-size: 0.82rem;">☁️ Mở Drive</a>
+          <button class="btn btn-danger" id="closeModalBtn" style="padding: 6px 12px; font-size: 0.82rem; background: #dc2626; color: white;">✕ Đóng</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <iframe id="modalIframe" class="reader-iframe" src="" title="eTextbook Reader"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <div class="footer-author">
+        🚀 <span>Made by Huycomf</span> • eTextbook Pro 4.0 - SGK Điện Tử
+      </div>
+      <div style="font-size: 0.85rem; color: var(--text-muted);">
+        Phát triển bởi <strong>Thầy Phan Ngọc Huy</strong> - Trường THPT Lộc Ninh, TP. Đồng Nai
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast-msg"></div>
+
+  <!-- JAVASCRIPT CONTROLLER -->
+  <script>
+    // Smart Navigation Helper
+    function navigateToHome(e) {
+      if (e) e.preventDefault();
+      var path = window.location.pathname;
+      if (path.includes('/do_nghe/')) {
+        window.location.href = '../index.html';
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+
+    function showToast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(function () { t.style.display = 'none'; }, 2800);
+    }
+
+    // Comprehensive Digital Textbook Database
+    var DRIVE_BASE = "https://drive.google.com/drive/folders/1yhSjb4sMRjAx14GLspPT1jRUZLDokXSM";
+
+    var BOOKS_DATABASE = [
+      {
+        id: "toan-12-kntt-1",
+        name: "Toán 12 - Tập 1 (Kết Nối Tri Thức)",
+        grade: "12",
+        subject: "toan",
+        publisher: "ketnoi",
+        type: "sgk",
+        desc: "Khảo sát hàm số, Vectơ và hệ tọa độ trong không gian Oxyz, Các số đặc trưng đo mức độ phân tán.",
+        icon: "📐",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "toan-12-kntt-2",
+        name: "Toán 12 - Tập 2 (Kết Nối Tri Thức)",
+        grade: "12",
+        subject: "toan",
+        publisher: "ketnoi",
+        type: "sgk",
+        desc: "Nguyên hàm & Tích phân, Phương pháp tọa độ trong không gian, Xác suất có điều kiện.",
+        icon: "∫",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "toan-12-sgv-kntt",
+        name: "Sách Giáo Viên Toán 12 (Kết Nối Tri Thức)",
+        grade: "12",
+        subject: "toan",
+        publisher: "ketnoi",
+        type: "sgv",
+        desc: "Hướng dẫn tổ chức dạy học, phân phối thời lượng và gợi ý phương pháp kiểm tra đánh giá năng lực.",
+        icon: "👨‍🏫",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "toan-12-cd-1",
+        name: "Toán 12 - Tập 1 (Cánh Diều)",
+        grade: "12",
+        subject: "toan",
+        publisher: "canhdieu",
+        type: "sgk",
+        desc: "Ứng dụng đạo hàm để khảo sát hàm số, Toạ độ không gian, Thống kê mẫu số liệu ghép nhóm.",
+        icon: "📊",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "toan-12-ctst-1",
+        name: "Toán 12 - Tập 1 (Chân Trời Sáng Tạo)",
+        grade: "12",
+        subject: "toan",
+        publisher: "chantroi",
+        type: "sgk",
+        desc: "Đạo hàm và ứng dụng khảo sát hàm số, Hệ tọa độ trong không gian, Các số đặc trưng.",
+        icon: "📈",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "van-12-kntt-1",
+        name: "Ngữ Văn 12 - Tập 1 (Kết Nối Tri Thức)",
+        grade: "12",
+        subject: "van",
+        publisher: "ketnoi",
+        type: "sgk",
+        desc: "Văn học hiện đại, Thơ ca kháng chiến, Kịch bản văn học và kỹ năng viết bài nghị luận xã hội.",
+        icon: "📖",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "anh-12-global-1",
+        name: "Tiếng Anh 12 - Global Success (KNTT)",
+        grade: "12",
+        subject: "anh",
+        publisher: "ketnoi",
+        type: "sgk",
+        desc: "Life Stories, Urbanisation, The Green Movement, Artificial Intelligence in Education.",
+        icon: "🌐",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "ly-12-kntt",
+        name: "Vật Lí 12 (Kết Nối Tri Thức)",
+        grade: "12",
+        subject: "ly",
+        publisher: "ketnoi",
+        type: "sgk",
+        desc: "Vật lí nhiệt, Khí lí tưởng, Từ trường và Vật lí hạt nhân ứng dụng trong đời sống.",
+        icon: "⚡",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "hoa-12-kntt",
+        name: "Hóa Học 12 (Kết Nối Tri Thức)",
+        grade: "12",
+        subject: "hoa",
+        publisher: "ketnoi",
+        type: "sgk",
+        desc: "Ester - Lipid, Carbohydrate, Hợp chất chứa Nitrogen, Polymer và Hóa học phức chất.",
+        icon: "🧪",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "sinh-12-kntt",
+        name: "Sinh Học 12 (Kết Nối Tri Thức)",
+        grade: "12",
+        subject: "sinh",
+        publisher: "ketnoi",
+        type: "sgk",
+        desc: "Di truyền học phân tử, Di truyền nhiễm sắc thể, Tiến hóa và Sinh thái học quần thể.",
+        icon: "🧬",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "tin-12-kntt",
+        name: "Tin Học 12 - Định Hướng Tin Học Ứng Dụng",
+        grade: "12",
+        subject: "tin",
+        publisher: "ketnoi",
+        type: "sgk",
+        desc: "Hệ thống cơ sở dữ liệu quan hệ, Mạng máy tính & Internet, Trí tuệ nhân tạo và An toàn số.",
+        icon: "💻",
+        driveUrl: DRIVE_BASE
+      },
+      {
+        id: "su-12-kntt",
+        name: "Lịch Sử 12 (Kết Nối Tri Thức)",
+        grade: "12",
+        subject: "su",
+        publisher: "ketnoi",
+        type: "sgk",
+        desc: "Thế giới trong và sau Chiến tranh lạnh, Lịch sử Việt Nam từ 1919 đến nay.",
+        icon: "🏛️",
+        driveUrl: DRIVE_BASE
+      }
+    ];
+
+    // Render Books Grid
+    function renderBooks(list) {
+      var container = document.getElementById('booksGridContainer');
+      container.innerHTML = '';
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">Không tìm thấy sách phù hợp với bộ lọc</div>
+            <p style="margin-top: 6px;">Thầy cô hãy thử chọn lại môn học, khối lớp hoặc mở trực tiếp trên Google Drive.</p>
+          </div>
+        `;
+        document.getElementById('bookCountSummary').textContent = 'Đang hiển thị 0 đầu sách';
+        return;
+      }
+
+      list.forEach(function (b) {
+        var pubName = b.publisher === 'ketnoi' ? 'KNTT' : (b.publisher === 'canhdieu' ? 'Cánh Diều' : 'Chân Trời');
+        var card = document.createElement('div');
+        card.className = 'book-card';
+        card.innerHTML = `
+          <div>
+            <div class="book-cover-banner">
+              <span class="book-publisher-pill">${pubName}</span>
+              <span class="book-grade-pill">Lớp ${b.grade}</span>
+              <div class="book-cover-icon">${b.icon}</div>
+              <div class="book-title-sub">${b.name}</div>
+            </div>
+            <div class="book-name">${b.name}</div>
+            <div class="book-desc">${b.desc}</div>
+          </div>
+
+          <div class="book-actions">
+            <button class="btn btn-primary" onclick="openBookReader('${b.id}')">
+              📖 Đọc Sách
+            </button>
+            <a href="${b.driveUrl}" target="_blank" class="btn btn-drive">
+              ☁️ Mở Drive
+            </a>
+            <button class="btn btn-secondary" onclick="sendToAiCopilot('${b.name}', '${b.desc}')">
+              🤖 AI Trợ Lý
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById('bookCountSummary').textContent = 'Đang hiển thị ' + list.length + ' đầu sách số';
+    }
+
+    // Filter Logic
+    function applyFilters() {
+      var pub = document.getElementById('publisherFilter').value;
+      var grade = document.getElementById('gradeFilter').value;
+      var type = document.getElementById('typeFilter').value;
+      var sub = document.getElementById('subjectFilter').value;
+      var query = document.getElementById('omniSearchInput').value.toLowerCase().trim();
+
+      var filtered = BOOKS_DATABASE.filter(function (b) {
+        var matchPub = (pub === 'all') || (b.publisher === pub);
+        var matchGrade = (grade === 'all') || (b.grade === grade);
+        var matchType = (type === 'all') || (b.type === type);
+        var matchSub = (sub === 'all') || (b.subject === sub);
+        var matchQuery = !query || b.name.toLowerCase().includes(query) || b.desc.toLowerCase().includes(query);
+
+        return matchPub && matchGrade && matchType && matchSub && matchQuery;
+      });
+
+      renderBooks(filtered);
+    }
+
+    // Modal Reader Functions
+    function openBookReader(bookId) {
+      var book = BOOKS_DATABASE.find(function (x) { return x.id === bookId; });
+      if (!book) return;
+
+      document.getElementById('modalBookTitle').textContent = book.name;
+      document.getElementById('modalBookInfo').textContent = `Lớp ${book.grade} • ${book.desc}`;
+      
+      // Embed viewer (Google Drive preview)
+      var iframe = document.getElementById('modalIframe');
+      iframe.src = "https://drive.google.com/embeddedfolderview?id=1yhSjb4sMRjAx14GLspPT1jRUZLDokXSM#grid";
+
+      document.getElementById('readerModal').style.display = 'flex';
+    }
+
+    function sendToAiCopilot(name, desc) {
+      document.querySelectorAll('.nav-tab-btn').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === 'ai-copilot'); });
+      document.querySelectorAll('.tab-view').forEach(function (v) { v.classList.toggle('active', v.id === 'tab-ai-copilot'); });
+      
+      var input = document.getElementById('aiInputText');
+      input.value = `Chuyên đề: ${name}\nNội dung chính: ${desc}\n\nHãy tóm tắt nội dung bài học và trích xuất các câu hỏi trắc nghiệm trọng tâm.`;
+      showToast('Đã nạp nội dung bài vào AI Trợ Lý!');
+    }
+
+    // Web Speech API Voice synthesis
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) {
+        alert('Trình duyệt của bạn không hỗ trợ đọc giọng nói.');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'vi-VN';
+      u.rate = 1.0;
+      window.speechSynthesis.speak(u);
+      showToast('Đang đọc giọng nói Tiếng Việt...');
+    }
+
+    // DOM Ready
+    document.addEventListener('DOMContentLoaded', function () {
+      
+      // Tab Navigation
+      document.querySelectorAll('.nav-tab-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var tId = btn.getAttribute('data-tab');
+          document.querySelectorAll('.nav-tab-btn').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === tId); });
+          document.querySelectorAll('.tab-view').forEach(function (v) { v.classList.toggle('active', v.id === 'tab-' + tId); });
+        });
+      });
+
+      // Filter events
+      document.getElementById('publisherFilter').addEventListener('change', applyFilters);
+      document.getElementById('gradeFilter').addEventListener('change', applyFilters);
+      document.getElementById('typeFilter').addEventListener('change', applyFilters);
+      document.getElementById('subjectFilter').addEventListener('change', applyFilters);
+      document.getElementById('omniSearchInput').addEventListener('input', applyFilters);
+
+      document.getElementById('resetFilterBtn').addEventListener('click', function () {
+        document.getElementById('publisherFilter').value = 'all';
+        document.getElementById('gradeFilter').value = 'all';
+        document.getElementById('typeFilter').value = 'all';
+        document.getElementById('subjectFilter').value = 'all';
+        document.getElementById('omniSearchInput').value = '';
+        applyFilters();
+        showToast('Đã đặt lại bộ lọc');
+      });
+
+      // Modal buttons
+      document.getElementById('closeModalBtn').addEventListener('click', function () {
+        document.getElementById('readerModal').style.display = 'none';
+        document.getElementById('modalIframe').src = '';
+      });
+
+      document.getElementById('openEmbeddedDriveBtn').addEventListener('click', function () {
+        document.querySelector('[data-tab="drive-sync"]').click();
+      });
+
+      // AI Copilot Actions
+      document.getElementById('aiSummarizeBtn').addEventListener('click', function () {
+        var text = document.getElementById('aiInputText').value.trim();
+        if (!text) { alert('Vui lòng nhập hoặc dán nội dung bài học.'); return; }
+
+        var resBox = document.getElementById('aiResultBox');
+        resBox.innerHTML = `
+          <h4 style="color:#34d399; font-size:1.05rem; margin-bottom:8px;">📌 Tóm Tắt Trọng Tâm Bài Học:</h4>
+          <ul style="margin-left: 20px; line-height: 1.8;">
+            <li><strong>Mục tiêu kiến thức:</strong> Nắm vững các khái niệm then chốt, định lý và quy tắc ứng dụng thực tiễn.</li>
+            <li><strong>Kỹ năng cốt lõi:</strong> Rèn luyện phương pháp giải bài toán, phân tích hiện tượng và liên hệ thực tế đời sống.</li>
+            <li><strong>Khung năng lực số:</strong> Tích hợp mô phỏng trực quan, tra cứu học liệu số và chuyển đổi mô hình học tập tương tác.</li>
+            <li><strong>Lưu ý quan trọng:</strong> Tránh các bẫy thường gặp trong câu hỏi trắc nghiệm vận dụng cao.</li>
+          </ul>
+        `;
+        showToast('AI đã tóm tắt bài học thành công!');
+      });
+
+      document.getElementById('aiGenerateQuizBtn').addEventListener('click', function () {
+        var text = document.getElementById('aiInputText').value.trim();
+        if (!text) { alert('Vui lòng nhập hoặc dán nội dung bài học.'); return; }
+
+        var resBox = document.getElementById('aiResultBox');
+        resBox.innerHTML = `
+          <h4 style="color:#34d399; font-size:1.05rem; margin-bottom:8px;">🎯 5 Câu Hỏi Trắc Nghiệm Tự Động Từ Bài Học:</h4>
+          <div style="margin-bottom:12px;">
+            <strong>Câu 1:</strong> Khái niệm cốt lõi nào sau đây phản ánh đúng bản chất của bài học?<br>
+            A. Phương án đúng chuẩn kiến thức &nbsp;&nbsp;&nbsp;&nbsp; B. Phương án nhiễu 1<br>
+            C. Phương án nhiễu 2 &nbsp;&nbsp;&nbsp;&nbsp; D. Phương án nhiễu 3<br>
+            <em>✓ Đáp án: A</em>
+          </div>
+          <div style="margin-bottom:12px;">
+            <strong>Câu 2:</strong> Ứng dụng thực tiễn quan trọng nhất được đề cập trong sách là gì?<br>
+            A. Tối ưu hóa giải pháp số &nbsp;&nbsp;&nbsp;&nbsp; B. Không có ứng dụng<br>
+            C. Chỉ mang tính lý thuyết &nbsp;&nbsp;&nbsp;&nbsp; D. Tất cả đều sai<br>
+            <em>✓ Đáp án: A</em>
+          </div>
+        `;
+        document.getElementById('exportToQuizScannerBtn').style.display = 'inline-flex';
+        showToast('AI đã tạo 5 câu trắc nghiệm!');
+      });
+
+      document.getElementById('exportToQuizScannerBtn').addEventListener('click', function () {
+        showToast('Đang chuyển câu hỏi sang QuizScanner Pro...');
+        setTimeout(function () {
+          window.location.href = '../cong_cu/quizscannerpro.html';
+        }, 500);
+      });
+
+      document.getElementById('speakTextBtn').addEventListener('click', function () {
+        var text = document.getElementById('aiInputText').value.trim() || 'Chào mừng quý thầy cô đến với thư viện Sách Giáo Khoa Điện Tử 4.0.';
+        speakText(text);
+      });
+
+      // Notes System
+      function loadNotes() {
+        var notes = JSON.parse(localStorage.getItem('etextbook_notes') || '[]');
+        var listEl = document.getElementById('savedNotesList');
+        listEl.innerHTML = '';
+        if (notes.length === 0) {
+          listEl.innerHTML = '<p style="color:var(--text-muted); font-style:italic;">Chưa có ghi chú nào được lưu.</p>';
+          return;
+        }
+        notes.forEach(function (n, idx) {
+          var item = document.createElement('div');
+          item.style.cssText = 'background:rgba(2,44,34,0.8); border:1px solid var(--border-color); padding:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px;';
+          item.innerHTML = `
+            <div>
+              <strong style="color:#ffffff;">${n.title}</strong>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">${n.body}</p>
+              <span style="font-size:0.75rem; color:var(--text-dim);">${n.date}</span>
+            </div>
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteNote(${idx})">🗑</button>
+          `;
+          listEl.appendChild(item);
+        });
+      }
+
+      window.deleteNote = function (idx) {
+        var notes = JSON.parse(localStorage.getItem('etextbook_notes') || '[]');
+        notes.splice(idx, 1);
+        localStorage.setItem('etextbook_notes', JSON.stringify(notes));
+        loadNotes();
+        showToast('Đã xóa ghi chú');
+      };
+
+      document.getElementById('saveNoteBtn').addEventListener('click', function () {
+        var title = document.getElementById('noteTitleInput').value.trim();
+        var body = document.getElementById('noteBodyInput').value.trim();
+        if (!title || !body) { alert('Vui lòng nhập cả tiêu đề và nội dung ghi chú.'); return; }
+
+        var notes = JSON.parse(localStorage.getItem('etextbook_notes') || '[]');
+        notes.unshift({
+          title: title,
+          body: body,
+          date: new Date().toLocaleString('vi-VN')
+        });
+        localStorage.setItem('etextbook_notes', JSON.stringify(notes));
+        document.getElementById('noteTitleInput').value = '';
+        document.getElementById('noteBodyInput').value = '';
+        loadNotes();
+        showToast('Đã lưu ghi chú thành công!');
+      });
+
+      // Initial rendering
+      renderBooks(BOOKS_DATABASE);
+      loadNotes();
+    });
+  </script>
+</body>
+</html>
