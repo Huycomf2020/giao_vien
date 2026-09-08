@@ -58,6 +58,58 @@
       }
     }
 
+    /* Tab Thi cử - các thẻ gương đồng bộ nhận diện trang */
+    .exam-mirror-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .exam-mirror-card {
+      position: relative;
+      display: flex;
+      min-height: 230px;
+      flex-direction: column;
+      padding: 24px;
+      overflow: hidden;
+      text-decoration: none;
+      color: #ecfdf5;
+      border: 1px solid rgba(52, 211, 153, 0.5);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(6, 78, 59, 0.92), rgba(2, 44, 30, 0.9));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 18px 38px rgba(0,0,0,.18);
+      transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    }
+
+    .exam-mirror-card::after {
+      content: '';
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      right: -55px;
+      top: -55px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(52,211,153,.25), transparent 70%);
+    }
+
+    .exam-mirror-card:hover {
+      transform: translateY(-5px);
+      border-color: #6ee7b7;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 22px 45px rgba(0,0,0,.25);
+    }
+
+    .exam-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .exam-card-icon { width: 58px; height: 58px; display: grid; place-items: center; border-radius: 16px; font-size: 1.8rem; background: linear-gradient(135deg,#34d399,#047857); box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
+    .exam-card-status { position: relative; z-index: 1; padding: 6px 10px; border-radius: 999px; color: #a7f3d0; background: rgba(4,120,87,.6); font-size: .72rem; font-weight: 800; }
+    .exam-card-status.soon { color: #fde68a; background: rgba(180,83,9,.42); }
+    .exam-card-title { margin: 22px 0 10px; color: #fff; font-size: 1.25rem; font-weight: 800; }
+    .exam-card-desc { flex: 1; color: #a7f3d0; font-size: .9rem; line-height: 1.65; }
+    .exam-card-action { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(52,211,153,.22); color: #6ee7b7; font-size: .86rem; font-weight: 800; }
+
+    @media (max-width: 992px) { .exam-mirror-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 600px) { .exam-mirror-grid { grid-template-columns: 1fr; } .exam-mirror-card { min-height: 205px; } }
+
     @media (max-width: 480px) {
       .brand-title {
         font-size: 1.1rem;
@@ -90,11 +142,8 @@
         <button class="nav-tab-btn" data-tab="about">🌟 Giới Thiệu</button>
         <button class="nav-tab-btn" data-tab="donghe">🧰 Đồ Nghề Giáo Viên</button>
         <button class="nav-tab-btn" data-tab="hotro">🛠️ Hỗ Trợ Giáo Viên</button>
+        <button class="nav-tab-btn" data-tab="thicu">📝 Thi Cử</button>
       </nav>
-
-      <div class="author-pill">
-        👨‍🏫 <strong>Thầy Phan Ngọc Huy</strong> • THPT Lộc Ninh, Đồng Nai
-      </div>
     </div>
   </header>
 
@@ -506,6 +555,55 @@
             </div>
           </div>
 
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 4: THI CỬ
+         ============================================================ -->
+    <section id="tab-thicu" class="tab-view">
+      <div class="glass-panel">
+        <h2 class="panel-title">📝 Thi Cử - Hệ Thống Ôn Luyện & Kiểm Tra</h2>
+        <p style="color: var(--text-muted); margin-top: -4px; line-height: 1.7;">
+          Không gian chuyên biệt hỗ trợ giáo viên xây dựng đề và học sinh luyện tập theo từng kỳ thi.
+        </p>
+
+        <div class="exam-mirror-grid">
+          <a href="thi_cu/dgnl.html" class="exam-mirror-card">
+            <div class="exam-card-top"><div class="exam-card-icon">🧠</div><span class="exam-card-status">ĐÃ SẴN SÀNG</span></div>
+            <div class="exam-card-title">Thi Đánh giá năng lực</div>
+            <div class="exam-card-desc">Tự học chuyên đề, sinh đề bằng Gemini và luyện thi V-ACT theo cấu trúc ĐHQG TP.HCM.</div>
+            <div class="exam-card-action"><span>Mở hệ thống ĐGNL</span><span>→</span></div>
+          </a>
+
+          <a href="#" class="exam-mirror-card" onclick="showToast('Hệ thống Thi TN THPT đang được xây dựng!'); return false;">
+            <div class="exam-card-top"><div class="exam-card-icon">🎓</div><span class="exam-card-status soon">ĐANG XÂY DỰNG</span></div>
+            <div class="exam-card-title">Thi TN THPT</div>
+            <div class="exam-card-desc">Ôn tập và biên soạn đề thi tốt nghiệp THPT theo cấu trúc, ma trận và định hướng đánh giá mới.</div>
+            <div class="exam-card-action"><span>Xem trạng thái</span><span>→</span></div>
+          </a>
+
+          <a href="#" class="exam-mirror-card" onclick="showToast('Hệ thống Kiểm tra GK, CK đang được xây dựng!'); return false;">
+            <div class="exam-card-top"><div class="exam-card-icon">📋</div><span class="exam-card-status soon">ĐANG XÂY DỰNG</span></div>
+            <div class="exam-card-title">Kiểm tra GK, CK</div>
+            <div class="exam-card-desc">Thiết kế đề giữa kỳ, cuối kỳ theo ma trận đặc tả, bốn mức độ nhận thức và chuẩn đầu ra môn học.</div>
+            <div class="exam-card-action"><span>Xem trạng thái</span><span>→</span></div>
+          </a>
+
+          <a href="#" class="exam-mirror-card" onclick="showToast('Hệ thống Thi HSG đang được xây dựng!'); return false;">
+            <div class="exam-card-top"><div class="exam-card-icon">🏆</div><span class="exam-card-status soon">ĐANG XÂY DỰNG</span></div>
+            <div class="exam-card-title">Thi HSG</div>
+            <div class="exam-card-desc">Chuyên đề nâng cao, đề luyện phân hóa mạnh và hệ thống lời giải dành cho kỳ thi học sinh giỏi.</div>
+            <div class="exam-card-action"><span>Xem trạng thái</span><span>→</span></div>
+          </a>
+
+          <a href="#" class="exam-mirror-card" onclick="showToast('Hệ thống Thi Chuyên đang được xây dựng!'); return false;">
+            <div class="exam-card-top"><div class="exam-card-icon">⭐</div><span class="exam-card-status soon">ĐANG XÂY DỰNG</span></div>
+            <div class="exam-card-title">Thi Chuyên</div>
+            <div class="exam-card-desc">Luyện thi vào lớp chuyên với lộ trình kiến thức, bài tập chọn lọc và đề mô phỏng có độ phân hóa cao.</div>
+            <div class="exam-card-action"><span>Xem trạng thái</span><span>→</span></div>
+          </a>
         </div>
       </div>
     </section>
