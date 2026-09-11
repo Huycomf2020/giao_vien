@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khảo Sát Hướng Nghiệp 12A11 - 2026-2027</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0d9488;          /* Teal / Xanh ngọc chính */
+            --primary-light: #f0fdf4;
+            --accent: #06b6d4;           /* Cyan / Xanh ngọc sáng */
+            --bg-body: #e6f4f1;          /* Nền xám xanh sáng dịu mắt */
+            --card-bg: #ffffff;          /* Card trắng nền nổi bật */
+            --border: #ccfbf1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.12) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 14px 40px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* HEADER VỚI HÌNH ẢNH NỔI BẬT */
+        .header-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .header-banner {
+            width: 100%;
+            height: 220px;
+            position: relative;
+            background-color: #0f766e;
+        }
+
+        .header-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .header-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(13, 148, 136, 0.85) 100%);
+        }
+
+        .header-content {
+            padding: 24px;
+            text-align: center;
+            margin-top: -30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: #ccfbf1;
+            color: #0f766e;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* CARD CHO TỪNG KHỐI FORM */
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #0d9488;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: #ccfbf1;
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        label .required {
+            color: #f43f5e;
+            margin-left: 2px;
+        }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            color: #0f172a;
+            font-size: 0.92rem;
+            transition: all 0.25s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus, select:focus, textarea:focus {
+            border-color: #0d9488;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
+        }
+
+        /* CHECKBOX CARD */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-card {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .checkbox-card:hover {
+            border-color: #0d9488;
+            background: #f0fdf4;
+        }
+
+        .checkbox-card input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            margin-right: 12px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            background: #fff;
+        }
+
+        .checkbox-card input[type="checkbox"]:checked {
+            background-color: #0d9488;
+            border-color: #0d9488;
+        }
+
+        .checkbox-card input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 900;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .checkbox-card span {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        /* BUTTON SUBMIT */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+            border: none;
+            border-radius: 16px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -5px rgba(13, 148, 136, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(13, 148, 136, 0.5);
+            filter: brightness(1.05);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #status {
+            display: none;
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        #status.success {
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            color: #166534;
+        }
+
+        #status.error {
+            background: #ffe4e6;
+            border: 1px solid #fca5a5;
+            color: #9f1239;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER HERO KHUNG ẢNH NỔI BẬT -->
+    <header class="header-card">
+        <div class="header-banner">
+            <img src="https://i.ibb.co/dJD37PQF/Lop12-A11-1.jpg" alt="Lớp 12A11 Header Image">
+            <div class="header-overlay"></div>
+        </div>
+        <div class="header-content">
+            <span class="badge">Năm học 2026 - 2027</span>
+            <h1>KHẢO SÁT HƯỚNG NGHIỆP 12A11</h1>
+            <p class="subtitle">Định hướng thi TN THPT & Xét tuyển Đại học 2027<br><b>GVCN: Thầy Phan Ngọc Huy</b></p>
+        </div>
+    </header>
+
+    <!-- FORM NỘI DUNG KHẢO SÁT -->
+    <form id="surveyForm">
+        <!-- KHỐI 1 -->
+        <div class="form-card" style="margin-bottom: 16px;">
+            <div class="section-title">01. Thông tin học sinh</div>
+            
+            <div class="form-group">
+                <label for="studentName">Họ và tên học sinh <span class="required">*</span></label>
+                <select id="studentName" name="studentName" required>
+                    <option value="" disabled selected>-- Chọn tên học sinh từ danh sách --</option>
+                    <option value="Thái Thị Lan Anh - 16/04/2009">Thái Thị Lan Anh - 16/04/2009</option>
+                    <option value="Phan Thành Đạt - 18/10/2009">Phan Thành Đạt - 18/10/2009</option>
+                    <option value="Nguyễn Thị Hà - 29/05/2009">Nguyễn Thị Hà - 29/05/2009</option>
+                    <option value="Nguyễn Thị Ngọc Hảo - 10/12/2009">Nguyễn Thị Ngọc Hảo - 10/12/2009</option>
+                    <option value="Võ Thị Thanh Hằng - 02/03/2009">Võ Thị Thanh Hằng - 02/03/2009</option>
+                    <option value="Nguyễn Hoàng Gia Hân - 29/01/2009">Nguyễn Hoàng Gia Hân - 29/01/2009</option>
+                    <option value="Nguyễn Ngọc Gia Hân - 20/06/2009">Nguyễn Ngọc Gia Hân - 20/06/2009</option>
+                    <option value="Lê Phạm Ngọc Khánh - 24/10/2009">Lê Phạm Ngọc Khánh - 24/10/2009</option>
+                    <option value="Phạm Hoàng Long - 03/06/2009">Phạm Hoàng Long - 03/06/2009</option>
+                    <option value="Nguyễn Kim Nga - 17/03/2009">Nguyễn Kim Nga - 17/03/2009</option>
+                    <option value="Trần Tuyết Ngân - 05/12/2009">Trần Tuyết Ngân - 05/12/2009</option>
+                    <option value="Vũ Thị Uyên Nhi - 29/10/2009">Vũ Thị Uyên Nhi - 29/10/2009</option>
+                    <option value="Hồ Quỳnh Như - 07/11/2009">Hồ Quỳnh Như - 07/11/2009</option>
+                    <option value="Trương Thành Pháp - 18/06/2009">Trương Thành Pháp - 18/06/2009</option>
+                    <option value="Trần Chí Phong - 25/01/2009">Trần Chí Phong - 25/01/2009</option>
+                    <option value="Nguyễn Hoàng Phúc - 29/01/2009">Nguyễn Hoàng Phúc - 29/01/2009</option>
+                    <option value="Nguyễn Hữu Phúc - 05/07/2009">Nguyễn Hữu Phúc - 05/07/2009</option>
+                    <option value="Phan Bình Phước - 09/09/2009">Phan Bình Phước - 09/09/2009</option>
+                    <option value="Trương Yến Phương - 01/01/2009">Trương Yến Phương - 01/01/2009</option>
+                    <option value="Nguyễn Văn Quân - 27/02/2009">Nguyễn Văn Quân - 27/02/2009</option>
+                    <option value="Võ Thúy Quân - 23/10/2009">Võ Thúy Quân - 23/10/2009</option>
+                    <option value="Phan Thị Thúy Quyền - 01/08/2009">Phan Thị Thúy Quyền - 01/08/2009</option>
+                    <option value="Bùi Trúc Quỳnh - 12/11/2009">Bùi Trúc Quỳnh - 12/11/2009</option>
+                    <option value="Lê Diễm Quỳnh - 02/08/2009">Lê Diễm Quỳnh - 02/08/2009</option>
+                    <option value="Lê Thị Mỹ Thảo - 17/06/2009">Lê Thị Mỹ Thảo - 17/06/2009</option>
+                    <option value="Lê Nguyễn Bảo Thi - 31/10/2009">Lê Nguyễn Bảo Thi - 31/10/2009</option>
+                    <option value="Nguyễn Thị Minh Thi - 06/03/2009">Nguyễn Thị Minh Thi - 06/03/2009</option>
+                    <option value="Nguyễn Đức Thọ - 25/08/2009">Nguyễn Đức Thọ - 25/08/2009</option>
+                    <option value="Trần Minh Thư - 03/07/2009">Trần Minh Thư - 03/07/2009</option>
+                    <option value="Trần Thị Nghi Thường - 19/03/2009">Trần Thị Nghi Thường - 19/03/2009</option>
+                    <option value="Phạm Bảo Thy - 08/02/2009">Phạm Bảo Thy - 08/02/2009</option>
+                    <option value="Hồ Thị Yến Trang - 12/05/2009">Hồ Thị Yến Trang - 12/05/2009</option>
+                    <option value="Phùng Thị Quỳnh Trang - 02/10/2009">Phùng Thị Quỳnh Trang - 02/10/2009</option>
+                    <option value="Nguyễn Thị Bảo Trâm - 31/10/2009">Nguyễn Thị Bảo Trâm - 31/10/2009</option>
+                    <option value="Võ Thùy Trâm - 04/04/2009">Võ Thùy Trâm - 04/04/2009</option>
+                    <option value="Lê Thảo Trân - 19/10/2009">Lê Thảo Trân - 19/10/2009</option>
+                    <option value="Nguyễn Ngọc Trinh - 20/01/2009">Nguyễn Ngọc Trinh - 20/01/2009</option>
+                    <option value="Võ Đức Trọng - 05/06/2009">Võ Đức Trọng - 05/06/2009</option>
+                    <option value="Đồng Thị Hồng Tuyết - 03/07/2009">Đồng Thị Hồng Tuyết - 03/07/2009</option>
+                    <option value="Lê Thị Ngọc Vy - 23/07/2009">Lê Thị Ngọc Vy - 23/07/2009</option>
+                    <option value="Mai Thị Tường Vy - 18/09/2009">Mai Thị Tường Vy - 18/09/2009</option>
+                    <option value="Trần Ngọc Như Ý - 15/10/2009">Trần Ngọc Như Ý - 15/10/2009</option>
+                    <option value="Trần Đặng Ngọc Ánh - 17/08/2009">Trần Đặng Ngọc Ánh - 17/08/2009</option>
+                    <option value="Nguyễn Thiện Nhân - 26/09/2009">Nguyễn Thiện Nhân - 26/09/2009</option>
+                    <option value="Nguyễn Duy Trường - 01/01/2009">Nguyễn Duy Trường - 01/01/2009</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Số điện thoại / Zalo của em <span class="required">*</span></label>
+                <input type="text" id="phone" name="phone" placeholder="Ví dụ: 0912345678" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="parentPhone">Họ tên Phụ huynh & SĐT <span class="required">*</span></label>
+                <input type="text" id="parentPhone" name="parentPhone" placeholder="Ví dụ: Nguyễn Văn A - 0987654321" required>
+            </div>
+        </div>
+
+        <!-- KHỐI 2 -->
+        <div class="form-card" style="margin-bottom: 16px;">
+            <div class="section-title">02. Định hướng tổ hợp & Nguyện vọng</div>
+
+            <div class="form-group">
+                <label>Tổ hợp môn dự định xét tuyển ĐH <span class="required">*</span></label>
+                <div class="checkbox-group">
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="subjectGroup" value="D01: Toán - Ngữ văn - Tiếng Anh">
+                        <span>D01: Toán - Ngữ văn - Tiếng Anh</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="subjectGroup" value="C00: Ngữ văn - Lịch sử - Địa lý">
+                        <span>C00: Ngữ văn - Lịch sử - Địa lý</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="subjectGroup" value="D09: Toán - Lịch sử - Tiếng Anh">
+                        <span>D09: Toán - Lịch sử - Tiếng Anh</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="subjectGroup" value="D10: Toán - Địa lý - Tiếng Anh">
+                        <span>D10: Toán - Địa lý - Tiếng Anh</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="subjectGroup" value="Tổ hợp GDKT&PL: Toán - Văn/Anh - GDKT&PL">
+                        <span>Tổ hợp GDKT&PL (Toán - Văn/Anh - GDKT&PL)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="target1">Nguyện vọng 1 (Ngành & Trường ĐH mơ ước) <span class="required">*</span></label>
+                <input type="text" id="target1" name="target1" placeholder="Ví dụ: Ngôn ngữ Anh - ĐH Khai phóng" required>
+            </div>
+
+            <div class="form-group">
+                <label for="target2">Nguyện vọng 2 (Ngành & Trường ĐH)</label>
+                <input type="text" id="target2" name="target2" placeholder="Ví dụ: Quan hệ công chúng - ĐH Văn hóa">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="targetScore">Mục tiêu tổng điểm 3 môn xét tuyển ĐH <span class="required">*</span></label>
+                <input type="text" id="targetScore" name="targetScore" placeholder="Ví dụ: 25.5 điểm" required>
+            </div>
+        </div>
+
+        <!-- KHỐI 3 -->
+        <div class="form-card">
+            <div class="section-title">03. Khó khăn & Đề xuất</div>
+
+            <div class="form-group">
+                <label>Khó khăn em đang gặp phải cần Thầy hỗ trợ:</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="difficulties" value="Chưa rõ định hướng ngành nghề / Chọn sai ngành">
+                        <span>Chưa rõ định hướng ngành nghề / Chọn sai ngành</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="difficulties" value="Mất gốc / Điểm số chưa đạt ở môn Tiếng Anh">
+                        <span>Mất gốc / Điểm số chưa đạt ở môn Tiếng Anh</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="difficulties" value="Cần phương pháp học và quản lý thời gian hiệu quả">
+                        <span>Cần phương pháp học & quản lý thời gian hiệu quả</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="difficulties" value="Áp lực tâm lý, mất tập trung">
+                        <span>Áp lực tâm lý, mất tập trung</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="note">Ý kiến / Mong muốn gửi riêng Thầy chủ nhiệm:</label>
+                <textarea id="note" name="note" rows="3" placeholder="Ghi chú thêm nếu em có mong muốn cụ thể nào khác..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span>GỬI PHIẾU KHẢO SÁT</span>
+            </button>
+
+            <div id="status"></div>
+        </div>
+    </form>
+</div>
+
+<script>
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxlxUkvN-wOfp_UbE1YlaBhSiIzmHQCM37qS_VoLf4_WjguSnDiXNTc48gTBChgM63j/exec';
+    const form = document.getElementById('surveyForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusDiv = document.getElementById('status');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const selectedGroups = Array.from(document.querySelectorAll('input[name="subjectGroup"]:checked')).map(cb => cb.value);
+        if (selectedGroups.length === 0) {
+            showStatus('Vui lòng chọn ít nhất 1 tổ hợp môn xét tuyển dự định.', 'error');
+            return;
+        }
+
+        const selectedDifficulties = Array.from(document.querySelectorAll('input[name="difficulties"]:checked')).map(cb => cb.value);
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner"></span> <span>Đang gửi dữ liệu...</span>';
+        statusDiv.style.display = 'none';
+
+        const payload = {
+            studentName: form.studentName.value,
+            phone: form.phone.value,
+            parentPhone: form.parentPhone.value,
+            subjectGroup: selectedGroups.join(' | '),
+            target1: form.target1.value,
+            target2: form.target2.value || '',
+            targetScore: form.targetScore.value,
+            difficulties: selectedDifficulties.join(' | '),
+            note: form.note.value || ''
+        };
+
+        fetch(scriptUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            showStatus('Cảm ơn em! Phiếu khảo sát đã được gửi thành công đến Thầy Huy.', 'success');
+            form.reset();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showStatus('Có lỗi xảy ra khi gửi. Em vui lòng kiểm tra lại kết nối mạng nhé!', 'error');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>GỬI PHIẾU KHẢO SÁT</span>';
+        });
+    });
+
+    function showStatus(message, type) {
+        statusDiv.className = type;
+        statusDiv.textContent = message;
+        statusDiv.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
