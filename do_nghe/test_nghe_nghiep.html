@@ -18,7 +18,50 @@ const DEMO=new URLSearchParams(location.search).get('demo')==='1';
 const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxlxUkvN-wOfp_UbE1YlaBhSiIzmHQCM37qS_VoLf4_WjguSnDiXNTc48gTBChgM63j/exec';
 const S={bootstrap:null,exam:null,index:0,answers:{},flags:{},violations:[],started:false,submitting:false,timer:null};
 const $=id=>document.getElementById(id); const text=(el,v)=>el.textContent=v==null?'':String(v);
-function gas(name,arg){if(DEMO)return new Promise(resolve=>setTimeout(()=>resolve(demoCall(name,arg)),350));if(typeof google!=='undefined'&&google.script&&google.script.run)return new Promise((resolve,reject)=>{const run=google.script.run.withSuccessHandler(resolve).withFailureHandler(e=>reject(new Error(e&&e.message||String(e))));arg===undefined?run[name]():run[name](arg)});const actions={getTestBootstrap:'testBootstrap',startCareerTest:'testStart',submitCareerTest:'testSubmit'};if(!actions[name])return Promise.reject(new Error('Yêu cầu không được hỗ trợ.'));return bridgeCall(actions[name],arg||{});}
+function gas(name, arg) {
+    if (DEMO) return new Promise(resolve => setTimeout(() => resolve(demoCall(name, arg)), 350));
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+        return new Promise((resolve, reject) => {
+            const run = google.script.run.withSuccessHandler(resolve).withFailureHandler(e => reject(new Error(e && e.message || String(e))));
+            arg === undefined ? run[name]() : run[name](arg);
+        });
+    }
+
+    // Xử lý riêng getTestBootstrap qua JSONP để không bao giờ bị chặn CORS
+    if (name === 'getTestBootstrap') {
+        return new Promise((resolve, reject) => {
+            const cbName = 'jsonp_cb_' + Date.now();
+            const script = document.createElement('script');
+            script.src = APPS_SCRIPT_URL + '?action=getTestBootstrap&callback=' + cbName;
+            
+            const timer = setTimeout(() => {
+                delete window[cbName];
+                script.remove();
+                reject(new Error('Không tải được danh sách từ Apps Script. Hãy kiểm tra lại kết nối mạng.'));
+            }, 15000);
+
+            window[cbName] = function(data) {
+                clearTimeout(timer);
+                delete window[cbName];
+                script.remove();
+                resolve(data);
+            };
+
+            script.onerror = function() {
+                clearTimeout(timer);
+                delete window[cbName];
+                script.remove();
+                reject(new Error('Lỗi kết nối đến máy chủ Apps Script.'));
+            };
+
+            document.body.appendChild(script);
+        });
+    }
+
+    const actions = { startCareerTest: 'testStart', submitCareerTest: 'testSubmit' };
+    if (!actions[name]) return Promise.reject(new Error('Yêu cầu không được hỗ trợ.'));
+    return bridgeCall(actions[name], arg || {});
+}
 function bridgeCall(action,payload){return new Promise((resolve,reject)=>{const requestId=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2));const frame=document.createElement('iframe');frame.name='gas_bridge_'+requestId.replace(/[^a-z0-9]/gi,'');frame.hidden=true;frame.setAttribute('aria-hidden','true');const form=document.createElement('form');form.method='POST';form.action=APPS_SCRIPT_URL;form.target=frame.name;form.hidden=true;[['action',action],['requestId',requestId],['payload',JSON.stringify(payload)]].forEach(([name,value])=>{const input=document.createElement('input');input.type='hidden';input.name=name;input.value=value;form.append(input)});let settled=false;const clean=()=>{window.removeEventListener('message',receive);clearTimeout(timer);form.remove();setTimeout(()=>frame.remove(),0)};const fail=message=>{if(settled)return;settled=true;clean();reject(new Error(message))};const receive=event=>{const allowed=event.origin==='https://script.google.com'||/^https:\/\/[^/]+\.googleusercontent\.com$/.test(event.origin);const data=event.data;if(!allowed||!data||data.channel!=='12A11_TEST_BRIDGE'||data.requestId!==requestId)return;settled=true;clean();data.ok?resolve(data.result):reject(new Error(data.error||'Máy chủ không xử lý được yêu cầu.'))};window.addEventListener('message',receive);const timer=setTimeout(()=>fail(action==='testBootstrap'?'Không tải được danh sách từ Apps Script. GVCN cần cập nhật Code.gs và triển khai phiên bản mới.':'Máy chủ phản hồi quá lâu. Hãy kiểm tra mạng rồi thử lại.'),action==='testBootstrap'?20000:210000);document.body.append(frame,form);form.submit()});}
 function demoCall(name,arg){if(name==='getTestBootstrap')return{students:['Thái Thị Lan Anh','Phan Thành Đạt'],subjects:[{name:'Toán',minutes:90},{name:'Ngữ văn',minutes:120}]};if(name==='startCareerTest'){const now=Date.now();return{ok:true,sessionId:'00000000-0000-0000-0000-000000000001',student:arg.student,subject:arg.subject,title:'Đề xem thử giao diện',instructions:'Bản xem thử không gửi dữ liệu.',startedAt:new Date(now).toISOString(),expiresAt:new Date(now+10*60000).toISOString(),durationMinutes:10,questions:[{id:'q1',type:'mcq',part:'Phần I',topic:'Hàm số',level:'Biết',context:'Cho hàm số f(x) = x² − 2x.',prompt:'Trục đối xứng của đồ thị là đường thẳng nào?',points:.25,choices:['x = −1','x = 0','x = 1','x = 2']},{id:'q2',type:'tf',part:'Phần II',topic:'Xác suất',level:'Hiểu',context:'Một hộp có 3 bi đỏ và 2 bi xanh. Lấy ngẫu nhiên một viên.',prompt:'Xác định đúng hoặc sai cho từng nhận định.',points:1,assertions:['Có 5 kết quả đồng khả năng.','Xác suất lấy bi đỏ là 3/5.','Xác suất lấy bi xanh là 3/5.','Hai biến cố lấy bi đỏ và lấy bi xanh đối nhau.']},{id:'q3',type:'written',part:'Phần viết',topic:'Nghị luận',level:'Vận dụng',context:'“Tri thức chỉ thực sự có ý nghĩa khi được dùng để giúp con người sống tốt hơn.”',prompt:'Viết một đoạn văn khoảng 200 chữ trình bày suy nghĩ của em.',points:2}]};}if(name==='submitCareerTest')return{ok:true,status:arg.exit?'Thoát bài':'Đã nộp',score:arg.exit?'':7.25,needsReview:true,details:{correct:2,total:3}};}
 function show(id){$(id).classList.remove('hidden')}function hide(id){$(id).classList.add('hidden')}
