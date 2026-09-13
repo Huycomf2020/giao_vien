@@ -73,6 +73,16 @@
 
 <div id="app" class="w-full max-w-md bg-aplus-dark min-h-screen shadow-2xl relative flex flex-col border-x border-emerald-900/50">
 
+    <div id="shutter-flash" class="hidden absolute inset-0 z-50 bg-white pointer-events-none transition-opacity duration-150" style="opacity:0"></div>
+
+    <div id="processing-overlay" class="hidden absolute inset-0 z-40 bg-black/70 flex items-center justify-center">
+        <div class="bg-emerald-950 border border-emerald-700 rounded-2xl px-6 py-5 flex flex-col items-center gap-3">
+            <i class="fa-solid fa-spinner fa-spin text-3xl text-aplus-accent"></i>
+            <p class="text-sm font-semibold text-emerald-100">Đang tự động cắt & làm sạch...</p>
+        </div>
+    </div>
+
+
     <!-- HEADER -->
     <header class="bg-aplus-header text-white p-4 flex justify-between items-center shadow-lg border-b border-emerald-800">
         <div class="flex items-center space-x-3">
@@ -187,7 +197,7 @@
             <div class="flex justify-between items-center">
                 <button id="btn-back-result" class="text-sm font-semibold text-emerald-300 px-2 py-2"><i class="fa-solid fa-arrow-left mr-1"></i>Quét lại</button>
                 <h2 class="text-sm font-bold text-emerald-100">Kết quả</h2>
-                <span class="w-16"></span>
+                <button id="btn-edit-corners" class="text-sm font-semibold text-emerald-300 px-2 py-2"><i class="fa-solid fa-crop-simple mr-1"></i>Sửa khung</button>
             </div>
 
             <div class="relative border-2 border-emerald-600/50 rounded-2xl bg-black min-h-[360px] flex-1 flex items-center justify-center overflow-hidden shadow-inner">
@@ -196,10 +206,10 @@
 
             <!-- Filters -->
             <div class="grid grid-cols-4 gap-2">
-                <button data-filter="original" class="filter-btn active bg-emerald-900/60 text-emerald-100 py-2 rounded-xl text-xs font-bold border border-emerald-700">Gốc</button>
+                <button data-filter="original" class="filter-btn bg-emerald-900/60 text-emerald-100 py-2 rounded-xl text-xs font-bold border border-emerald-700">Gốc</button>
                 <button data-filter="bw" class="filter-btn bg-emerald-900/60 text-emerald-100 py-2 rounded-xl text-xs font-bold border border-emerald-700">Trắng đen</button>
                 <button data-filter="gray" class="filter-btn bg-emerald-900/60 text-emerald-100 py-2 rounded-xl text-xs font-bold border border-emerald-700">Xám</button>
-                <button data-filter="enhance" class="filter-btn bg-emerald-900/60 text-emerald-100 py-2 rounded-xl text-xs font-bold border border-emerald-700">Làm nét</button>
+                <button data-filter="enhance" class="filter-btn active bg-emerald-900/60 text-emerald-100 py-2 rounded-xl text-xs font-bold border border-emerald-700">Làm sạch</button>
             </div>
 
             <!-- Export -->
@@ -265,6 +275,7 @@
 /* ============================== STATE ============================== */
 let isOpenCvReady = false;
 let pendingConfirmAdjust = false;
+let pendingCaptureAction = null;
 
 function handleCvScriptLoaded() {
     if (typeof cv === 'undefined') return;
@@ -283,6 +294,11 @@ function markCvReady() {
     // fire before the rest of this script has finished defining things
     const banner = document.getElementById('cv-loading-banner');
     if (banner) banner.classList.add('hidden');
+    if (pendingCaptureAction) {
+        const fn = pendingCaptureAction;
+        pendingCaptureAction = null;
+        setTimeout(fn, 30);
+    }
     if (pendingConfirmAdjust) {
         pendingConfirmAdjust = false;
         setConfirmWaiting(false);
@@ -416,10 +432,7 @@ fileInput.addEventListener('change', (e) => {
             const c = document.createElement('canvas');
             c.width = img.width; c.height = img.height;
             c.getContext('2d').drawImage(img, 0, 0);
-            sourceCanvas = c;
-            const detected = isOpenCvReady ? detectCornersInMat(cv.imread(c)) : null;
-            adjustCorners = detected || defaultCorners(c.width, c.height);
-            openAdjustScreen();
+            autoProcessCapturedCanvas(c);
         };
         img.src = evt.target.result;
     };
@@ -431,13 +444,41 @@ function capturePhotoFromVideo() {
     const c = document.createElement('canvas');
     c.width = video.videoWidth; c.height = video.videoHeight;
     c.getContext('2d').drawImage(video, 0, 0);
-    sourceCanvas = c;
-    adjustCorners = liveDetectedCorners
-        ? liveDetectedCorners.map(p => ({ x: p.x, y: p.y }))
-        : defaultCorners(c.width, c.height);
+    flashShutter();
     stopCamera();
     resetCaptureUI();
-    openAdjustScreen();
+    autoProcessCapturedCanvas(c);
+}
+
+function flashShutter() {
+    const f = $('shutter-flash');
+    f.classList.remove('hidden');
+    f.style.opacity = '1';
+    requestAnimationFrame(() => { f.style.opacity = '0'; });
+    setTimeout(() => f.classList.add('hidden'), 200);
+}
+
+// Fully automatic pipeline: detect the page's 4 corners on the just-captured
+// photo (fresh, full-resolution detection — not the cached live-preview
+// corners, which can lag a frame or two), warp it flat, and auto-clean it.
+// No manual step in between, matching a one-tap scanner flow.
+function autoProcessCapturedCanvas(canvas) {
+    sourceCanvas = canvas;
+    const run = () => {
+        const detected = detectCornersInMat(cv.imread(canvas));
+        adjustCorners = detected || defaultCorners(canvas.width, canvas.height);
+        performPerspectiveCrop();
+    };
+    showProcessingOverlay(true);
+    if (!isOpenCvReady) {
+        pendingCaptureAction = run;
+        return;
+    }
+    setTimeout(run, 30); // let the overlay paint before the heavy CV work
+}
+
+function showProcessingOverlay(show) {
+    $('processing-overlay').classList.toggle('hidden', !show);
 }
 
 /* ---------- live contour detection loop (camera) ---------- */
@@ -629,11 +670,12 @@ function defaultCorners(w, h) {
     return [{ x: mx, y: my }, { x: w - mx, y: my }, { x: w - mx, y: h - my }, { x: mx, y: h - my }];
 }
 
-/* ============================== ADJUST SCREEN ============================== */
+/* ============================== ADJUST SCREEN (manual override only) ============================== */
 const adjustImage = $('adjust-image');
 const adjustContainer = $('adjust-container');
 const adjustHandles = $('adjust-handles');
 const adjustPoly = $('adjust-poly');
+let adjustReturnScreen = 'capture-screen';
 
 function openAdjustScreen() {
     showOnly('adjust-screen');
@@ -705,7 +747,7 @@ function renderAdjustOverlay() {
 }
 window.addEventListener('resize', () => { if (!$('adjust-screen').classList.contains('hidden')) renderAdjustOverlay(); });
 
-$('btn-cancel-adjust').addEventListener('click', () => { showOnly('capture-screen'); });
+$('btn-cancel-adjust').addEventListener('click', () => { showOnly(adjustReturnScreen); });
 $('btn-confirm-adjust').addEventListener('click', () => {
     if (!isOpenCvReady) {
         pendingConfirmAdjust = true;
@@ -752,12 +794,14 @@ function performPerspectiveCrop() {
 
     cv.imshow(resultCanvas, dstMat);
     resultBaseImageData = resultCtx.getImageData(0, 0, resultCanvas.width, resultCanvas.height);
-    currentFilter = 'original';
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === 'original'));
+    currentFilter = 'enhance'; // auto-clean by default, like vFlat's "Magic Color"
+    applyFilter(currentFilter);
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === currentFilter));
 
     srcMat.delete(); dstMat.delete(); M.delete(); srcCoords.delete(); dstCoords.delete();
 
     $('ocr-result-box').classList.add('hidden');
+    showProcessingOverlay(false);
     showOnly('result-screen');
 }
 
@@ -801,6 +845,12 @@ function applyFilter(mode) {
 /* ============================== RESULT: NAV ============================== */
 $('btn-back-result').addEventListener('click', () => showOnly('capture-screen'));
 $('btn-rescan').addEventListener('click', () => showOnly('capture-screen'));
+$('btn-edit-corners').addEventListener('click', () => {
+    if (!sourceCanvas) return;
+    if (!adjustCorners) adjustCorners = defaultCorners(sourceCanvas.width, sourceCanvas.height);
+    adjustReturnScreen = 'result-screen';
+    openAdjustScreen();
+});
 
 /* ============================== EXPORT ============================== */
 $('btn-pdf').addEventListener('click', () => {
