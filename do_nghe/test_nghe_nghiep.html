@@ -23,7 +23,6 @@ const text = (el, v) => el.textContent = v == null ? '' : String(v);
 function gas(name, arg) {
     if (DEMO) return new Promise(resolve => setTimeout(() => resolve(demoCall(name, arg)), 350));
     
-    // JSONP gọi danh sách môn/học sinh
     if (name === 'getTestBootstrap') {
         return new Promise((resolve, reject) => {
             const cbName = 'jsonp_boot_' + Date.now();
@@ -32,7 +31,7 @@ function gas(name, arg) {
             
             const timer = setTimeout(() => {
                 delete window[cbName]; script.remove();
-                reject(new Error('Không tải được danh sách từ Apps Script. Hãy kiểm tra lại kết nối mạng.'));
+                reject(new Error('Không tải được danh sách từ Apps Script. Hãy kiểm tra kết nối mạng.'));
             }, 12000);
 
             window[cbName] = function(data) {
@@ -44,7 +43,6 @@ function gas(name, arg) {
         });
     }
 
-    // JSONP gọi khởi tạo đề thi
     if (name === 'startCareerTest') {
         return new Promise((resolve, reject) => {
             const cbName = 'jsonp_start_' + Date.now();
@@ -55,7 +53,7 @@ function gas(name, arg) {
             const timer = setTimeout(() => {
                 delete window[cbName]; script.remove();
                 reject(new Error('Máy chủ phản hồi quá lâu. Vui lòng thử lại.'));
-            }, 25000);
+            }, 30000);
 
             window[cbName] = function(data) {
                 clearTimeout(timer); delete window[cbName]; script.remove();
@@ -66,7 +64,6 @@ function gas(name, arg) {
         });
     }
 
-    // JSONP gọi nộp bài
     if (name === 'submitCareerTest') {
         return new Promise((resolve, reject) => {
             const cbName = 'jsonp_sub_' + Date.now();
@@ -109,9 +106,10 @@ $('prevBtn').onclick=()=>{if(S.index>0){S.index--;render()}};$('nextBtn').onclic
 function modal(title,message,buttons){text($('modalTitle'),title);text($('modalText'),message);const a=$('modalActions');a.replaceChildren();buttons.forEach(x=>{const b=document.createElement('button');b.className='btn '+(x.kind||'');b.textContent=x.label;b.onclick=()=>{hide('modal');x.action&&x.action()};a.append(b)});show('modal')}
 function confirmSubmit(){const missing=S.exam.questions.filter(q=>!isDone(q)).length;modal('Nộp bài?',missing?`Em còn ${missing} câu chưa hoàn thành. Sau khi nộp, em không thể sửa bài.`:'Em đã trả lời tất cả câu hỏi. Sau khi nộp, em không thể sửa bài.',[{label:'Tiếp tục làm'},{label:'Nộp bài',kind:'primary',action:()=>finish(false)}])}
 $('exitBtn').onclick=()=>modal('Thoát bài?', 'Bài sẽ được ghi nhận ở trạng thái “Thoát bài” và không chấm điểm.',[{label:'Ở lại làm bài'},{label:'Thoát bài',kind:'danger',action:()=>finish(true)}]);
-async function finish(exit){if(S.submitting)return;S.submitting=true;clearInterval(S.timer);document.querySelectorAll('button').forEach(b=>b.disabled=true);modal(exit?'Đang thoát bài':'Đang nộp bài','Hệ thống đang ghi dữ liệu. Không đóng trang.',[]);try{const r=await gas('submitCareerTest',{sessionId:S.exam.sessionId,answers:S.answers,violations:S.violations,exit});hide('modal');S.started=false;window.removeEventListener('beforeunload',guard);try{if(document.fullscreenElement)await document.exitFullscreen()}catch(e){}hide('exam');hide('timer');hide('examActions');hide('submitTop');show('result');text($('resultStatus'),r.status==='Thoát bài'?'Bài đã được ghi nhận là thoát trước khi nộp.':'Kết quả đã được lưu vào bảng của GVCN.');text($('score'),r.score===''?'Không chấm':`${r.score} / 10`);const stats=$('resultStats');stats.replaceChildren();if(r.details&&Number.isFinite(r.details.correct))addStat(stats,r.details.correct,'Câu/khối đúng');addStat(stats,S.violations.length,'Lần rời màn hình');addStat(stats,r.status,'Trạng thái');const rev=$('reviewNotice');rev.replaceChildren();if(r.needsReview){const n=document.createElement('div');n.className='notice';n.textContent='Kết quả cần giáo viên duyệt lại trước khi sử dụng. Với môn Ngữ văn, điểm hiển thị là điểm chẩn đoán do AI chấm hai lượt.';rev.append(n)}}catch(e){hide('modal');modal('Chưa nộp được bài',e.message||'Mất kết nối. Hãy giữ nguyên trang và thử lại.',[{label:'Thử nộp lại',kind:'primary',action:()=>{S.submitting=false;finish(exit)}}]);S.timer=setInterval(updateTimer,1000)}finally{S.submitting=false;document.querySelectorAll('button').forEach(b=>b.disabled=false)}}
-function addStat(box,value,label){const e=document.className='stat';const b=document.createElement('b');b.textContent=value;const s=document.createElement('span');s.textContent=label;e.append(b,s);box.append(e)}
-function startTimer(){updateTimer();S.timer=setInterval(updateTimer,1000)}function updateTimer(){if(!S.exam)return;let sec=Math.max(0,Math.floor((new Date(S.exam.expiresAt).getTime()-Date.now())/1000));text($('timer'),`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`);$('timer').classList.toggle('danger',sec<=300);if(sec<=0&&!S.submitting){clearInterval(S.timer);modal('Đã hết giờ','Hệ thống đang tự động nộp bài.',[]);finish(false)}}
+async function finish(exit){if(S.submitting)return;S.submitting=true;clearInterval(S.timer);document.querySelectorAll('button').forEach(b=>b.disabled=true);modal(exit?'Đang thoát bài':'Đang nộp bài','Hệ thống đang ghi dữ liệu. Không đóng trang.',[]);try{const r=await gas('submitCareerTest',{sessionId:S.exam.sessionId,answers:S.answers,violations:S.violations,exit});hide('modal');S.started=false;window.removeEventListener('beforeunload',guard);try{if(document.fullscreenElement)await document.exitFullscreen()}catch(e){}hide('exam');hide('timer');hide('examActions');hide('submitTop');show('result');text($('resultStatus'),r.status==='Thoát bài'?'Bài đã được ghi nhận là thoát trước khi nộp.':'Kết quả đã được lưu vào bảng của GVCN.');text($('score'),r.score===''?'Không chấm':`${r.score} / 10`);const stats=$('resultStats');stats.replaceChildren();if(r.details&&Number.isFinite(r.details.correct))addStat(stats,r.details.correct,'Câu/khối đúng');addStat(stats,S.violations.length,'Lần rời màn hình');addStat(stats,r.status,'Trạng thái');const rev=$('reviewNotice');rev.replaceChildren();if(r.needsReview){const n=document.createElement('div');n.className='notice';n.textContent='Kết quả cần giáo viên duyệt lại trước khi sử dụng.';rev.append(n)}}catch(e){hide('modal');modal('Chưa nộp được bài',e.message||'Mất kết nối. Hãy giữ nguyên trang và thử lại.',[{label:'Thử nộp lại',kind:'primary',action:()=>{S.submitting=false;finish(exit)}}]);S.timer=setInterval(updateTimer,1000)}finally{S.submitting=false;document.querySelectorAll('button').forEach(b=>b.disabled=false)}}
+function addStat(box,value,label){const e=document.createElement('div');e.className='stat';const b=document.createElement('b');b.textContent=value;const s=document.createElement('span');s.textContent=label;e.append(b,s);box.append(e)}
+function startTimer(){updateTimer();S.timer=setInterval(updateTimer,1000)}
+function updateTimer(){if(!S.exam||!S.started)return;const expTime=new Date(S.exam.expiresAt).getTime();if(isNaN(expTime))return;let sec=Math.max(0,Math.floor((expTime-Date.now())/1000));text($('timer'),`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`);$('timer').classList.toggle('danger',sec<=300);if(sec<=0&&!S.submitting){clearInterval(S.timer);modal('Đã hết giờ','Hệ thống đang tự động nộp bài.',[]);finish(false)}}
 function violation(type){if(!S.started||S.submitting)return;S.violations.push({type,at:new Date().toISOString()});}
 document.addEventListener('contextmenu',e=>{if(S.started){e.preventDefault();violation('Nhấp chuột phải');modal('Thao tác không được phép','Hệ thống đã ghi nhận thao tác nhấp chuột phải. Em hãy tiếp tục làm bài.',[{label:'Tiếp tục',kind:'primary'}])}});
 document.addEventListener('visibilitychange',()=>{if(S.started&&document.hidden)violation('Rời tab/cửa sổ');else if(S.started)modal('Cảnh báo rời màn hình','Hệ thống đã ghi nhận việc rời tab hoặc mở cửa sổ khác. Em hãy quay lại toàn màn hình và tiếp tục làm bài.',[{label:'Trở lại toàn màn hình',kind:'primary',action:()=>document.documentElement.requestFullscreen().catch(()=>{})}])});
