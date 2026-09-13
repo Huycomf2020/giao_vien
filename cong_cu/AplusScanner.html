@@ -15,10 +15,9 @@
                 extend: {
                     colors: {
                         aplus: {
-                            dark: '#042f2e',
+                            dark: '#022c22',
                             header: '#064e3b',
                             primary: '#059669',
-                            light: '#10b981',
                             accent: '#34d399'
                         }
                     }
@@ -28,26 +27,25 @@
     </script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- OpenCV.js cho việc tự động tìm 4 góc tài liệu -->
+    <!-- OpenCV.js cho Perspective Transform & Contour Detection -->
     <script async src="https://docs.opencv.org/4.7.0/opencv.js" onload="onOpenCvReady()"></script>
     <!-- jsPDF & Tesseract.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
     <style>
-        body { background-color: #022c22; }
-        .scan-line {
+        body { background-color: #011913; }
+        .corner-handle {
             position: absolute;
-            width: 100%;
-            height: 4px;
-            background: rgba(52, 211, 153, 0.9);
-            box-shadow: 0 0 15px #34d399;
-            animation: scan 2s infinite ease-in-out;
-        }
-        @keyframes scan {
-            0% { top: 0%; }
-            50% { top: 95%; }
-            100% { top: 0%; }
+            width: 24px;
+            height: 24px;
+            background-color: #34d399;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: move;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 30;
         }
     </style>
 </head>
@@ -59,7 +57,7 @@
         <!-- HEADER -->
         <header class="bg-aplus-header text-white p-4 flex justify-between items-center shadow-lg border-b border-emerald-800">
             <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 bg-emerald-900 text-aplus-accent rounded-lg flex items-center justify-center font-black text-xl border border-emerald-500/40">A+</div>
+                <div class="w-9 h-9 bg-emerald-950 text-aplus-accent rounded-lg flex items-center justify-center font-black text-xl border border-emerald-500/40">A+</div>
                 <h1 class="text-lg font-bold tracking-wide text-emerald-50">A+ Scanner</h1>
             </div>
             <div class="flex items-center space-x-3">
@@ -80,7 +78,7 @@
                 <div class="text-center">
                     <div class="w-24 h-24 bg-aplus-header text-aplus-accent font-black text-5xl rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-emerald-500/30">A+</div>
                     <h2 class="text-2xl font-bold text-emerald-100">A+ Document Scanner</h2>
-                    <p class="text-xs text-emerald-400 mt-1">Quét & Làm sạch tài liệu thông minh</p>
+                    <p class="text-xs text-emerald-400 mt-1">Quét & Số hóa tài liệu chuẩn vFlat</p>
                 </div>
                 <form id="login-form" class="space-y-4">
                     <div>
@@ -97,7 +95,7 @@
                 </form>
             </section>
 
-            <!-- 2. MÀN HÌNH CHÍNH (CAMERA SCANNER & TỰ ĐỘNG LẤY 4 GÓC) -->
+            <!-- 2. MÀN HÌNH CHÍNH (CAMERA & CẮT NẮN TRANG GIẤY TỰ ĐỘNG) -->
             <section id="main-screen" class="hidden space-y-4 flex-1 flex flex-col">
                 <!-- User Info Bar -->
                 <div class="flex justify-between items-center text-xs bg-emerald-900/40 px-3 py-2 rounded-lg border border-emerald-800">
@@ -105,36 +103,47 @@
                     <button id="btn-logout" class="text-red-400 hover:underline">Đăng xuất</button>
                 </div>
 
-                <!-- Live Camera Viewport with 4-Corner Contour Overlay -->
-                <div class="relative border-2 border-emerald-600/50 rounded-2xl bg-black min-h-[350px] flex-1 flex items-center justify-center overflow-hidden shadow-inner">
-                    <!-- Live Video Stream -->
+                <!-- Camera / Preview Frame Container -->
+                <div id="scanner-container" class="relative border-2 border-emerald-600/50 rounded-2xl bg-black min-h-[360px] flex-1 flex items-center justify-center overflow-hidden shadow-inner">
+                    <!-- Live Camera Feed -->
                     <video id="webcam" autoplay playsinline class="w-full h-full object-cover hidden"></video>
-                    <!-- Overlay Canvas for Auto 4-Corner Detection Grid -->
+                    
+                    <!-- Realtime Detection Overlay (Chuẩn khung xanh vFlat) -->
                     <canvas id="canvas-overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none hidden"></canvas>
                     
-                    <!-- Captured Image Preview -->
-                    <img id="image-preview" class="max-w-full max-h-[380px] object-contain hidden" />
-                    <canvas id="process-canvas" class="hidden"></canvas>
+                    <!-- Result Preview Canvas (Ảnh đã nắn thẳng phẳng) -->
+                    <canvas id="result-canvas" class="max-w-full max-h-[380px] object-contain hidden"></canvas>
                     
-                    <div id="camera-placeholder" class="text-center p-6">
-                        <i class="fa-solid fa-camera-retro text-5xl text-emerald-500 mb-3 animate-pulse"></i>
-                        <p class="text-sm font-semibold text-emerald-200">Chưa mở máy quét</p>
-                        <p class="text-xs text-emerald-400/70 mt-1">Bấm nút bên dưới để bật Camera quét 4 góc tự động</p>
+                    <!-- 4 Handle Points cho phép chỉnh tay nếu muốn -->
+                    <div id="corner-handles" class="hidden">
+                        <div id="h-tl" class="corner-handle"></div>
+                        <div id="h-tr" class="corner-handle"></div>
+                        <div id="h-br" class="corner-handle"></div>
+                        <div id="h-bl" class="corner-handle"></div>
                     </div>
 
-                    <div id="scan-effect" class="scan-line hidden"></div>
+                    <div id="camera-placeholder" class="text-center p-6">
+                        <i class="fa-solid fa-camera-retro text-5xl text-emerald-500 mb-3 animate-pulse"></i>
+                        <p class="text-sm font-semibold text-emerald-200">Máy quét sẵn sàng</p>
+                        <p class="text-xs text-emerald-400/70 mt-1">Bấm nút bên dưới để bật Camera hoặc tải ảnh</p>
+                    </div>
                 </div>
 
-                <!-- Camera Controls -->
+                <input type="file" id="file-input" accept="image/*" class="hidden">
+
+                <!-- Dynamic Action Control Buttons -->
                 <div class="grid grid-cols-2 gap-2">
                     <button id="btn-start-camera" class="bg-aplus-primary text-white py-3 rounded-xl font-bold shadow hover:bg-emerald-600 flex items-center justify-center gap-2 border border-emerald-500/30">
-                        <i class="fa-solid fa-video"></i> Bật Camera Quét
+                        <i class="fa-solid fa-camera"></i> Bật Camera Quét
                     </button>
-                    <button id="btn-snap" class="bg-emerald-500 text-slate-950 py-3 rounded-xl font-bold shadow hover:bg-emerald-400 flex items-center justify-center gap-2 hidden">
-                        <i class="fa-solid fa-expand"></i> Chụp & Cắt 4 Góc
+                    <button id="btn-upload" class="bg-emerald-800 text-emerald-100 py-3 rounded-xl font-bold shadow hover:bg-emerald-700 flex items-center justify-center gap-2 border border-emerald-600/40">
+                        <i class="fa-solid fa-image"></i> Chọn Ảnh Có Sẵn
                     </button>
-                    <button id="btn-filter" class="bg-emerald-700 text-white py-3 rounded-xl font-bold shadow hover:bg-emerald-600 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled>
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Làm Sạch Ảnh
+                    <button id="btn-snap-crop" class="col-span-2 bg-emerald-400 text-slate-950 py-3 rounded-xl font-bold shadow hover:bg-emerald-300 flex items-center justify-center gap-2 hidden">
+                        <i class="fa-solid fa-crop-simple"></i> Quét & Cắt Nắn Trang Giấy Tự Động
+                    </button>
+                    <button id="btn-filter" class="col-span-2 bg-emerald-700 text-white py-3 rounded-xl font-bold shadow hover:bg-emerald-600 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed hidden" disabled>
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Làm Sạch Ảnh (Magic Color)
                     </button>
                 </div>
 
@@ -154,7 +163,7 @@
                     </div>
                 </div>
 
-                <!-- OCR Box -->
+                <!-- OCR Result -->
                 <div id="ocr-result-box" class="hidden border border-emerald-800 rounded-xl p-3 bg-emerald-950/80">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-xs font-bold text-emerald-300">Kết quả OCR:</span>
@@ -178,7 +187,7 @@
                         <div class="w-14 h-14 bg-aplus-header text-aplus-accent font-black text-3xl rounded-2xl flex items-center justify-center shadow-lg border border-emerald-500/40">A+</div>
                         <div>
                             <h3 class="font-bold text-emerald-50 text-base">A+ Document Scanner</h3>
-                            <p class="text-xs text-emerald-400">Version 2.0.0 (Dark-Green Edition)</p>
+                            <p class="text-xs text-emerald-400">Version 3.0.0 (vFlat Engine Edition)</p>
                         </div>
                     </div>
                     <hr class="border-emerald-800">
@@ -199,21 +208,15 @@
         let isOpenCvReady = false;
         function onOpenCvReady() {
             isOpenCvReady = true;
-            console.log("OpenCV.js Engine Ready!");
+            console.log("OpenCV vFlat Engine Loaded Successfully.");
         }
 
-        // --- FULLSCREEN AUTO LOGIC ---
+        // --- FULLSCREEN ---
         function enableFullscreen() {
             const docEl = document.documentElement;
-            if (docEl.requestFullscreen) {
-                docEl.requestFullscreen().catch(() => {});
-            } else if (docEl.webkitRequestFullscreen) {
-                docEl.webkitRequestFullscreen();
-            } else if (docEl.msRequestFullscreen) {
-                docEl.msRequestFullscreen();
-            }
+            if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+            else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
         }
-
         document.getElementById('btn-fullscreen').addEventListener('click', enableFullscreen);
 
         // --- AUTH & ROUTING ---
@@ -238,9 +241,8 @@
 
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            localStorage.setItem('aplus_user_email', email);
-            enableFullscreen(); // Tự động bật Fullscreen khi đăng nhập thành công
+            localStorage.setItem('aplus_user_email', document.getElementById('email').value);
+            enableFullscreen();
             checkAuth();
         });
 
@@ -257,18 +259,18 @@
         });
         document.getElementById('btn-back-settings').addEventListener('click', checkAuth);
 
-        // --- CAMERA STREAM & AUTOMATIC 4-CORNER DETECTION ---
+        // --- CORE CAMERA & AUTOMATIC PERSPECTIVE TRANSFORM (vFLAT CROP) ---
         const video = document.getElementById('webcam');
         const overlayCanvas = document.getElementById('canvas-overlay');
         const overlayCtx = overlayCanvas.getContext('2d');
+        const resultCanvas = document.getElementById('result-canvas');
+        const resultCtx = resultCanvas.getContext('2d');
         const cameraPlaceholder = document.getElementById('camera-placeholder');
-        const imagePreview = document.getElementById('image-preview');
-        const processCanvas = document.getElementById('process-canvas');
-        const processCtx = processCanvas.getContext('2d');
-        const scanEffect = document.getElementById('scan-effect');
+        const fileInput = document.getElementById('file-input');
 
         const btnStartCamera = document.getElementById('btn-start-camera');
-        const btnSnap = document.getElementById('btn-snap');
+        const btnUpload = document.getElementById('btn-upload');
+        const btnSnapCrop = document.getElementById('btn-snap-crop');
         const btnFilter = document.getElementById('btn-filter');
         const btnPdf = document.getElementById('btn-pdf');
         const btnWord = document.getElementById('btn-word');
@@ -276,34 +278,70 @@
 
         let streamTrack = null;
         let isDetecting = false;
-        let detectedCorners = null;
+        let detectedCorners = null; // Stored 4 points {x, y}
+        let currentSourceElement = null; // video or loaded image
 
+        // Bật Camera
         btnStartCamera.addEventListener('click', async () => {
             enableFullscreen();
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } } 
+                    video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } } 
                 });
                 streamTrack = stream.getVideoTracks()[0];
                 video.srcObject = stream;
+                currentSourceElement = video;
                 
                 video.classList.remove('hidden');
                 overlayCanvas.classList.remove('hidden');
+                resultCanvas.classList.add('hidden');
                 cameraPlaceholder.classList.add('hidden');
-                imagePreview.classList.add('hidden');
                 
                 btnStartCamera.classList.add('hidden');
-                btnSnap.classList.remove('hidden');
+                btnUpload.classList.add('hidden');
+                btnSnapCrop.classList.remove('hidden');
 
                 video.onloadedmetadata = () => {
                     overlayCanvas.width = video.videoWidth;
                     overlayCanvas.height = video.videoHeight;
                     isDetecting = true;
-                    detect4CornersLoop();
+                    detectContourLoop();
                 };
             } catch (err) {
-                alert("Không thể truy cập camera: " + err.message);
+                alert("Lỗi truy cập camera: " + err.message);
             }
+        });
+
+        btnUpload.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const img = new Image();
+                img.onload = () => {
+                    currentSourceElement = img;
+                    overlayCanvas.width = img.width;
+                    overlayCanvas.height = img.height;
+                    
+                    stopCamera();
+                    video.classList.add('hidden');
+                    cameraPlaceholder.classList.add('hidden');
+                    overlayCanvas.classList.remove('hidden');
+
+                    btnStartCamera.classList.remove('hidden');
+                    btnUpload.classList.remove('hidden');
+                    btnSnapCrop.classList.remove('hidden');
+
+                    // Tự động nhận diện 4 góc từ ảnh nạp vào & cắt luôn
+                    detect4CornersFromMat(img);
+                    executePerspectiveCrop();
+                };
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
         });
 
         function stopCamera() {
@@ -312,26 +350,33 @@
                 streamTrack = null;
             }
             isDetecting = false;
-            video.classList.add('hidden');
-            overlayCanvas.classList.add('hidden');
         }
 
-        // Thuật toán quét và nhận diện 4 góc khung tài liệu tự động (Real-time Contour Detection)
-        function detect4CornersLoop() {
+        // Nhận diện viền khung vFlat thời gian thực
+        function detectContourLoop() {
             if (!isDetecting || !isOpenCvReady) {
-                if (isDetecting) requestAnimationFrame(detect4CornersLoop);
+                if (isDetecting) requestAnimationFrame(detectContourLoop);
                 return;
             }
+            detect4CornersFromMat(video);
+            if (isDetecting) requestAnimationFrame(detectContourLoop);
+        }
 
+        function detect4CornersFromMat(element) {
             try {
-                let src = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
-                let cap = new cv.VideoCapture(video);
-                cap.read(src);
+                let src = new cv.Mat(element.videoHeight || element.height, element.videoWidth || element.width, cv.CV_8UC4);
+                let cap;
+                if (element === video) {
+                    cap = new cv.VideoCapture(video);
+                    cap.read(src);
+                } else {
+                    src = cv.imread(element);
+                }
 
                 let gray = new cv.Mat();
                 cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
                 cv.GaussianBlur(gray, gray, new cv.Size(5, 5), 0);
-                cv.Canny(gray, gray, 75, 200);
+                cv.Canny(gray, gray, 50, 150);
 
                 let contours = new cv.MatVector();
                 let hierarchy = new cv.Mat();
@@ -345,123 +390,164 @@
                 for (let i = 0; i < contours.size(); ++i) {
                     let cnt = contours.get(i);
                     let area = cv.contourArea(cnt);
-                    if (area > 5000) {
+                    if (area > 8000) {
                         let peri = cv.arcLength(cnt, true);
                         let approx = new cv.Mat();
                         cv.approxPolyDP(cnt, approx, 0.02 * peri, true);
 
-                        if (approx.rows === 4 && area > maxArea) { // Tìm khung có đúng 4 góc
+                        if (approx.rows === 4 && area > maxArea) {
                             maxArea = area;
                             bestApprox = approx;
                         }
                     }
                 }
 
-                // Vẽ 4 góc định vị lên màn hình
                 if (bestApprox) {
-                    let points = [];
+                    let pts = [];
                     for (let j = 0; j < 4; j++) {
-                        points.push({ x: bestApprox.data32S[j * 2], y: bestApprox.data32S[j * 2 + 1] });
+                        pts.push({ x: bestApprox.data32S[j * 2], y: bestApprox.data32S[j * 2 + 1] });
                     }
-                    detectedCorners = points;
+                    detectedCorners = sortCorners(pts);
 
-                    // Vẽ viền và 4 đỉnh xanh lục rực rỡ
+                    // Vẽ khung xanh viền rực rỡ chuẩn vFlat
                     overlayCtx.strokeStyle = "#34d399";
-                    overlayCtx.lineWidth = 4;
+                    overlayCtx.lineWidth = 6;
                     overlayCtx.beginPath();
-                    overlayCtx.moveTo(points[0].x, points[0].y);
-                    overlayCtx.lineTo(points[1].x, points[1].y);
-                    overlayCtx.lineTo(points[2].x, points[2].y);
-                    overlayCtx.lineTo(points[3].x, points[3].y);
+                    overlayCtx.moveTo(detectedCorners[0].x, detectedCorners[0].y);
+                    overlayCtx.lineTo(detectedCorners[1].x, detectedCorners[1].y);
+                    overlayCtx.lineTo(detectedCorners[2].x, detectedCorners[2].y);
+                    overlayCtx.lineTo(detectedCorners[3].x, detectedCorners[3].y);
                     overlayCtx.closePath();
                     overlayCtx.stroke();
-
-                    // Vẽ 4 chấm tròn tại 4 góc tài liệu
-                    points.forEach(p => {
-                        overlayCtx.fillStyle = "#10b981";
-                        overlayCtx.beginPath();
-                        overlayCtx.arc(p.x, p.y, 8, 0, 2 * Math.PI);
-                        overlayCtx.fill();
-                        overlayCtx.strokeStyle = "#ffffff";
-                        overlayCtx.lineWidth = 2;
-                        overlayCtx.stroke();
-                    });
                 }
 
                 src.delete(); gray.delete(); contours.delete(); hierarchy.delete();
             } catch (e) {
                 console.log(e);
             }
-
-            if (isDetecting) requestAnimationFrame(detect4CornersLoop);
         }
 
-        // Nút Chụp & Cắt 4 góc tự động
-        btnSnap.addEventListener('click', () => {
-            processCanvas.width = video.videoWidth;
-            processCanvas.height = video.videoHeight;
-            processCtx.drawImage(video, 0, 0);
+        // Sắp xếp 4 góc: [Top-Left, Top-Right, Bottom-Right, Bottom-Left]
+        function sortCorners(pts) {
+            pts.sort((a, b) => a.y - b.y);
+            let topTwo = pts.slice(0, 2).sort((a, b) => a.x - b.x);
+            let bottomTwo = pts.slice(2, 4).sort((a, b) => b.x - a.x);
+            return [topTwo[0], topTwo[1], bottomTwo[0], bottomTwo[1]];
+        }
 
-            imagePreview.src = processCanvas.toDataURL('image/jpeg');
-            imagePreview.classList.remove('hidden');
-            
-            stopCamera();
-
-            btnSnap.classList.add('hidden');
-            btnStartCamera.classList.remove('hidden');
-
-            // Kích hoạt các nút xử lý ảnh và xuất file
-            [btnFilter, btnPdf, btnWord, btnExcel].forEach(btn => {
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            });
+        // THUẬT TOÁN PERSPECTIVE TRANSFORM: CẮT LOẠI BỎ HẬU CẢNH VÀ NẮN THẲNG TRANG GIẤY
+        btnSnapCrop.addEventListener('click', () => {
+            executePerspectiveCrop();
         });
 
-        // --- LÀM SẠCH ẢNH MAGIC COLOR ---
+        function executePerspectiveCrop() {
+            if (!currentSourceElement || !isOpenCvReady) return;
+
+            // Nếu không phát hiện đủ 4 góc, tự gắn 4 góc mép ngoài cùng của ảnh
+            const w = currentSourceElement.videoWidth || currentSourceElement.width;
+            const h = currentSourceElement.videoHeight || currentSourceElement.height;
+            if (!detectedCorners) {
+                detectedCorners = [
+                    { x: 0, y: 0 },
+                    { x: w, y: 0 },
+                    { x: w, y: h },
+                    { x: 0, y: h }
+                ];
+            }
+
+            // Tính toán kích thước trang giấy đầu ra chuẩn A4
+            let widthA = Math.hypot(detectedCorners[2].x - detectedCorners[3].x, detectedCorners[2].y - detectedCorners[3].y);
+            let widthB = Math.hypot(detectedCorners[1].x - detectedCorners[0].x, detectedCorners[1].y - detectedCorners[0].y);
+            let targetWidth = Math.max(widthA, widthB);
+
+            let heightA = Math.hypot(detectedCorners[1].x - detectedCorners[2].x, detectedCorners[1].y - detectedCorners[2].y);
+            let heightB = Math.hypot(detectedCorners[0].x - detectedCorners[3].x, detectedCorners[0].y - detectedCorners[3].y);
+            let targetHeight = Math.max(heightA, heightB);
+
+            let srcMat = (currentSourceElement === video) ? cv.imread(video) : cv.imread(currentSourceElement);
+            let dstMat = new cv.Mat();
+
+            // Ma trận tọa độ 4 góc gốc -> Ma trận tọa độ phẳng mới
+            let srcCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [
+                detectedCorners[0].x, detectedCorners[0].y,
+                detectedCorners[1].x, detectedCorners[1].y,
+                detectedCorners[2].x, detectedCorners[2].y,
+                detectedCorners[3].x, detectedCorners[3].y
+            ]);
+
+            let dstCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [
+                0, 0,
+                targetWidth, 0,
+                targetWidth, targetHeight,
+                0, targetHeight
+            ]);
+
+            // Thực hiện biến đổiPerspective Transform (Nắn phẳng trang giấy)
+            let M = cv.getPerspectiveTransform(srcCoords, dstCoords);
+            let dsize = new cv.Size(targetWidth, targetHeight);
+            cv.warpPerspective(srcMat, dstMat, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+
+            // Đưa kết quả đã cắt nắn lên Canvas
+            cv.imshow(resultCanvas, dstMat);
+
+            stopCamera();
+            video.classList.add('hidden');
+            overlayCanvas.classList.add('hidden');
+            resultCanvas.classList.remove('hidden');
+
+            btnSnapCrop.classList.add('hidden');
+            btnStartCamera.classList.remove('hidden');
+            btnUpload.classList.remove('hidden');
+
+            btnFilter.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
+            btnFilter.disabled = false;
+            [btnPdf, btnWord, btnExcel].forEach(b => {
+                b.disabled = false;
+                b.classList.remove('opacity-50', 'cursor-not-allowed');
+            });
+
+            srcMat.delete(); dstMat.delete(); M.delete(); srcCoords.delete(); dstCoords.delete();
+        }
+
+        // --- BỘ LỌC LÀM SẠCH VÀ TRẮNG NỀN VFLAT (MAGIC COLOR) ---
         btnFilter.addEventListener('click', () => {
-            scanEffect.classList.remove('hidden');
-            setTimeout(() => {
-                let imgData = processCtx.getImageData(0, 0, processCanvas.width, processCanvas.height);
-                let data = imgData.data;
+            let imgData = resultCtx.getImageData(0, 0, resultCanvas.width, resultCanvas.height);
+            let data = imgData.data;
 
-                for (let i = 0; i < data.length; i += 4) {
-                    let gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-                    if (gray > 125) gray = Math.min(255, gray * 1.3);
-                    else gray = Math.max(0, gray * 0.7);
-                    data[i] = gray; data[i + 1] = gray; data[i + 2] = gray;
-                }
+            for (let i = 0; i < data.length; i += 4) {
+                let gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                // Tăng độ trắng của giấy và làm rõ chữ viết
+                if (gray > 115) gray = Math.min(255, gray * 1.35);
+                else gray = Math.max(0, gray * 0.65);
 
-                processCtx.putImageData(imgData, 0, 0);
-                imagePreview.src = processCanvas.toDataURL('image/jpeg');
-                scanEffect.classList.add('hidden');
-            }, 400);
+                data[i] = gray; data[i + 1] = gray; data[i + 2] = gray;
+            }
+
+            resultCtx.putImageData(imgData, 0, 0);
         });
 
         // --- XUẤT FILE PDF / WORD / EXCEL ---
         btnPdf.addEventListener('click', () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.addImage(imagePreview.src, 'JPEG', 10, 10, 190, 0);
+            const imgData = resultCanvas.toDataURL('image/jpeg');
+            doc.addImage(imgData, 'JPEG', 10, 10, 190, 0);
             doc.save('DocScanner_Aplus.pdf');
         });
 
         async function runOCR(formatType) {
-            scanEffect.classList.remove('hidden');
             const ocrBox = document.getElementById('ocr-result-box');
             const ocrText = document.getElementById('ocr-text');
-            
-            ocrText.value = "Đang trích xuất văn bản OCR...";
+            ocrText.value = "Đang quét nhận diện chữ tiếng Việt...";
             ocrBox.classList.remove('hidden');
 
             try {
                 const worker = await Tesseract.createWorker('vie');
-                const ret = await worker.recognize(imagePreview.src);
+                const ret = await worker.recognize(resultCanvas.toDataURL('image/jpeg'));
                 const text = ret.data.text;
                 await worker.terminate();
 
                 ocrText.value = text;
-                scanEffect.classList.add('hidden');
-
                 if (formatType === 'word') {
                     const blob = new Blob(['\ufeff' + text], { type: 'application/msword' });
                     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Aplus_Scanner.doc'; a.click();
@@ -471,7 +557,6 @@
                 }
             } catch (err) {
                 alert("Lỗi OCR: " + err.message);
-                scanEffect.classList.add('hidden');
             }
         }
 
@@ -479,7 +564,7 @@
         btnExcel.addEventListener('click', () => runOCR('excel'));
         document.getElementById('btn-copy').addEventListener('click', () => {
             navigator.clipboard.writeText(document.getElementById('ocr-text').value);
-            alert("Đã sao chép!");
+            alert("Đã sao chép văn bản!");
         });
 
         checkAuth();
