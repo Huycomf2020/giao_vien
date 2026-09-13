@@ -14,14 +14,16 @@
 <div id="modal" class="modal-back hidden" role="dialog" aria-modal="true"><div class="modal"><h2 id="modalTitle"></h2><p id="modalText"></p><div class="modal-actions" id="modalActions"></div></div></div>
 <script>
 'use strict';
-const DEMO=new URLSearchParams(location.search).get('demo')==='1';
-const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxlxUkvN-wOfp_UbE1YlaBhSiIzmHQCM37qS_VoLf4_WjguSnDiXNTc48gTBChgM63j/exec';
-const S={bootstrap:null,exam:null,index:0,answers:{},flags:{},violations:[],started:false,submitting:false,timer:null};
-const $=id=>document.getElementById(id); const text=(el,v)=>el.textContent=v==null?'':String(v);
+const DEMO = new URLSearchParams(location.search).get('demo') === '1';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxlxUkvN-wOfp_UbE1YlaBhSiIzmHQCM37qS_VoLf4_WjguSnDiXNTc48gTBChgM63j/exec';
+const S = {bootstrap:null, exam:null, index:0, answers:{}, flags:{}, violations:[], started:false, submitting:false, timer:null};
+const $ = id => document.getElementById(id); 
+const text = (el, v) => el.textContent = v == null ? '' : String(v);
+
 function gas(name, arg) {
     if (DEMO) return new Promise(resolve => setTimeout(() => resolve(demoCall(name, arg)), 350));
     
-    // 1. Dùng JSONP lấy danh sách môn & học sinh (Tức thì)
+    // JSONP gọi danh sách môn/học sinh
     if (name === 'getTestBootstrap') {
         return new Promise((resolve, reject) => {
             const cbName = 'jsonp_boot_' + Date.now();
@@ -30,18 +32,19 @@ function gas(name, arg) {
             
             const timer = setTimeout(() => {
                 delete window[cbName]; script.remove();
-                reject(new Error('Không tải được danh sách từ Apps Script. Kiểm tra lại mạng.'));
-            }, 10000);
+                reject(new Error('Không tải được danh sách từ Apps Script. Hãy kiểm tra lại kết nối mạng.'));
+            }, 12000);
 
             window[cbName] = function(data) {
                 clearTimeout(timer); delete window[cbName]; script.remove();
-                resolve(data);
+                if (data.ok) resolve(data.result);
+                else reject(new Error(data.error || 'Lỗi lấy dữ liệu.'));
             };
             document.body.appendChild(script);
         });
     }
 
-    // 2. Dùng JSONP lấy đề thi ngẫu nhiên từ ngân hàng đề (Tức thì, không qua iframe)
+    // JSONP gọi khởi tạo đề thi
     if (name === 'startCareerTest') {
         return new Promise((resolve, reject) => {
             const cbName = 'jsonp_start_' + Date.now();
@@ -51,22 +54,43 @@ function gas(name, arg) {
             
             const timer = setTimeout(() => {
                 delete window[cbName]; script.remove();
-                reject(new Error('Máy chủ lấy đề quá lâu. Vui lòng bấm thử lại.'));
-            }, 12000);
+                reject(new Error('Máy chủ phản hồi quá lâu. Vui lòng thử lại.'));
+            }, 25000);
 
             window[cbName] = function(data) {
                 clearTimeout(timer); delete window[cbName]; script.remove();
-                if (data.error) reject(new Error(data.error));
-                else resolve(data.result);
+                if (data.ok) resolve(data.result);
+                else reject(new Error(data.error || 'Không thể tạo đề thi.'));
             };
             document.body.appendChild(script);
         });
     }
 
-    const actions = { submitCareerTest: 'testSubmit' };
-    return bridgeCall(actions[name], arg || {});
+    // JSONP gọi nộp bài
+    if (name === 'submitCareerTest') {
+        return new Promise((resolve, reject) => {
+            const cbName = 'jsonp_sub_' + Date.now();
+            const script = document.createElement('script');
+            const param = encodeURIComponent(JSON.stringify(arg));
+            script.src = APPS_SCRIPT_URL + '?action=submitCareerTest&payload=' + param + '&callback=' + cbName;
+            
+            const timer = setTimeout(() => {
+                delete window[cbName]; script.remove();
+                reject(new Error('Không thể gửi bài thi đến máy chủ.'));
+            }, 20000);
+
+            window[cbName] = function(data) {
+                clearTimeout(timer); delete window[cbName]; script.remove();
+                if (data.ok) resolve(data.result);
+                else reject(new Error(data.error || 'Lỗi khi nộp bài.'));
+            };
+            document.body.appendChild(script);
+        });
+    }
+
+    return Promise.reject(new Error('Yêu cầu không được hỗ trợ.'));
 }
-function bridgeCall(action,payload){return new Promise((resolve,reject)=>{const requestId=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2));const frame=document.createElement('iframe');frame.name='gas_bridge_'+requestId.replace(/[^a-z0-9]/gi,'');frame.hidden=true;frame.setAttribute('aria-hidden','true');const form=document.createElement('form');form.method='POST';form.action=APPS_SCRIPT_URL;form.target=frame.name;form.hidden=true;[['action',action],['requestId',requestId],['payload',JSON.stringify(payload)]].forEach(([name,value])=>{const input=document.createElement('input');input.type='hidden';input.name=name;input.value=value;form.append(input)});let settled=false;const clean=()=>{window.removeEventListener('message',receive);clearTimeout(timer);form.remove();setTimeout(()=>frame.remove(),0)};const fail=message=>{if(settled)return;settled=true;clean();reject(new Error(message))};const receive=event=>{const allowed=event.origin==='https://script.google.com'||/^https:\/\/[^/]+\.googleusercontent\.com$/.test(event.origin);const data=event.data;if(!allowed||!data||data.channel!=='12A11_TEST_BRIDGE'||data.requestId!==requestId)return;settled=true;clean();data.ok?resolve(data.result):reject(new Error(data.error||'Máy chủ không xử lý được yêu cầu.'))};window.addEventListener('message',receive);const timer=setTimeout(()=>fail(action==='testBootstrap'?'Không tải được danh sách từ Apps Script. GVCN cần cập nhật Code.gs và triển khai phiên bản mới.':'Máy chủ phản hồi quá lâu. Hãy kiểm tra mạng rồi thử lại.'),action==='testBootstrap'?20000:210000);document.body.append(frame,form);form.submit()});}
+
 function demoCall(name,arg){if(name==='getTestBootstrap')return{students:['Thái Thị Lan Anh','Phan Thành Đạt'],subjects:[{name:'Toán',minutes:90},{name:'Ngữ văn',minutes:120}]};if(name==='startCareerTest'){const now=Date.now();return{ok:true,sessionId:'00000000-0000-0000-0000-000000000001',student:arg.student,subject:arg.subject,title:'Đề xem thử giao diện',instructions:'Bản xem thử không gửi dữ liệu.',startedAt:new Date(now).toISOString(),expiresAt:new Date(now+10*60000).toISOString(),durationMinutes:10,questions:[{id:'q1',type:'mcq',part:'Phần I',topic:'Hàm số',level:'Biết',context:'Cho hàm số f(x) = x² − 2x.',prompt:'Trục đối xứng của đồ thị là đường thẳng nào?',points:.25,choices:['x = −1','x = 0','x = 1','x = 2']},{id:'q2',type:'tf',part:'Phần II',topic:'Xác suất',level:'Hiểu',context:'Một hộp có 3 bi đỏ và 2 bi xanh. Lấy ngẫu nhiên một viên.',prompt:'Xác định đúng hoặc sai cho từng nhận định.',points:1,assertions:['Có 5 kết quả đồng khả năng.','Xác suất lấy bi đỏ là 3/5.','Xác suất lấy bi xanh là 3/5.','Hai biến cố lấy bi đỏ và lấy bi xanh đối nhau.']},{id:'q3',type:'written',part:'Phần viết',topic:'Nghị luận',level:'Vận dụng',context:'“Tri thức chỉ thực sự có ý nghĩa khi được dùng để giúp con người sống tốt hơn.”',prompt:'Viết một đoạn văn khoảng 200 chữ trình bày suy nghĩ của em.',points:2}]};}if(name==='submitCareerTest')return{ok:true,status:arg.exit?'Thoát bài':'Đã nộp',score:arg.exit?'':7.25,needsReview:true,details:{correct:2,total:3}};}
 function show(id){$(id).classList.remove('hidden')}function hide(id){$(id).classList.add('hidden')}
 function setStatus(msg,error=false){const e=$('startStatus');e.className=msg?'notice'+(error?' error':''):'';text(e,msg)}
@@ -86,7 +110,7 @@ function modal(title,message,buttons){text($('modalTitle'),title);text($('modalT
 function confirmSubmit(){const missing=S.exam.questions.filter(q=>!isDone(q)).length;modal('Nộp bài?',missing?`Em còn ${missing} câu chưa hoàn thành. Sau khi nộp, em không thể sửa bài.`:'Em đã trả lời tất cả câu hỏi. Sau khi nộp, em không thể sửa bài.',[{label:'Tiếp tục làm'},{label:'Nộp bài',kind:'primary',action:()=>finish(false)}])}
 $('exitBtn').onclick=()=>modal('Thoát bài?', 'Bài sẽ được ghi nhận ở trạng thái “Thoát bài” và không chấm điểm.',[{label:'Ở lại làm bài'},{label:'Thoát bài',kind:'danger',action:()=>finish(true)}]);
 async function finish(exit){if(S.submitting)return;S.submitting=true;clearInterval(S.timer);document.querySelectorAll('button').forEach(b=>b.disabled=true);modal(exit?'Đang thoát bài':'Đang nộp bài','Hệ thống đang ghi dữ liệu. Không đóng trang.',[]);try{const r=await gas('submitCareerTest',{sessionId:S.exam.sessionId,answers:S.answers,violations:S.violations,exit});hide('modal');S.started=false;window.removeEventListener('beforeunload',guard);try{if(document.fullscreenElement)await document.exitFullscreen()}catch(e){}hide('exam');hide('timer');hide('examActions');hide('submitTop');show('result');text($('resultStatus'),r.status==='Thoát bài'?'Bài đã được ghi nhận là thoát trước khi nộp.':'Kết quả đã được lưu vào bảng của GVCN.');text($('score'),r.score===''?'Không chấm':`${r.score} / 10`);const stats=$('resultStats');stats.replaceChildren();if(r.details&&Number.isFinite(r.details.correct))addStat(stats,r.details.correct,'Câu/khối đúng');addStat(stats,S.violations.length,'Lần rời màn hình');addStat(stats,r.status,'Trạng thái');const rev=$('reviewNotice');rev.replaceChildren();if(r.needsReview){const n=document.createElement('div');n.className='notice';n.textContent='Kết quả cần giáo viên duyệt lại trước khi sử dụng. Với môn Ngữ văn, điểm hiển thị là điểm chẩn đoán do AI chấm hai lượt.';rev.append(n)}}catch(e){hide('modal');modal('Chưa nộp được bài',e.message||'Mất kết nối. Hãy giữ nguyên trang và thử lại.',[{label:'Thử nộp lại',kind:'primary',action:()=>{S.submitting=false;finish(exit)}}]);S.timer=setInterval(updateTimer,1000)}finally{S.submitting=false;document.querySelectorAll('button').forEach(b=>b.disabled=false)}}
-function addStat(box,value,label){const e=document.createElement('div');e.className='stat';const b=document.createElement('b');b.textContent=value;const s=document.createElement('span');s.textContent=label;e.append(b,s);box.append(e)}
+function addStat(box,value,label){const e=document.className='stat';const b=document.createElement('b');b.textContent=value;const s=document.createElement('span');s.textContent=label;e.append(b,s);box.append(e)}
 function startTimer(){updateTimer();S.timer=setInterval(updateTimer,1000)}function updateTimer(){if(!S.exam)return;let sec=Math.max(0,Math.floor((new Date(S.exam.expiresAt).getTime()-Date.now())/1000));text($('timer'),`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`);$('timer').classList.toggle('danger',sec<=300);if(sec<=0&&!S.submitting){clearInterval(S.timer);modal('Đã hết giờ','Hệ thống đang tự động nộp bài.',[]);finish(false)}}
 function violation(type){if(!S.started||S.submitting)return;S.violations.push({type,at:new Date().toISOString()});}
 document.addEventListener('contextmenu',e=>{if(S.started){e.preventDefault();violation('Nhấp chuột phải');modal('Thao tác không được phép','Hệ thống đã ghi nhận thao tác nhấp chuột phải. Em hãy tiếp tục làm bài.',[{label:'Tiếp tục',kind:'primary'}])}});
