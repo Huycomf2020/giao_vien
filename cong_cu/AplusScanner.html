@@ -126,15 +126,54 @@ function detectLoop() {
   drawOverlay(points); requestAnimationFrame(detectLoop);
 }
 function detectDocument(mat) {
-  let gray=null, edges=null, contours=null, hierarchy=null, best=null;
+  let small=null, gray=null, edges=null, mask=null, contours=null, hierarchy=null, best=null;
   try {
-    const scale=Math.min(1,520/Math.max(mat.cols,mat.rows)); const small=new cv.Mat();
+    const scale=Math.min(1,600/Math.max(mat.cols,mat.rows)); small=new cv.Mat();
     if(scale<1) cv.resize(mat,small,new cv.Size(Math.round(mat.cols*scale),Math.round(mat.rows*scale))); else mat.copyTo(small);
-    gray=new cv.Mat(); cv.cvtColor(small,gray,cv.COLOR_RGBA2GRAY); cv.GaussianBlur(gray,gray,new cv.Size(5,5),0); edges=new cv.Mat(); cv.Canny(gray,edges,55,170); const kernel=cv.Mat.ones(5,5,cv.CV_8U); cv.dilate(edges,edges,kernel); kernel.delete(); contours=new cv.MatVector(); hierarchy=new cv.Mat(); cv.findContours(edges,contours,hierarchy,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
-    let bestArea=small.cols*small.rows*0.12;
-    for(let i=0;i<contours.size();i++){ const contour=contours.get(i), area=cv.contourArea(contour), perimeter=cv.arcLength(contour,true), approx=new cv.Mat(); cv.approxPolyDP(contour,approx,0.035*perimeter,true); if(area>bestArea && approx.rows===4 && cv.isContourConvex(approx)){ bestArea=area; best=[]; for(let j=0;j<4;j++) best.push({x:approx.data32S[j*2]/scale,y:approx.data32S[j*2+1]/scale}); } approx.delete(); contour.delete(); }
-    small.delete(); return best ? orderCorners(best) : null;
-  } catch(error) { return null; } finally { mat.delete(); if(gray)gray.delete(); if(edges)edges.delete(); if(contours)contours.delete(); if(hierarchy)hierarchy.delete(); }
+    gray=new cv.Mat();
+    cv.cvtColor(small,gray,small.channels()===4 ? cv.COLOR_RGBA2GRAY : cv.COLOR_RGB2GRAY);
+    cv.GaussianBlur(gray,gray,new cv.Size(5,5),0);
+    const frameArea=small.cols*small.rows;
+    let bestArea=frameArea*0.08;
+
+    // First use edges so dark tables and colored backgrounds still work.
+    edges=new cv.Mat(); cv.Canny(gray,edges,35,150);
+    const edgeKernel=cv.Mat.ones(5,5,cv.CV_8U); cv.dilate(edges,edges,edgeKernel); edgeKernel.delete();
+    best=largestDocumentQuad(edges,bestArea,scale,false);
+
+    // A bright sheet often has weak edges; threshold it as a second strategy.
+    if(!best) {
+      mask=new cv.Mat(); cv.threshold(gray,mask,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);
+      const maskKernel=cv.Mat.ones(9,9,cv.CV_8U); cv.morphologyEx(mask,mask,cv.MORPH_CLOSE,maskKernel); maskKernel.delete();
+      best=largestDocumentQuad(mask,bestArea,scale,true);
+    }
+    return best ? orderCorners(best) : null;
+  } catch(error) { return null; } finally { mat.delete(); if(small)small.delete(); if(gray)gray.delete(); if(edges)edges.delete(); if(mask)mask.delete(); if(contours)contours.delete(); if(hierarchy)hierarchy.delete(); }
+}
+function largestDocumentQuad(binary, minimumArea, scale, useRectangleFallback) {
+  let contours=null, hierarchy=null, best=null;
+  try {
+    contours=new cv.MatVector(); hierarchy=new cv.Mat(); cv.findContours(binary,contours,hierarchy,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
+    let bestArea=minimumArea;
+    for(let i=0;i<contours.size();i++) {
+      const contour=contours.get(i), area=cv.contourArea(contour);
+      if(area>bestArea) {
+        const perimeter=cv.arcLength(contour,true), approx=new cv.Mat();
+        cv.approxPolyDP(contour,approx,0.04*perimeter,true);
+        if(approx.rows===4 && cv.isContourConvex(approx)) {
+          bestArea=area; best=[];
+          for(let j=0;j<4;j++) best.push({x:approx.data32S[j*2]/scale,y:approx.data32S[j*2+1]/scale});
+        } else if(useRectangleFallback) {
+          const rect=cv.minAreaRect(contour), angle=rect.angle*Math.PI/180, a=Math.sin(angle)*0.5, b=Math.cos(angle)*0.5;
+          const cx=rect.center.x, cy=rect.center.y, w=rect.size.width, h=rect.size.height;
+          bestArea=area; best=[{x:(cx-a*h-b*w)/scale,y:(cy+b*h-a*w)/scale},{x:(cx+a*h-b*w)/scale,y:(cy-b*h-a*w)/scale},{x:(cx+a*h+b*w)/scale,y:(cy-b*h+a*w)/scale},{x:(cx-a*h+b*w)/scale,y:(cy+b*h+a*w)/scale}];
+        }
+        approx.delete();
+      }
+      contour.delete();
+    }
+    return best;
+  } finally { if(contours)contours.delete(); if(hierarchy)hierarchy.delete(); }
 }
 function orderCorners(points) { const sum=p=>p.x+p.y, diff=p=>p.x-p.y; return [points.reduce((a,b)=>sum(a)<sum(b)?a:b),points.reduce((a,b)=>diff(a)>diff(b)?a:b),points.reduce((a,b)=>sum(a)>sum(b)?a:b),points.reduce((a,b)=>diff(a)<diff(b)?a:b)]; }
 function drawOverlay(points) { overlayCtx.clearRect(0,0,overlay.width,overlay.height); document.querySelectorAll('.corner').forEach(el=>el.style.display='none'); state.corners=points; if(!points) { setStatus('Đưa tài liệu vào khung hình'); return; } setStatus('Đã nhận diện tài liệu',true); overlayCtx.beginPath(); overlayCtx.moveTo(points[0].x,points[0].y); points.slice(1).forEach(p=>overlayCtx.lineTo(p.x,p.y)); overlayCtx.closePath(); overlayCtx.fillStyle='#34d39955'; overlayCtx.fill(); overlayCtx.strokeStyle='#6ee7b7'; overlayCtx.lineWidth=6; overlayCtx.stroke(); points.forEach((p,i)=>{ const el=document.querySelectorAll('.corner')[i]; el.style.display='block'; el.style.left=(p.x/overlay.width*100)+'%'; el.style.top=(p.y/overlay.height*100)+'%'; }); }
@@ -154,9 +193,12 @@ $('closeResult').addEventListener('click',()=>{ $('resultModal').classList.add('
 function download(data,name) { const a=document.createElement('a'); a.href=data; a.download=name; a.click(); }
 function renderScans() { const list=$('scanList'); $('scanCount').textContent=state.scans.length+' tài liệu'; list.innerHTML=state.scans.length ? state.scans.map((scan,i)=>'<button class="w-full flex items-center gap-3 bg-white border border-[#d5e7df] rounded-xl p-2 text-left" data-index="'+i+'"><img src="'+scan.data+'" class="w-12 h-14 object-cover rounded-lg"><span><strong class="display-font">'+scan.name+'</strong><small class="sans block text-xs text-[#52716a]">'+scan.date+'</small></span></button>').join('') : '<p class="sans text-sm text-[#52716a] py-8 text-center">Chưa có tài liệu. Camera đã sẵn sàng.</p>'; list.querySelectorAll('[data-index]').forEach(btn=>btn.addEventListener('click',()=>{ const scan=state.scans[btn.dataset.index]; $('resultCanvas').width=1; const img=new Image(); img.onload=()=>{ $('resultCanvas').width=img.width; $('resultCanvas').height=img.height; $('resultCanvas').getContext('2d').drawImage(img,0,0); $('documentName').value=scan.name; $('resultModal').classList.remove('hidden'); $('resultModal').classList.add('flex'); }; img.src=scan.data; })); }
 function waitForOpenCv() {
-  if (typeof cv !== 'undefined' && typeof cv.Mat === 'function') {
-    state.cvReady = true;
-    return;
+  if (typeof cv !== 'undefined' && typeof cv.Mat === 'function' && typeof cv.imread === 'function') {
+    try {
+      const probe=new cv.Mat(1,1,cv.CV_8UC4); probe.delete(); state.cvReady=true; return;
+    } catch(error) {
+      state.cvReady=false;
+    }
   }
   setTimeout(waitForOpenCv, 250);
 }
