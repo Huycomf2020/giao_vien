@@ -37,6 +37,8 @@
     <style>
         body { background-color: #011913; }
         #app { touch-action: none; }
+        #cv-loading-banner { display: none; }
+        #scanner-container { height: min(52vh, 480px); min-height: 280px; flex: none; }
         .corner-handle {
             position: absolute;
             width: 30px; height: 30px;
@@ -89,9 +91,7 @@
         </div>
     </header>
 
-    <div id="cv-loading-banner" class="bg-amber-900/60 text-amber-200 text-xs font-semibold text-center py-2 px-3 border-b border-amber-700/50 flex items-center justify-center gap-2">
-        <i class="fa-solid fa-spinner fa-spin"></i> Đang tải công cụ xử lý ảnh AI, vui lòng đợi vài giây...
-    </div>
+    <div id="cv-loading-banner" aria-hidden="true"></div>
 
     <main class="flex-1 p-4 overflow-y-auto flex flex-col justify-between">
 
@@ -124,12 +124,12 @@
                 <button id="btn-logout" class="text-red-400 hover:underline">Đăng xuất</button>
             </div>
 
-            <div id="scanner-container" class="relative border-2 border-emerald-600/50 rounded-2xl bg-black min-h-[400px] flex-1 flex items-center justify-center overflow-hidden shadow-inner">
+            <div id="scanner-container" class="relative border-2 border-emerald-600/50 rounded-2xl bg-black flex items-center justify-center overflow-hidden shadow-inner">
                 <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover hidden"></video>
                 <canvas id="canvas-overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none hidden"></canvas>
 
                 <div id="detect-badge" class="hidden absolute top-3 left-1/2 -translate-x-1/2 bg-black/60 text-emerald-300 text-[11px] font-semibold px-3 py-1 rounded-full border border-emerald-500/40 z-10">
-                    <i class="fa-solid fa-crosshairs mr-1"></i><span id="detect-badge-text">Đang tìm trang giấy...</span>
+                    <i class="fa-solid fa-crosshairs mr-1"></i><span id="detect-badge-text">Đưa tài liệu vào khung hình</span>
                 </div>
 
                 <div id="camera-placeholder" class="text-center p-6">
@@ -296,6 +296,7 @@ function markCvReady() {
 }
 
 let streamTrack = null;
+let videoCapture = null;
 let isDetecting = false;
 let autoCaptureEnabled = false;
 let liveDetectedCorners = null;   // corners in VIDEO pixel space
@@ -370,10 +371,12 @@ $('btn-start-camera').addEventListener('click', async () => {
 
         $('capture-idle-controls').classList.add('hidden');
         $('capture-live-controls').classList.remove('hidden');
+        $('detect-badge-text').textContent = 'Đang nhận diện tài liệu...';
 
         video.onloadedmetadata = () => {
             overlayCanvas.width = video.videoWidth;
             overlayCanvas.height = video.videoHeight;
+            videoCapture = new cv.VideoCapture(video);
             isDetecting = true;
             stableFrameCount = 0;
             detectLoop();
@@ -407,6 +410,7 @@ function resetCaptureUI() {
 
 function stopCamera() {
     if (streamTrack) { streamTrack.stop(); streamTrack = null; }
+    if (videoCapture) { videoCapture.delete(); videoCapture = null; }
     isDetecting = false;
 }
 
@@ -458,16 +462,15 @@ function processCapturedImage() {
 function detectLoop() {
     if (!isDetecting) return;
     if (isOpenCvReady) {
-        const cap = new cv.VideoCapture(video);
         const frame = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
-        cap.read(frame);
+        videoCapture.read(frame);
         const corners = detectCornersInMat(frame);
         frame.delete();
         drawOverlay(corners);
 
         if (corners) {
             stableFrameCount++;
-            $('detect-badge-text').textContent = 'Đã phát hiện trang giấy (A4)';
+            $('detect-badge-text').textContent = 'Đã nhận diện tài liệu';
             if (autoCaptureEnabled && stableFrameCount >= STABLE_FRAMES_NEEDED) {
                 stableFrameCount = 0;
                 capturePhotoFromVideo();
@@ -475,7 +478,7 @@ function detectLoop() {
             }
         } else {
             stableFrameCount = 0;
-            $('detect-badge-text').textContent = 'Đang tìm trang giấy...';
+            $('detect-badge-text').textContent = 'Đưa tài liệu vào khung hình';
         }
     }
     requestAnimationFrame(detectLoop);
@@ -777,22 +780,17 @@ function performPerspectiveCrop() {
 }
 
 function cleanDocumentImage() {
-    const scanned = cv.imread(resultCanvas);
-    const gray = new cv.Mat();
-    const cleaned = new cv.Mat();
-    cv.cvtColor(scanned, gray, cv.COLOR_RGBA2GRAY);
-
-    // Flatten uneven lighting and increase text clarity without requiring a manual filter step.
-    const background = new cv.Mat();
-    cv.GaussianBlur(gray, background, new cv.Size(0, 0), 21);
-    cv.divide(gray, background, cleaned, 255);
-    cv.normalize(cleaned, cleaned, 0, 255, cv.NORM_MINMAX);
-
-    const rgba = new cv.Mat();
-    cv.cvtColor(cleaned, rgba, cv.COLOR_GRAY2RGBA);
-    cv.imshow(resultCanvas, rgba);
-
-    scanned.delete(); gray.delete(); cleaned.delete(); background.delete(); rgba.delete();
+    const image = resultCtx.getImageData(0, 0, resultCanvas.width, resultCanvas.height);
+    const pixels = image.data;
+    for (let i = 0; i < pixels.length; i += 4) {
+        const luminance = 0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2];
+        const cleaned = Math.max(0, Math.min(255, (luminance - 18) * 1.14));
+        pixels[i] = cleaned;
+        pixels[i + 1] = cleaned;
+        pixels[i + 2] = cleaned;
+        pixels[i + 3] = 255;
+    }
+    resultCtx.putImageData(image, 0, 0);
 }
 
 /* ============================== RESULT: FILTERS ============================== */
