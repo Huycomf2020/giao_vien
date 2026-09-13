@@ -1,1 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A+ Document Scanner</title>
+    <!-- Favicon biểu tượng Scan qua chữ A+ (Data URI SVG) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><text x='50' y='65' font-size='50' font-weight='bold' fill='white' text-anchor='middle' font-family='sans-serif'>A+</text><line x1='10' y1='45' x2='90' y2='45' stroke='%2338bdf8' stroke-width='6' stroke-dasharray='4'/></svg>">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jsPDF & Tesseract.js cho PDF & OCR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
+    <style>
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: rgba(56, 189, 248, 0.8);
+            box-shadow: 0 0 15px #38bdf8;
+            animation: scan 2s infinite ease-in-out;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 95%; }
+            100% { top: 0%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="max-w-md mx-auto bg-white min-h-screen shadow-xl relative flex flex-col">
+
+        <!-- HEADER -->
+        <header class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
+            <div class="flex items-center space-x-2">
+                <div class="w-9 h-9 bg-white text-blue-600 rounded-lg flex items-center justify-center font-black text-xl shadow">A+</div>
+                <h1 class="text-lg font-bold">A+ Scanner</h1>
+            </div>
+            <button id="btn-settings" class="text-white hover:text-blue-200 transition">
+                <i class="fa-solid fa-gear text-xl"></i>
+            </button>
+        </header>
+
+        <!-- CONTENT AREA -->
+        <main class="flex-1 p-4 overflow-y-auto">
+
+            <!-- 1. MÀN HÌNH ĐĂNG NHẬP (Hiển thị khi chưa Auth) -->
+            <section id="auth-screen" class="space-y-4 pt-10">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-blue-600 text-white font-black text-4xl rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">A+</div>
+                    <h2 class="text-2xl font-bold text-slate-700">Đăng Nhập A+ Scanner</h2>
+                    <p class="text-xs text-slate-500 mt-1">Quét & Số hóa tài liệu học tập thông minh</p>
+                </div>
+                <form id="login-form" class="space-y-3 mt-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                        <input type="email" id="email" required placeholder="nhapemail@gmail.com" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Mật khẩu</label>
+                        <input type="password" id="password" required placeholder="••••••••" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow transition">
+                        Đăng Nhập / Đăng ký
+                    </button>
+                </form>
+            </section>
+
+            <!-- 2. MÀN HÌNH CHÍNH (SCANNER) -->
+            <section id="main-screen" class="hidden space-y-4">
+                <!-- User Info Bar -->
+                <div class="flex justify-between items-center text-xs bg-slate-50 p-2.5 rounded-lg border">
+                    <span id="user-display" class="font-medium text-slate-600"><i class="fa-regular fa-user mr-1"></i> User</span>
+                    <button id="btn-logout" class="text-red-500 hover:underline">Đăng xuất</button>
+                </div>
+
+                <!-- Preview Area -->
+                <div class="relative border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 min-h-[320px] flex items-center justify-center overflow-hidden">
+                    <img id="image-preview" class="max-w-full max-h-[350px] object-contain hidden" />
+                    <canvas id="canvas" class="hidden"></canvas>
+                    
+                    <div id="upload-placeholder" class="text-center p-6 cursor-pointer">
+                        <i class="fa-solid fa-camera text-4xl text-blue-500 mb-2"></i>
+                        <p class="text-sm font-semibold text-slate-600">Chụp ảnh hoặc Chọn ảnh tài liệu</p>
+                        <p class="text-xs text-slate-400 mt-1">Hỗ trợ JPG, PNG</p>
+                    </div>
+
+                    <div id="scan-effect" class="scan-line hidden"></div>
+                </div>
+
+                <!-- Dynamic Controls -->
+                <input type="file" id="file-input" accept="image/*" class="hidden">
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="btn-camera" class="bg-blue-600 text-white py-2.5 rounded-lg font-semibold shadow hover:bg-blue-700 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-camera"></i> Chọn / Chụp Ảnh
+                    </button>
+                    <button id="btn-filter" class="bg-emerald-600 text-white py-2.5 rounded-lg font-semibold shadow hover:bg-emerald-700 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Làm Sạch Ảnh
+                    </button>
+                </div>
+
+                <!-- Export Options -->
+                <div class="border-t pt-3">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Xuất định dạng</h3>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button id="btn-pdf" class="bg-red-500 text-white py-2 rounded-lg text-xs font-bold shadow hover:bg-red-600 flex items-center justify-center gap-1 opacity-50 cursor-not-allowed" disabled>
+                            <i class="fa-solid fa-file-pdf"></i> PDF
+                        </button>
+                        <button id="btn-word" class="bg-blue-700 text-white py-2 rounded-lg text-xs font-bold shadow hover:bg-blue-800 flex items-center justify-center gap-1 opacity-50 cursor-not-allowed" disabled>
+                            <i class="fa-solid fa-file-word"></i> Word
+                        </button>
+                        <button id="btn-excel" class="bg-emerald-700 text-white py-2 rounded-lg text-xs font-bold shadow hover:bg-emerald-800 flex items-center justify-center gap-1 opacity-50 cursor-not-allowed" disabled>
+                            <i class="fa-solid fa-file-excel"></i> Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- OCR Output Area -->
+                <div id="ocr-result-box" class="hidden border rounded-lg p-3 bg-slate-50">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-slate-600">Kết quả trích xuất chữ (OCR):</span>
+                        <button id="btn-copy" class="text-xs text-blue-600 font-semibold hover:underline">Sao chép</button>
+                    </div>
+                    <textarea id="ocr-text" class="w-full h-24 text-xs p-2 border rounded bg-white" readonly></textarea>
+                </div>
+            </section>
+
+            <!-- 3. MÀN HÌNH CÀI ĐẶT & GIỚI THIỆU -->
+            <section id="settings-screen" class="hidden space-y-4">
+                <div class="flex items-center space-x-2 border-b pb-3">
+                    <button id="btn-back-settings" class="text-slate-600 hover:text-slate-900">
+                        <i class="fa-solid fa-arrow-left text-lg"></i>
+                    </button>
+                    <h2 class="text-lg font-bold">Cài đặt & Giới thiệu</h2>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl border space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-blue-600 text-white font-black text-2xl rounded-xl flex items-center justify-center shadow">A+</div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">A+ Document Scanner</h3>
+                            <p class="text-xs text-slate-500">Phiên bản: 1.0.0 (Web Edition)</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="text-xs text-slate-700 space-y-2 leading-relaxed">
+                        <p class="font-semibold text-emerald-600"><i class="fa-solid fa-gift mr-1"></i> Một sản phẩm miễn phí.</p>
+                        <p><i class="fa-solid fa-code mr-1"></i> <strong>Tác giả:</strong> Made by Huycomf</p>
+                        <p><i class="fa-solid fa-phone mr-1"></i> <strong>Zalo:</strong> <a href="https://zalo.me/0907218089" target="_blank" class="text-blue-600 underline font-semibold">0907218089</a></p>
+                        <p><i class="fa-solid fa-globe mr-1"></i> <strong>Website:</strong> <a href="https://huycomf2020.github.io/giao_vien/index.html" target="_blank" class="text-blue-600 underline break-all font-semibold">huycomf2020.github.io/giao_vien</a></p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. QUẢN LÝ TRẠNG THÁI & AUTH (LƯU TRÊN MÁY) ---
+        const authScreen = document.getElementById('auth-screen');
+        const mainScreen = document.getElementById('main-screen');
+        const settingsScreen = document.getElementById('settings-screen');
+        const userDisplay = document.getElementById('user-display');
+
+        // Kiểm tra xem người dùng đã đăng nhập trước đó chưa (localStorage)
+        function checkAuth() {
+            const savedUser = localStorage.getItem('aplus_user_email');
+            if (savedUser) {
+                userDisplay.innerHTML = `<i class="fa-regular fa-user mr-1"></i> ${savedUser}`;
+                authScreen.classList.add('hidden');
+                settingsScreen.classList.add('hidden');
+                mainScreen.classList.remove('hidden');
+            } else {
+                authScreen.classList.remove('hidden');
+                mainScreen.classList.add('hidden');
+                settingsScreen.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            localStorage.setItem('aplus_user_email', email);
+            checkAuth();
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            localStorage.removeItem('aplus_user_email');
+            checkAuth();
+        });
+
+        // Điều hướng màn hình Cài đặt
+        document.getElementById('btn-settings').addEventListener('click', () => {
+            authScreen.classList.add('hidden');
+            mainScreen.classList.add('hidden');
+            settingsScreen.classList.remove('hidden');
+        });
+        document.getElementById('btn-back-settings').addEventListener('click', checkAuth);
+
+        // --- 2. XỬ LÝ ẢNH & LÀM SẠCH (SCANNER MAGIC COLOR) ---
+        const fileInput = document.getElementById('file-input');
+        const btnCamera = document.getElementById('btn-camera');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const imagePreview = document.getElementById('image-preview');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const scanEffect = document.getElementById('scan-effect');
+
+        const btnFilter = document.getElementById('btn-filter');
+        const btnPdf = document.getElementById('btn-pdf');
+        const btnWord = document.getElementById('btn-word');
+        const btnExcel = document.getElementById('btn-excel');
+
+        let currentImage = null;
+
+        uploadPlaceholder.addEventListener('click', () => fileInput.click());
+        btnCamera.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    currentImage = img;
+                    imagePreview.src = event.target.result;
+                    imagePreview.classList.remove('hidden');
+                    uploadPlaceholder.classList.add('hidden');
+                    
+                    // Bật các nút chức năng
+                    [btnFilter, btnPdf, btnWord, btnExcel].forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    });
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Bộ lọc Magic Color (Tăng tương phản & Khử bóng làm sạch nền)
+        btnFilter.addEventListener('click', () => {
+            if (!currentImage) return;
+
+            scanEffect.classList.remove('hidden');
+            setTimeout(() => {
+                canvas.width = currentImage.width;
+                canvas.height = currentImage.height;
+                ctx.drawImage(currentImage, 0, 0);
+
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+
+                // Thuật toán làm sạch ảnh: Chuyển xám + Tăng tương phản cao + Tăng độ sáng nền
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i], g = data[i + 1], b = data[i + 2];
+                    // Chuyển sang ảnh xám
+                    let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                    
+                    // Khử bóng và làm trắng nền
+                    if (gray > 130) {
+                        gray = Math.min(255, gray * 1.25);
+                    } else {
+                        gray = Math.max(0, gray * 0.75); // Làm đậm nét chữ
+                    }
+
+                    data[i] = gray;
+                    data[i + 1] = gray;
+                    data[i + 2] = gray;
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                imagePreview.src = canvas.toDataURL('image/jpeg');
+                scanEffect.classList.add('hidden');
+            }, 500);
+        });
+
+        // --- 3. XUẤT FILE (PDF / WORD / EXCEL / OCR) ---
+        // Xuất PDF
+        btnPdf.addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const imgData = imagePreview.src;
+            
+            doc.addImage(imgData, 'JPEG', 10, 10, 190, 0);
+            doc.save('DocScanner_Aplus.pdf');
+        });
+
+        // OCR Trích xuất văn bản chữ cho Word & Excel
+        async function runOCR(formatType) {
+            scanEffect.classList.remove('hidden');
+            const ocrBox = document.getElementById('ocr-result-box');
+            const ocrText = document.getElementById('ocr-text');
+            
+            ocrText.value = "Đang quét và nhận diện chữ viết (OCR)... Vui lòng đợi...";
+            ocrBox.classList.remove('hidden');
+
+            try {
+                const worker = await Tesseract.createWorker('vie'); // Nhận diện tiếng Việt
+                const ret = await worker.recognize(imagePreview.src);
+                const extractedText = ret.data.text;
+                await worker.terminate();
+
+                ocrText.value = extractedText;
+                scanEffect.classList.add('hidden');
+
+                // Tải xuống file tương ứng
+                if (formatType === 'word') {
+                    const blob = new Blob(['\ufeff' + extractedText], { type: 'application/msword' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'DocScanner_Aplus.doc';
+                    link.click();
+                } else if (formatType === 'excel') {
+                    // Chuyển các dòng thành định dạng CSV
+                    const blob = new Blob(['\ufeff' + extractedText], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'DocScanner_Aplus.csv';
+                    link.click();
+                }
+            } catch (err) {
+                alert("Lỗi OCR: " + err.message);
+                scanEffect.classList.add('hidden');
+            }
+        }
+
+        btnWord.addEventListener('click', () => runOCR('word'));
+        btnExcel.addEventListener('click', () => runOCR('excel'));
+
+        document.getElementById('btn-copy').addEventListener('click', () => {
+            const text = document.getElementById('ocr-text').value;
+            navigator.clipboard.writeText(text);
+            alert("Đã sao chép văn bản vào bộ nhớ tạm!");
+        });
+
+        // Khởi chạy kiểm tra Đăng nhập khi mở trang
+        checkAuth();
+    </script>
+</body>
+</html>
