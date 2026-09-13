@@ -1,882 +1,167 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>A+ Document Scanner</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23064e3b'/><text x='50' y='65' font-size='50' font-weight='bold' fill='%2334d399' text-anchor='middle' font-family='sans-serif'>A+</text><line x1='10' y1='45' x2='90' y2='45' stroke='%2310b981' stroke-width='6' stroke-dasharray='4'/></svg>">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        aplus: { dark: '#022c22', header: '#064e3b', primary: '#059669', accent: '#34d399' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        // opencv.js fires its script "onload" as soon as the JS is parsed, but the actual
-        // WASM runtime (cv.Mat, cv.Canny, ...) only becomes usable a bit later, via
-        // cv['onRuntimeInitialized']. Bridge that here so it works no matter which
-        // script finishes parsing first.
-        window.__cvScriptLoaded = false;
-        function onOpenCvScriptLoad() {
-            window.__cvScriptLoaded = true;
-            if (window.__cvLoadedCallback) window.__cvLoadedCallback();
-        }
-    </script>
-    <script async src="https://docs.opencv.org/4.7.0/opencv.js" onload="onOpenCvScriptLoad()"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-
-    <style>
-        body { background-color: #011913; }
-        #app { touch-action: none; }
-        #cv-loading-banner { display: none; }
-        #scanner-container { height: min(52vh, 480px); min-height: 280px; flex: none; }
-        .corner-handle {
-            position: absolute;
-            width: 30px; height: 30px;
-            margin-left: -15px; margin-top: -15px;
-            background: rgba(52,211,153,0.25);
-            border: 3px solid #34d399;
-            border-radius: 50%;
-            cursor: grab;
-            touch-action: none;
-            z-index: 40;
-            box-shadow: 0 0 0 4px rgba(0,0,0,0.25);
-        }
-        .corner-handle::after {
-            content: '';
-            position: absolute; inset: 9px;
-            background: #34d399;
-            border-radius: 50%;
-        }
-        .corner-handle.active { cursor: grabbing; background: rgba(255,255,255,0.35); }
-        .filter-btn.active { outline: 2px solid #34d399; outline-offset: -2px; }
-        .fade-in { animation: fadeIn .25s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
-        .pulse-ring {
-            animation: pulseRing 1.6s ease-out infinite;
-        }
-        @keyframes pulseRing {
-            0% { box-shadow: 0 0 0 0 rgba(52,211,153,0.5); }
-            70% { box-shadow: 0 0 0 14px rgba(52,211,153,0); }
-            100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0d3b35">
+  <title>A+ Scanner</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230d3b35'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-size='45' font-family='Arial' font-weight='700' fill='%236ee7b7'%3EA+%3C/text%3E%3C/svg%3E">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://docs.opencv.org/4.7.0/opencv.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root { --forest:#0d3b35; --deep:#062722; --mint:#6ee7b7; --lime:#b8f7d4; --ink:#102c27; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#e7f1ed; color:var(--ink); font-family:Georgia, 'Times New Roman', serif; }
+    button, input { font:inherit; }
+    button { cursor:pointer; }
+    .app-shell { max-width:480px; min-height:100vh; margin:auto; background:#f8fcfa; box-shadow:0 0 35px #0d3b3520; }
+    .display-font { font-family:Georgia, 'Times New Roman', serif; letter-spacing:0; }
+    .sans { font-family:Arial, sans-serif; }
+    .camera-frame { position:relative; height:min(58vh,560px); min-height:340px; background:#07100e; overflow:hidden; }
+    #video, #preview { width:100%; height:100%; object-fit:cover; display:block; }
+    #overlay { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+    .corner { position:absolute; width:18px; height:18px; border:3px solid var(--mint); border-radius:50%; transform:translate(-50%,-50%); box-shadow:0 0 0 4px #06272288; display:none; }
+    .status-pill { position:absolute; top:16px; left:50%; transform:translateX(-50%); padding:8px 13px; border:1px solid #a7f3d0aa; border-radius:99px; background:#062722cc; color:#d1fae5; font:600 12px Arial, sans-serif; white-space:nowrap; }
+    .shutter { width:76px; height:76px; border-radius:50%; border:5px solid #0d3b35; background:white; box-shadow:0 4px 15px #0d3b3540; display:grid; place-items:center; }
+    .shutter::after { content:''; width:57px; height:57px; border-radius:50%; background:var(--mint); display:block; }
+    .tab { border-bottom:2px solid transparent; color:#52716a; }
+    .tab.active { color:var(--forest); border-color:var(--forest); }
+    .modal { background:#f8fcfa; border:1px solid #c4dcd3; box-shadow:0 15px 45px #0d3b3530; }
+    .toast { animation:toast .25s ease-out; }
+    @keyframes toast { from { opacity:0; transform:translate(-50%,8px); } to { opacity:1; transform:translate(-50%,0); } }
+  </style>
 </head>
-<body class="text-slate-100 font-sans min-h-screen flex items-center justify-center">
+<body>
+<div class="app-shell">
+  <header class="bg-[#0d3b35] text-white px-5 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-[#062722] border border-emerald-300/40 grid place-items-center text-[#6ee7b7] font-bold text-lg">A+</div>
+      <div><div class="display-font text-xl">A+ Scanner</div><div class="sans text-[10px] text-emerald-200">Document studio</div></div>
+    </div>
+    <button id="settingsButton" class="text-emerald-100 text-xl" title="Cài đặt">&#9881;</button>
+  </header>
 
-<div id="app" class="w-full max-w-md bg-aplus-dark min-h-screen shadow-2xl relative flex flex-col border-x border-emerald-900/50">
+  <main>
+    <section id="authView" class="px-6 py-12 hidden">
+      <div class="text-center mb-8"><div class="inline-grid place-items-center w-20 h-20 rounded-3xl bg-[#0d3b35] text-[#6ee7b7] text-4xl font-bold">A+</div><h1 class="display-font text-3xl mt-4">Quét tài liệu sáng rõ</h1><p class="sans text-sm text-[#52716a] mt-2">Tự động nhận diện, làm sạch và lưu tài liệu.</p></div>
+      <form id="authForm" class="space-y-3">
+        <input id="nameInput" class="w-full rounded-xl border border-[#c4dcd3] bg-white px-4 py-3 outline-none focus:border-[#0d3b35]" placeholder="Tên của bạn" autocomplete="name">
+        <input id="emailInput" type="email" required class="w-full rounded-xl border border-[#c4dcd3] bg-white px-4 py-3 outline-none focus:border-[#0d3b35]" placeholder="Email" autocomplete="email">
+        <input id="passwordInput" type="password" required class="w-full rounded-xl border border-[#c4dcd3] bg-white px-4 py-3 outline-none focus:border-[#0d3b35]" placeholder="Mật khẩu" autocomplete="current-password">
+        <button class="w-full rounded-xl bg-[#0d3b35] py-3 text-white font-bold">Đăng nhập / Đăng ký</button>
+      </form>
+      <p class="sans text-center text-xs text-[#52716a] mt-4">Lần sau app sẽ tự nhớ tài khoản trên thiết bị này.</p>
+    </section>
 
-    <!-- HEADER -->
-    <header class="bg-aplus-header text-white p-4 flex justify-between items-center shadow-lg border-b border-emerald-800">
-        <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 bg-emerald-950 text-aplus-accent rounded-lg flex items-center justify-center font-black text-xl border border-emerald-500/40">A+</div>
-            <h1 class="text-lg font-bold tracking-wide text-emerald-50">A+ Scanner</h1>
-        </div>
-        <div class="flex items-center space-x-3">
-            <button id="btn-fullscreen" class="text-emerald-300 hover:text-white transition" title="Toàn màn hình">
-                <i class="fa-solid fa-expand text-lg"></i>
-            </button>
-            <button id="btn-settings" class="text-emerald-300 hover:text-white transition">
-                <i class="fa-solid fa-gear text-lg"></i>
-            </button>
-        </div>
-    </header>
+    <section id="scannerView" class="hidden">
+      <div class="px-5 py-3 flex items-center justify-between bg-[#eef7f2] border-b border-[#d5e7df]"><span id="userLabel" class="sans text-xs text-[#52716a]"></span><button id="logoutButton" class="sans text-xs text-red-700">Đăng xuất</button></div>
+      <div class="camera-frame">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="overlay"></canvas>
+        <div id="status" class="status-pill">Đang mở camera...</div>
+        <div id="corners"><i class="corner"></i><i class="corner"></i><i class="corner"></i><i class="corner"></i></div>
+        <div id="cameraError" class="absolute inset-0 hidden items-center justify-center p-8 text-center text-white sans"><div><div class="text-4xl mb-3">&#128247;</div><p>Không thể mở camera. Hãy cho phép trình duyệt truy cập camera.</p></div></div>
+      </div>
+      <div class="bg-white px-5 py-4 flex items-center justify-between border-b border-[#d5e7df]">
+        <button id="galleryButton" class="sans text-sm text-[#0d3b35] font-bold">&#128444; Ảnh có sẵn</button>
+        <button id="shutter" class="shutter" title="Chụp tài liệu"></button>
+        <button id="flashButton" class="sans text-sm text-[#52716a]" title="Bật đèn flash">&#9889; Đèn</button>
+      </div>
+      <input id="fileInput" type="file" accept="image/*" class="hidden">
+      <div class="px-5 py-5"><div class="flex items-center justify-between mb-3"><h2 class="display-font text-xl">Tài liệu đã lưu</h2><span id="scanCount" class="sans text-xs text-[#52716a]"></span></div><div id="scanList" class="space-y-2"></div></div>
+    </section>
 
-    <div id="cv-loading-banner" aria-hidden="true"></div>
-
-    <main class="flex-1 p-4 overflow-y-auto flex flex-col justify-between">
-
-        <!-- 1. AUTH -->
-        <section id="auth-screen" class="space-y-6 pt-8 my-auto fade-in">
-            <div class="text-center">
-                <div class="w-24 h-24 bg-aplus-header text-aplus-accent font-black text-5xl rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-emerald-500/30">A+</div>
-                <h2 class="text-2xl font-bold text-emerald-100">A+ Document Scanner</h2>
-                <p class="text-xs text-emerald-400 mt-1">Quét & số hóa tài liệu, tự động nhận diện 4 góc</p>
-            </div>
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-emerald-300 mb-1">Email</label>
-                    <input type="email" id="email" required placeholder="nhapemail@gmail.com" class="w-full px-3 py-2.5 bg-emerald-950/60 border border-emerald-700/60 text-emerald-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-emerald-300 mb-1">Mật khẩu</label>
-                    <input type="password" id="password" required placeholder="••••••••" class="w-full px-3 py-2.5 bg-emerald-950/60 border border-emerald-700/60 text-emerald-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400">
-                </div>
-                <button type="submit" class="w-full bg-aplus-primary hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg transition duration-200">
-                    Đăng nhập / Bắt đầu
-                </button>
-            </form>
-        </section>
-
-        <!-- 2. CAPTURE -->
-        <section id="capture-screen" class="hidden space-y-3 flex-1 flex flex-col fade-in">
-            <div class="flex justify-between items-center text-xs bg-emerald-900/40 px-3 py-2 rounded-lg border border-emerald-800">
-                <span id="user-display" class="font-medium text-emerald-300"><i class="fa-regular fa-user mr-1"></i> User</span>
-                <button id="btn-logout" class="text-red-400 hover:underline">Đăng xuất</button>
-            </div>
-
-            <div id="scanner-container" class="relative border-2 border-emerald-600/50 rounded-2xl bg-black flex items-center justify-center overflow-hidden shadow-inner">
-                <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover hidden"></video>
-                <canvas id="canvas-overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none hidden"></canvas>
-
-                <div id="detect-badge" class="hidden absolute top-3 left-1/2 -translate-x-1/2 bg-black/60 text-emerald-300 text-[11px] font-semibold px-3 py-1 rounded-full border border-emerald-500/40 z-10">
-                    <i class="fa-solid fa-crosshairs mr-1"></i><span id="detect-badge-text">Đưa tài liệu vào khung hình</span>
-                </div>
-
-                <div id="camera-placeholder" class="text-center p-6">
-                    <i class="fa-solid fa-camera-retro text-5xl text-emerald-500 mb-3 animate-pulse"></i>
-                    <p class="text-sm font-semibold text-emerald-200">Máy quét sẵn sàng</p>
-                    <p class="text-xs text-emerald-400/70 mt-1">Bấm nút bên dưới để bật camera hoặc tải ảnh</p>
-                </div>
-            </div>
-
-            <input type="file" id="file-input" accept="image/*" class="hidden">
-
-            <!-- Idle controls -->
-            <div id="capture-idle-controls" class="grid grid-cols-2 gap-2">
-                <button id="btn-start-camera" class="bg-aplus-primary text-white py-3 rounded-xl font-bold shadow hover:bg-emerald-600 flex items-center justify-center gap-2 border border-emerald-500/30">
-                    <i class="fa-solid fa-camera"></i> Bật camera quét
-                </button>
-                <button id="btn-upload" class="bg-emerald-800 text-emerald-100 py-3 rounded-xl font-bold shadow hover:bg-emerald-700 flex items-center justify-center gap-2 border border-emerald-600/40">
-                    <i class="fa-solid fa-image"></i> Chọn ảnh có sẵn
-                </button>
-            </div>
-
-            <!-- Live camera controls -->
-            <div id="capture-live-controls" class="hidden flex items-center justify-between px-4">
-                <button id="btn-cancel-camera" class="w-11 h-11 rounded-full bg-emerald-900/70 border border-emerald-700 flex items-center justify-center text-emerald-300">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-                <button id="btn-shutter" class="w-16 h-16 rounded-full bg-white border-4 border-emerald-400 pulse-ring flex items-center justify-center">
-                    <span class="w-12 h-12 rounded-full bg-emerald-500"></span>
-                </button>
-                <button id="btn-toggle-auto" class="w-11 h-11 rounded-full bg-emerald-900/70 border border-emerald-700 flex items-center justify-center text-emerald-300" title="Bật/tắt tự động chụp">
-                    <i class="fa-solid fa-bolt"></i>
-                </button>
-            </div>
-        </section>
-
-        <!-- 3. ADJUST CORNERS -->
-        <section id="adjust-screen" class="hidden space-y-3 flex-1 flex flex-col fade-in">
-            <div class="flex justify-between items-center">
-                <button id="btn-cancel-adjust" class="text-sm font-semibold text-red-400 px-3 py-2"><i class="fa-solid fa-xmark mr-1"></i>Hủy</button>
-                <h2 class="text-sm font-bold text-emerald-100">Kéo 4 góc cho khớp trang giấy</h2>
-                <button id="btn-confirm-adjust" class="text-sm font-bold text-emerald-950 bg-aplus-accent px-3 py-2 rounded-lg"><i class="fa-solid fa-check mr-1"></i>Xong</button>
-            </div>
-            <div id="adjust-container" class="relative flex-1 bg-black rounded-2xl overflow-hidden border-2 border-emerald-700/50 min-h-[400px]">
-                <img id="adjust-image" class="w-full h-full object-contain select-none pointer-events-none" draggable="false">
-                <svg id="adjust-svg" class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
-                    <polygon id="adjust-poly" points="" fill="rgba(52,211,153,0.18)" stroke="#34d399" stroke-width="3"></polygon>
-                </svg>
-                <div id="adjust-handles" class="absolute inset-0"></div>
-            </div>
-            <p class="text-[11px] text-center text-emerald-400/80">Mẹo: kéo từng chấm tròn ra đúng 4 góc của tờ giấy để cắt chính xác</p>
-        </section>
-
-        <!-- 4. RESULT -->
-        <section id="result-screen" class="hidden space-y-3 flex-1 flex flex-col fade-in">
-            <div class="flex justify-between items-center">
-                <button id="btn-back-result" class="text-sm font-semibold text-emerald-300 px-2 py-2"><i class="fa-solid fa-arrow-left mr-1"></i>Quét lại</button>
-                <h2 class="text-sm font-bold text-emerald-100">Kết quả</h2>
-                <span class="w-16"></span>
-            </div>
-
-            <div class="relative border-2 border-emerald-600/50 rounded-2xl bg-black min-h-[360px] flex-1 flex items-center justify-center overflow-hidden shadow-inner">
-                <canvas id="result-canvas" class="max-w-full max-h-[420px] object-contain"></canvas>
-            </div>
-
-            <!-- Filters -->
-            <div class="grid grid-cols-4 gap-2">
-                <button data-filter="original" class="filter-btn active bg-emerald-900/60 text-emerald-100 py-2 rounded-xl text-xs font-bold border border-emerald-700">Gốc</button>
-                <button data-filter="bw" class="filter-btn bg-emerald-900/60 text-emerald-100 py-2 rounded-xl text-xs font-bold border border-emerald-700">Trắng đen</button>
-                <button data-filter="gray" class="filter-btn bg-emerald-900/60 text-emerald-100 py-2 rounded-xl text-xs font-bold border border-emerald-700">Xám</button>
-                <button data-filter="enhance" class="filter-btn bg-emerald-900/60 text-emerald-100 py-2 rounded-xl text-xs font-bold border border-emerald-700">Làm nét</button>
-            </div>
-
-            <!-- Export -->
-            <div class="border-t border-emerald-800/80 pt-3">
-                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Xuất định dạng</h3>
-                <div class="grid grid-cols-3 gap-2">
-                    <button id="btn-pdf" class="bg-rose-900/80 text-rose-200 border border-rose-700 py-2 rounded-xl text-xs font-bold shadow hover:bg-rose-800 flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-file-pdf"></i> PDF
-                    </button>
-                    <button id="btn-word" class="bg-blue-900/80 text-blue-200 border border-blue-700 py-2 rounded-xl text-xs font-bold shadow hover:bg-blue-800 flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-file-word"></i> Word
-                    </button>
-                    <button id="btn-excel" class="bg-emerald-950 text-emerald-300 border border-emerald-700 py-2 rounded-xl text-xs font-bold shadow hover:bg-emerald-900 flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-file-excel"></i> Excel
-                    </button>
-                </div>
-            </div>
-
-            <button id="btn-rescan" class="w-full bg-aplus-primary text-white py-3 rounded-xl font-bold shadow hover:bg-emerald-600 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-plus"></i> Quét trang mới
-            </button>
-
-            <div id="ocr-result-box" class="hidden border border-emerald-800 rounded-xl p-3 bg-emerald-950/80">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-xs font-bold text-emerald-300">Kết quả OCR:</span>
-                    <button id="btn-copy" class="text-xs text-aplus-accent hover:underline">Sao chép</button>
-                </div>
-                <textarea id="ocr-text" class="w-full h-20 text-xs p-2 border border-emerald-800 rounded-lg bg-emerald-900/40 text-emerald-100" readonly></textarea>
-            </div>
-        </section>
-
-        <!-- 5. SETTINGS -->
-        <section id="settings-screen" class="hidden space-y-4 fade-in">
-            <div class="flex items-center space-x-3 border-b border-emerald-800 pb-3">
-                <button id="btn-back-settings" class="text-emerald-400 hover:text-white">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
-                </button>
-                <h2 class="text-lg font-bold text-emerald-100">Cài đặt & giới thiệu</h2>
-            </div>
-
-            <div class="bg-emerald-900/30 p-5 rounded-2xl border border-emerald-800 space-y-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-14 h-14 bg-aplus-header text-aplus-accent font-black text-3xl rounded-2xl flex items-center justify-center shadow-lg border border-emerald-500/40">A+</div>
-                    <div>
-                        <h3 class="font-bold text-emerald-50 text-base">A+ Document Scanner</h3>
-                        <p class="text-xs text-emerald-400">Version 4.0.0 — Auto-Detect Engine</p>
-                    </div>
-                </div>
-                <hr class="border-emerald-800">
-                <div class="text-xs text-emerald-200 space-y-3 leading-relaxed">
-                    <p class="font-semibold text-aplus-accent flex items-center gap-2"><i class="fa-solid fa-gift"></i> Một sản phẩm miễn phí.</p>
-                    <p class="flex items-center gap-2"><i class="fa-solid fa-code text-emerald-400"></i> <strong>Tác giả:</strong> Made by Huycomf</p>
-                    <p class="flex items-center gap-2"><i class="fa-solid fa-phone text-emerald-400"></i> <strong>Zalo:</strong> <a href="https://zalo.me/0907218089" target="_blank" class="text-aplus-accent underline font-semibold">0907218089</a></p>
-                    <p class="flex items-start gap-2"><i class="fa-solid fa-globe text-emerald-400 mt-0.5"></i> <span><strong>Website:</strong> <a href="https://huycomf2020.github.io/giao_vien/index.html" target="_blank" class="text-aplus-accent underline break-all font-semibold">huycomf2020.github.io/giao_vien</a></span></p>
-                </div>
-            </div>
-        </section>
-
-    </main>
+    <section id="settingsView" class="hidden px-5 py-6">
+      <div class="flex items-center gap-3 mb-6"><button id="backButton" class="text-2xl">&#8592;</button><h2 class="display-font text-2xl">Cài đặt</h2></div>
+      <div class="rounded-2xl bg-[#eef7f2] p-5 space-y-4"><div class="flex justify-between"><span class="sans text-sm text-[#52716a]">Tên app</span><strong>A+ Scanner</strong></div><div class="flex justify-between"><span class="sans text-sm text-[#52716a]">Phiên bản</span><strong>1.0.0</strong></div><hr class="border-[#c4dcd3]"><p class="text-[#0d3b35] font-bold">App Quét tài liệu miễn phí</p><p class="sans text-sm leading-6 text-[#52716a]">Made by Huycomf<br>Zalo: <a class="text-[#0d3b35] font-bold" href="https://zalo.me/0907218089" target="_blank">0907218089</a><br>Website: <a class="text-[#0d3b35] font-bold break-all" href="https://huycomf2020.github.io/giao_vien/index.html" target="_blank">huycomf2020.github.io/giao_vien/index.html</a></p></div>
+    </section>
+  </main>
 </div>
 
+<div id="resultModal" class="fixed inset-0 bg-[#062722cc] hidden items-end sm:items-center justify-center p-3 z-20">
+  <div class="modal w-full max-w-[460px] rounded-3xl p-4"><div class="flex items-center justify-between mb-3"><h2 class="display-font text-xl">Tài liệu đã quét</h2><button id="closeResult" class="text-2xl">&times;</button></div><div class="bg-[#e7f1ed] rounded-2xl p-2"><canvas id="resultCanvas" class="w-full max-h-[55vh] object-contain"></canvas></div><input id="documentName" class="w-full mt-3 rounded-xl border border-[#c4dcd3] px-3 py-2" value="Aplus_Scan"><div class="grid grid-cols-3 gap-2 mt-3"><button id="saveButton" class="rounded-xl bg-[#0d3b35] text-white py-3 font-bold">Lưu ảnh</button><button id="pdfButton" class="rounded-xl bg-[#b8f7d4] text-[#0d3b35] py-3 font-bold">PDF</button><button id="wordButton" class="rounded-xl border border-[#c4dcd3] py-3 font-bold">Word</button></div><button id="excelButton" class="w-full mt-2 rounded-xl border border-[#c4dcd3] py-3 font-bold">Xuất Excel / CSV</button></div>
+</div>
+<div id="toast" class="fixed bottom-7 left-1/2 hidden toast bg-[#062722] text-white sans text-sm px-4 py-3 rounded-xl z-30"></div>
+
 <script>
-/* ============================== STATE ============================== */
-let isOpenCvReady = false;
-let pendingConfirmAdjust = false;
-let pendingAutoProcess = false;
+const $ = id => document.getElementById(id);
+const state = { stream:null, corners:null, source:null, result:null, scans:JSON.parse(localStorage.getItem('aplus_scans') || '[]'), cvReady:false };
+const video = $('video'), overlay = $('overlay'), overlayCtx = overlay.getContext('2d');
 
-function handleCvScriptLoaded() {
-    if (typeof cv === 'undefined') return;
-    // Some builds expose a fully-usable `cv` immediately; others only finish
-    // initializing the WASM runtime a moment later.
-    if (typeof cv.Mat === 'function') markCvReady();
-    else cv['onRuntimeInitialized'] = markCvReady;
+function toast(message) { const el=$('toast'); el.textContent=message; el.classList.remove('hidden'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.add('hidden'),2400); }
+function show(view) { ['authView','scannerView','settingsView'].forEach(id => $(id).classList.toggle('hidden', id !== view)); }
+function setStatus(text, good=false) { $('status').textContent=text; $('status').style.color=good ? '#b8f7d4' : '#d1fae5'; }
+function saveScans() { localStorage.setItem('aplus_scans', JSON.stringify(state.scans.slice(0,12))); }
+function filename() { return ($('documentName').value || 'Aplus_Scan').replace(/[^a-z0-9_-]/gi,'_'); }
+
+function loadApp() {
+  const user=JSON.parse(localStorage.getItem('aplus_user') || 'null');
+  if (!user) { show('authView'); return; }
+  $('userLabel').textContent='Xin chào, ' + (user.name || user.email);
+  show('scannerView'); renderScans(); startCamera();
 }
-window.__cvLoadedCallback = handleCvScriptLoaded;
-if (window.__cvScriptLoaded) handleCvScriptLoaded();
+$('authForm').addEventListener('submit', event => { event.preventDefault(); localStorage.setItem('aplus_user', JSON.stringify({name:$('nameInput').value.trim(),email:$('emailInput').value.trim()})); loadApp(); });
+$('logoutButton').addEventListener('click', () => { stopCamera(); localStorage.removeItem('aplus_user'); show('authView'); });
+$('settingsButton').addEventListener('click', () => { stopCamera(); show('settingsView'); });
+$('backButton').addEventListener('click', () => { show('scannerView'); startCamera(); });
+$('galleryButton').addEventListener('click', () => $('fileInput').click());
+$('fileInput').addEventListener('change', event => { const file=event.target.files[0]; if(file) readImage(file); event.target.value=''; });
+$('shutter').addEventListener('click', captureCamera);
+$('flashButton').addEventListener('click', async () => { const track=state.stream && state.stream.getVideoTracks()[0]; if(!track) return; const caps=track.getCapabilities(); if(!caps.torch) { toast('Đèn flash không được hỗ trợ trên thiết bị này'); return; } await track.applyConstraints({advanced:[{torch:!state.torch}]}); state.torch=!state.torch; });
 
-function markCvReady() {
-    isOpenCvReady = true;
-    console.log('OpenCV runtime ready');
-    // uses document.getElementById directly (not the $ helper) since this can
-    // fire before the rest of this script has finished defining things
-    const banner = document.getElementById('cv-loading-banner');
-    if (banner) banner.classList.add('hidden');
-    if (pendingConfirmAdjust) {
-        pendingConfirmAdjust = false;
-        setConfirmWaiting(false);
-        performPerspectiveCrop();
-    }
-    if (pendingAutoProcess) {
-        pendingAutoProcess = false;
-        performPerspectiveCrop();
-    }
+async function startCamera() {
+  stopCamera();
+  try {
+    state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
+    video.srcObject=state.stream; video.onloadedmetadata=()=>{ overlay.width=video.videoWidth; overlay.height=video.videoHeight; detectLoop(); };
+    setStatus('Đang nhận diện tài liệu...');
+  } catch (error) { $('cameraError').classList.remove('hidden'); $('cameraError').classList.add('flex'); setStatus('Camera chưa sẵn sàng'); }
 }
-
-let streamTrack = null;
-let videoCapture = null;
-let isDetecting = false;
-let autoCaptureEnabled = false;
-let liveDetectedCorners = null;   // corners in VIDEO pixel space
-let stableFrameCount = 0;
-const STABLE_FRAMES_NEEDED = 10;
-
-let sourceCanvas = null;          // full-res canvas of the captured/uploaded photo
-let adjustCorners = null;         // 4 points {x,y} in sourceCanvas pixel space
-let draggingHandle = null;
-
-let resultBaseImageData = null;   // pristine ImageData of the cropped result (for filters)
-let currentFilter = 'original';
-
-/* ============================== HELPERS ============================== */
-const $ = (id) => document.getElementById(id);
-function showOnly(id) {
-    ['auth-screen','capture-screen','adjust-screen','result-screen','settings-screen'].forEach(s => {
-        $(s).classList.toggle('hidden', s !== id);
-    });
-}
-function enableFullscreen() {
-    const el = document.documentElement;
-    if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-}
-$('btn-fullscreen').addEventListener('click', enableFullscreen);
-
-/* ============================== AUTH ============================== */
-function checkAuth() {
-    const savedUser = localStorage.getItem('aplus_user_email');
-    if (savedUser) {
-        $('user-display').innerHTML = `<i class="fa-regular fa-user mr-1"></i> ${savedUser}`;
-        showOnly('capture-screen');
-    } else {
-        showOnly('auth-screen');
-    }
-}
-$('login-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    localStorage.setItem('aplus_user_email', $('email').value);
-    enableFullscreen();
-    checkAuth();
-});
-$('btn-logout').addEventListener('click', () => {
-    localStorage.removeItem('aplus_user_email');
-    stopCamera();
-    checkAuth();
-});
-$('btn-settings').addEventListener('click', () => showOnly('settings-screen'));
-$('btn-back-settings').addEventListener('click', checkAuth);
-
-/* ============================== CAPTURE SCREEN ============================== */
-const video = $('webcam');
-const overlayCanvas = $('canvas-overlay');
-const overlayCtx = overlayCanvas.getContext('2d');
-const cameraPlaceholder = $('camera-placeholder');
-const fileInput = $('file-input');
-
-$('btn-start-camera').addEventListener('click', async () => {
-    enableFullscreen();
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
-        });
-        streamTrack = stream.getVideoTracks()[0];
-        video.srcObject = stream;
-
-        video.classList.remove('hidden');
-        overlayCanvas.classList.remove('hidden');
-        cameraPlaceholder.classList.add('hidden');
-        $('detect-badge').classList.remove('hidden');
-
-        $('capture-idle-controls').classList.add('hidden');
-        $('capture-live-controls').classList.remove('hidden');
-        $('detect-badge-text').textContent = 'Đang nhận diện tài liệu...';
-
-        video.onloadedmetadata = () => {
-            overlayCanvas.width = video.videoWidth;
-            overlayCanvas.height = video.videoHeight;
-            videoCapture = new cv.VideoCapture(video);
-            isDetecting = true;
-            stableFrameCount = 0;
-            detectLoop();
-        };
-    } catch (err) {
-        alert('Lỗi truy cập camera: ' + err.message);
-    }
-});
-
-$('btn-cancel-camera').addEventListener('click', () => {
-    stopCamera();
-    resetCaptureUI();
-});
-
-$('btn-toggle-auto').addEventListener('click', () => {
-    autoCaptureEnabled = !autoCaptureEnabled;
-    $('btn-toggle-auto').classList.toggle('text-aplus-accent', autoCaptureEnabled);
-    $('btn-toggle-auto').classList.toggle('border-aplus-accent', autoCaptureEnabled);
-});
-
-$('btn-shutter').addEventListener('click', () => capturePhotoFromVideo());
-
-function resetCaptureUI() {
-    video.classList.add('hidden');
-    overlayCanvas.classList.add('hidden');
-    cameraPlaceholder.classList.remove('hidden');
-    $('detect-badge').classList.add('hidden');
-    $('capture-idle-controls').classList.remove('hidden');
-    $('capture-live-controls').classList.add('hidden');
-}
-
-function stopCamera() {
-    if (streamTrack) { streamTrack.stop(); streamTrack = null; }
-    if (videoCapture) { videoCapture.delete(); videoCapture = null; }
-    isDetecting = false;
-}
-
-$('btn-upload').addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-        const img = new Image();
-        img.onload = () => {
-            const c = document.createElement('canvas');
-            c.width = img.width; c.height = img.height;
-            c.getContext('2d').drawImage(img, 0, 0);
-            sourceCanvas = c;
-            const detected = isOpenCvReady ? detectCornersInMat(cv.imread(c)) : null;
-            adjustCorners = detected || defaultCorners(c.width, c.height);
-            processCapturedImage();
-        };
-        img.src = evt.target.result;
-    };
-    reader.readAsDataURL(file);
-    fileInput.value = '';
-});
-
-function capturePhotoFromVideo() {
-    const c = document.createElement('canvas');
-    c.width = video.videoWidth; c.height = video.videoHeight;
-    c.getContext('2d').drawImage(video, 0, 0);
-    sourceCanvas = c;
-    adjustCorners = liveDetectedCorners
-        ? liveDetectedCorners.map(p => ({ x: p.x, y: p.y }))
-        : defaultCorners(c.width, c.height);
-    stopCamera();
-    resetCaptureUI();
-    processCapturedImage();
-}
-
-function processCapturedImage() {
-    if (!isOpenCvReady) {
-        pendingAutoProcess = true;
-        $('detect-badge-text').textContent = 'Đang hoàn tất xử lý ảnh...';
-        return;
-    }
-    performPerspectiveCrop();
-}
-
-/* ---------- live contour detection loop (camera) ---------- */
+function stopCamera() { if(state.stream) state.stream.getTracks().forEach(track=>track.stop()); state.stream=null; }
 function detectLoop() {
-    if (!isDetecting) return;
-    if (isOpenCvReady) {
-        const frame = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
-        videoCapture.read(frame);
-        const corners = detectCornersInMat(frame);
-        frame.delete();
-        drawOverlay(corners);
-
-        if (corners) {
-            stableFrameCount++;
-            $('detect-badge-text').textContent = 'Đã nhận diện tài liệu';
-            if (autoCaptureEnabled && stableFrameCount >= STABLE_FRAMES_NEEDED) {
-                stableFrameCount = 0;
-                capturePhotoFromVideo();
-                return;
-            }
-        } else {
-            stableFrameCount = 0;
-            $('detect-badge-text').textContent = 'Đưa tài liệu vào khung hình';
-        }
-    }
-    requestAnimationFrame(detectLoop);
+  if(!state.stream || video.readyState < 2) { requestAnimationFrame(detectLoop); return; }
+  let points=null;
+  if(state.cvReady) { const mat=cv.imread(video); points=detectDocument(mat); }
+  drawOverlay(points); requestAnimationFrame(detectLoop);
 }
-
-function drawOverlay(corners) {
-    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-    if (!corners) { liveDetectedCorners = null; return; }
-
-    overlayCtx.beginPath();
-    overlayCtx.moveTo(corners[0].x, corners[0].y);
-    for (let i = 1; i < 4; i++) overlayCtx.lineTo(corners[i].x, corners[i].y);
-    overlayCtx.closePath();
-    overlayCtx.fillStyle = 'rgba(52,211,153,0.28)';
-    overlayCtx.fill();
-    overlayCtx.strokeStyle = '#34d399';
-    overlayCtx.lineWidth = 6;
-    overlayCtx.stroke();
-
-    corners.forEach(p => {
-        overlayCtx.beginPath();
-        overlayCtx.arc(p.x, p.y, 10, 0, Math.PI * 2);
-        overlayCtx.fillStyle = 'rgba(52,211,153,0.95)';
-        overlayCtx.fill();
-        overlayCtx.lineWidth = 3;
-        overlayCtx.strokeStyle = '#ffffff';
-        overlayCtx.stroke();
-    });
-    liveDetectedCorners = corners;
+function detectDocument(mat) {
+  let gray=null, edges=null, contours=null, hierarchy=null, best=null;
+  try {
+    const scale=Math.min(1,520/Math.max(mat.cols,mat.rows)); const small=new cv.Mat();
+    if(scale<1) cv.resize(mat,small,new cv.Size(Math.round(mat.cols*scale),Math.round(mat.rows*scale))); else mat.copyTo(small);
+    gray=new cv.Mat(); cv.cvtColor(small,gray,cv.COLOR_RGBA2GRAY); cv.GaussianBlur(gray,gray,new cv.Size(5,5),0); edges=new cv.Mat(); cv.Canny(gray,edges,55,170); const kernel=cv.Mat.ones(5,5,cv.CV_8U); cv.dilate(edges,edges,kernel); kernel.delete(); contours=new cv.MatVector(); hierarchy=new cv.Mat(); cv.findContours(edges,contours,hierarchy,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
+    let bestArea=small.cols*small.rows*0.12;
+    for(let i=0;i<contours.size();i++){ const contour=contours.get(i), area=cv.contourArea(contour), perimeter=cv.arcLength(contour,true), approx=new cv.Mat(); cv.approxPolyDP(contour,approx,0.035*perimeter,true); if(area>bestArea && approx.rows===4 && cv.isContourConvex(approx)){ bestArea=area; best=[]; for(let j=0;j<4;j++) best.push({x:approx.data32S[j*2]/scale,y:approx.data32S[j*2+1]/scale}); } approx.delete(); contour.delete(); }
+    small.delete(); return best ? orderCorners(best) : null;
+  } catch(error) { return null; } finally { mat.delete(); if(gray)gray.delete(); if(edges)edges.delete(); if(contours)contours.delete(); if(hierarchy)hierarchy.delete(); }
 }
+function orderCorners(points) { const sum=p=>p.x+p.y, diff=p=>p.x-p.y; return [points.reduce((a,b)=>sum(a)<sum(b)?a:b),points.reduce((a,b)=>diff(a)>diff(b)?a:b),points.reduce((a,b)=>sum(a)>sum(b)?a:b),points.reduce((a,b)=>diff(a)<diff(b)?a:b)]; }
+function drawOverlay(points) { overlayCtx.clearRect(0,0,overlay.width,overlay.height); document.querySelectorAll('.corner').forEach(el=>el.style.display='none'); state.corners=points; if(!points) { setStatus('Đưa tài liệu vào khung hình'); return; } setStatus('Đã nhận diện tài liệu',true); overlayCtx.beginPath(); overlayCtx.moveTo(points[0].x,points[0].y); points.slice(1).forEach(p=>overlayCtx.lineTo(p.x,p.y)); overlayCtx.closePath(); overlayCtx.fillStyle='#34d39955'; overlayCtx.fill(); overlayCtx.strokeStyle='#6ee7b7'; overlayCtx.lineWidth=6; overlayCtx.stroke(); points.forEach((p,i)=>{ const el=document.querySelectorAll('.corner')[i]; el.style.display='block'; el.style.left=(p.x/overlay.width*100)+'%'; el.style.top=(p.y/overlay.height*100)+'%'; }); }
 
-/* ---------- shared OpenCV corner-detection routine ---------- */
-// Tries two strategies, in order:
-//  1) Edge-based: Canny (thresholds derived from the frame's own median
-//     brightness, so it adapts to bright/dark rooms) + dilate to close gaps,
-//     then look for a 4-point convex contour.
-//  2) Brightness-based fallback: a sheet of paper is almost always the
-//     brightest object in frame, so an Otsu threshold segments it directly;
-//     falls back to a minAreaRect if the blob isn't cleanly a quadrilateral.
-// Detection runs on a small (max ~500px) copy of the frame for speed, then
-// the resulting corners are scaled back up to full resolution.
-function detectCornersInMat(srcMat) {
-    let small, gray, edges, dilated, thresh;
-    try {
-        const fullW = srcMat.cols, fullH = srcMat.rows;
-        const scale = Math.min(1, 500 / Math.max(fullW, fullH));
-        small = new cv.Mat();
-        if (scale < 1) cv.resize(srcMat, small, new cv.Size(Math.round(fullW * scale), Math.round(fullH * scale)));
-        else srcMat.copyTo(small);
+function captureCamera() { if(!video.videoWidth) return toast('Camera chưa sẵn sàng'); const canvas=document.createElement('canvas'); canvas.width=video.videoWidth; canvas.height=video.videoHeight; canvas.getContext('2d').drawImage(video,0,0); processImage(canvas,state.corners || defaultCorners(canvas.width,canvas.height)); }
+function readImage(file) { const image=new Image(); image.onload=()=>{ const canvas=document.createElement('canvas'); canvas.width=image.width; canvas.height=image.height; canvas.getContext('2d').drawImage(image,0,0); processImage(canvas,null); }; image.src=URL.createObjectURL(file); }
+function defaultCorners(w,h) { return [{x:w*.04,y:h*.04},{x:w*.96,y:h*.04},{x:w*.96,y:h*.96},{x:w*.04,y:h*.96}]; }
+function processImage(canvas,points) { stopCamera(); $('resultModal').classList.remove('hidden'); $('resultModal').classList.add('flex'); $('resultCanvas').width=canvas.width; $('resultCanvas').height=canvas.height; const ctx=$('resultCanvas').getContext('2d'); ctx.drawImage(canvas,0,0); if(points && state.cvReady) warpAndClean(canvas,points); else cleanCanvas(); state.result=$('resultCanvas'); }
+function warpAndClean(canvas,p) { const src=cv.imread(canvas), dst=new cv.Mat(); const width=Math.max(Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y),Math.hypot(p[2].x-p[3].x,p[2].y-p[3].y)), height=Math.max(Math.hypot(p[3].x-p[0].x,p[3].y-p[0].y),Math.hypot(p[2].x-p[1].x,p[2].y-p[1].y)); const from=cv.matFromArray(4,1,cv.CV_32FC2,p.flatMap(q=>[q.x,q.y])), to=cv.matFromArray(4,1,cv.CV_32FC2,[0,0,width,0,width,height,0,height]), matrix=cv.getPerspectiveTransform(from,to); cv.warpPerspective(src,dst,matrix,new cv.Size(width,height)); cv.imshow($('resultCanvas'),dst); [src,dst,from,to,matrix].forEach(x=>x.delete()); cleanCanvas(); }
+function cleanCanvas() { const canvas=$('resultCanvas'),ctx=canvas.getContext('2d'),data=ctx.getImageData(0,0,canvas.width,canvas.height),p=data.data; for(let i=0;i<p.length;i+=4){ const gray=.299*p[i]+.587*p[i+1]+.114*p[i+2]; const value=Math.max(0,Math.min(255,(gray-12)*1.13)); p[i]=p[i+1]=p[i+2]=value; p[i+3]=255; } ctx.putImageData(data,0,0); }
 
-        const w = small.cols, h = small.rows;
-        const frameArea = w * h;
-        const minArea = frameArea * 0.12; // ignore anything smaller than 12% of the frame
-
-        gray = new cv.Mat();
-        cv.cvtColor(small, gray, cv.COLOR_RGBA2GRAY);
-        cv.GaussianBlur(gray, gray, new cv.Size(5, 5), 0);
-
-        // --- Strategy 1: edge-based ---
-        const median = computeMedian(gray);
-        const lower = Math.max(0, 0.66 * median);
-        const upper = Math.min(255, 1.33 * median);
-        edges = new cv.Mat();
-        cv.Canny(gray, edges, lower, upper);
-        dilated = new cv.Mat();
-        const kernel = cv.Mat.ones(3, 3, cv.CV_8U);
-        cv.dilate(edges, dilated, kernel, new cv.Point(-1, -1), 2);
-        kernel.delete();
-
-        let contours = new cv.MatVector();
-        let hierarchy = new cv.Mat();
-        cv.findContours(dilated, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-        let pts = pickBestQuad(contours, minArea, false);
-        contours.delete(); hierarchy.delete();
-
-        // --- Strategy 2: brightness-based fallback ---
-        if (!pts) {
-            thresh = new cv.Mat();
-            cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
-            if (cv.countNonZero(thresh) / frameArea > 0.6) cv.bitwise_not(thresh, thresh);
-            const kernel2 = cv.Mat.ones(7, 7, cv.CV_8U);
-            cv.morphologyEx(thresh, thresh, cv.MORPH_CLOSE, kernel2);
-            kernel2.delete();
-            contours = new cv.MatVector();
-            hierarchy = new cv.Mat();
-            cv.findContours(thresh, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-            pts = pickBestQuad(contours, minArea, true);
-            contours.delete(); hierarchy.delete();
-        }
-
-        if (!pts) return null;
-        return sortCorners(pts.map(p => ({ x: p.x / scale, y: p.y / scale })));
-    } catch (e) {
-        console.debug('detect error', e);
-        return null;
-    } finally {
-        if (small) small.delete();
-        if (gray) gray.delete();
-        if (edges) edges.delete();
-        if (dilated) dilated.delete();
-        if (thresh) thresh.delete();
-        srcMat.delete();
-    }
+$('saveButton').addEventListener('click',()=>{ const data=$('resultCanvas').toDataURL('image/jpeg',.94); state.scans.unshift({name:filename(),data,date:new Date().toLocaleDateString('vi-VN')}); saveScans(); renderScans(); download(data,filename()+'.jpg'); toast('Đã lưu tài liệu vào máy'); });
+$('pdfButton').addEventListener('click',()=>{ const {jsPDF}=window.jspdf, canvas=$('resultCanvas'),doc=new jsPDF({unit:'px',format:[canvas.width,canvas.height]}); doc.addImage(canvas.toDataURL('image/jpeg',.94),'JPEG',0,0,canvas.width,canvas.height); doc.save(filename()+'.pdf'); });
+$('wordButton').addEventListener('click',()=>{ const html='<html><body><h1>'+filename()+'</h1><img src="'+$('resultCanvas').toDataURL('image/jpeg',.94)+'" style="max-width:100%"></body></html>'; download('data:application/msword;charset=utf-8,'+encodeURIComponent(html),filename()+'.doc'); });
+$('excelButton').addEventListener('click',()=>{ const csv='Tên tài liệu,Ngày tạo\n'+filename()+','+new Date().toLocaleDateString('vi-VN'); download('data:text/csv;charset=utf-8,\ufeff'+encodeURIComponent(csv),filename()+'.csv'); });
+$('closeResult').addEventListener('click',()=>{ $('resultModal').classList.add('hidden'); $('resultModal').classList.remove('flex'); show('scannerView'); startCamera(); });
+function download(data,name) { const a=document.createElement('a'); a.href=data; a.download=name; a.click(); }
+function renderScans() { const list=$('scanList'); $('scanCount').textContent=state.scans.length+' tài liệu'; list.innerHTML=state.scans.length ? state.scans.map((scan,i)=>'<button class="w-full flex items-center gap-3 bg-white border border-[#d5e7df] rounded-xl p-2 text-left" data-index="'+i+'"><img src="'+scan.data+'" class="w-12 h-14 object-cover rounded-lg"><span><strong class="display-font">'+scan.name+'</strong><small class="sans block text-xs text-[#52716a]">'+scan.date+'</small></span></button>').join('') : '<p class="sans text-sm text-[#52716a] py-8 text-center">Chưa có tài liệu. Camera đã sẵn sàng.</p>'; list.querySelectorAll('[data-index]').forEach(btn=>btn.addEventListener('click',()=>{ const scan=state.scans[btn.dataset.index]; $('resultCanvas').width=1; const img=new Image(); img.onload=()=>{ $('resultCanvas').width=img.width; $('resultCanvas').height=img.height; $('resultCanvas').getContext('2d').drawImage(img,0,0); $('documentName').value=scan.name; $('resultModal').classList.remove('hidden'); $('resultModal').classList.add('flex'); }; img.src=scan.data; })); }
+function waitForOpenCv() {
+  if (typeof cv !== 'undefined' && typeof cv.Mat === 'function') {
+    state.cvReady = true;
+    return;
+  }
+  setTimeout(waitForOpenCv, 250);
 }
-
-// Scans a contour list for the largest valid quadrilateral. If allowRectFallback
-// is true and no clean 4-point polygon is found, falls back to the
-// minimum-area bounding rectangle of the largest blob (handles rounded/blurry
-// edges from the brightness-based mask).
-function pickBestQuad(contours, minArea, allowRectFallback) {
-    let bestPts = null, bestArea = minArea;
-    for (let i = 0; i < contours.size(); i++) {
-        const cnt = contours.get(i);
-        const area = cv.contourArea(cnt);
-        if (area > bestArea) {
-            const peri = cv.arcLength(cnt, true);
-            const approx = new cv.Mat();
-            cv.approxPolyDP(cnt, approx, 0.02 * peri, true);
-            if (approx.rows === 4 && cv.isContourConvex(approx)) {
-                bestArea = area;
-                bestPts = [];
-                for (let j = 0; j < 4; j++) bestPts.push({ x: approx.data32S[j * 2], y: approx.data32S[j * 2 + 1] });
-            } else if (allowRectFallback) {
-                bestArea = area;
-                bestPts = rotatedRectPoints(cv.minAreaRect(cnt));
-            }
-            approx.delete();
-        }
-        cnt.delete();
-    }
-    return bestPts;
-}
-
-function rotatedRectPoints(rr) {
-    const angle = rr.angle * Math.PI / 180;
-    const b = Math.cos(angle) * 0.5, a = Math.sin(angle) * 0.5;
-    const cx = rr.center.x, cy = rr.center.y, w = rr.size.width, h = rr.size.height;
-    return [
-        { x: cx - a * h - b * w, y: cy + b * h - a * w },
-        { x: cx + a * h - b * w, y: cy - b * h - a * w },
-        { x: cx + a * h + b * w, y: cy - b * h + a * w },
-        { x: cx - a * h + b * w, y: cy + b * h + a * w }
-    ];
-}
-
-function computeMedian(grayMat) {
-    const data = grayMat.data;
-    const hist = new Uint32Array(256);
-    for (let i = 0; i < data.length; i++) hist[data[i]]++;
-    const half = data.length / 2;
-    let sum = 0;
-    for (let v = 0; v < 256; v++) { sum += hist[v]; if (sum >= half) return v; }
-    return 128;
-}
-
-function sortCorners(pts) {
-    pts.sort((a, b) => a.y - b.y);
-    const top = pts.slice(0, 2).sort((a, b) => a.x - b.x);
-    const bottom = pts.slice(2, 4).sort((a, b) => a.x - b.x);
-    return [top[0], top[1], bottom[1], bottom[0]]; // TL, TR, BR, BL
-}
-
-function defaultCorners(w, h) {
-    const mx = w * 0.06, my = h * 0.06;
-    return [{ x: mx, y: my }, { x: w - mx, y: my }, { x: w - mx, y: h - my }, { x: mx, y: h - my }];
-}
-
-/* ============================== ADJUST SCREEN ============================== */
-const adjustImage = $('adjust-image');
-const adjustContainer = $('adjust-container');
-const adjustHandles = $('adjust-handles');
-const adjustPoly = $('adjust-poly');
-
-function openAdjustScreen() {
-    showOnly('adjust-screen');
-    adjustImage.src = sourceCanvas.toDataURL('image/jpeg', 0.95);
-    adjustImage.onload = () => { buildHandles(); renderAdjustOverlay(); };
-}
-
-function getRenderRect() {
-    // rect of the actual image pixels inside the object-contain <img>, relative to container
-    const cw = adjustContainer.clientWidth, ch = adjustContainer.clientHeight;
-    const iw = sourceCanvas.width, ih = sourceCanvas.height;
-    const scale = Math.min(cw / iw, ch / ih);
-    const rw = iw * scale, rh = ih * scale;
-    return { x: (cw - rw) / 2, y: (ch - rh) / 2, w: rw, h: rh, scale };
-}
-
-function imgToScreen(pt) {
-    const r = getRenderRect();
-    return { x: r.x + pt.x * r.scale, y: r.y + pt.y * r.scale };
-}
-function screenToImg(x, y) {
-    const r = getRenderRect();
-    const ix = Math.min(Math.max((x - r.x) / r.scale, 0), sourceCanvas.width);
-    const iy = Math.min(Math.max((y - r.y) / r.scale, 0), sourceCanvas.height);
-    return { x: ix, y: iy };
-}
-
-function buildHandles() {
-    adjustHandles.innerHTML = '';
-    adjustCorners.forEach((pt, idx) => {
-        const h = document.createElement('div');
-        h.className = 'corner-handle';
-        h.dataset.idx = idx;
-        h.addEventListener('pointerdown', onHandleDown);
-        adjustHandles.appendChild(h);
-    });
-}
-
-function onHandleDown(e) {
-    e.preventDefault();
-    draggingHandle = parseInt(e.currentTarget.dataset.idx, 10);
-    e.currentTarget.classList.add('active');
-    e.currentTarget.setPointerCapture(e.pointerId);
-}
-adjustHandles.addEventListener('pointermove', (e) => {
-    if (draggingHandle === null) return;
-    const rect = adjustContainer.getBoundingClientRect();
-    const p = screenToImg(e.clientX - rect.left, e.clientY - rect.top);
-    adjustCorners[draggingHandle] = p;
-    renderAdjustOverlay();
-});
-function endDrag(e) {
-    if (draggingHandle === null) return;
-    const handleEl = adjustHandles.querySelector(`[data-idx="${draggingHandle}"]`);
-    if (handleEl) handleEl.classList.remove('active');
-    draggingHandle = null;
-}
-adjustHandles.addEventListener('pointerup', endDrag);
-adjustHandles.addEventListener('pointercancel', endDrag);
-
-function renderAdjustOverlay() {
-    const screenPts = adjustCorners.map(imgToScreen);
-    adjustPoly.setAttribute('points', screenPts.map(p => `${p.x},${p.y}`).join(' '));
-    const handles = adjustHandles.children;
-    for (let i = 0; i < handles.length; i++) {
-        handles[i].style.left = screenPts[i].x + 'px';
-        handles[i].style.top = screenPts[i].y + 'px';
-    }
-}
-window.addEventListener('resize', () => { if (!$('adjust-screen').classList.contains('hidden')) renderAdjustOverlay(); });
-
-$('btn-cancel-adjust').addEventListener('click', () => { showOnly('capture-screen'); });
-$('btn-confirm-adjust').addEventListener('click', () => {
-    if (!isOpenCvReady) {
-        pendingConfirmAdjust = true;
-        setConfirmWaiting(true);
-        return;
-    }
-    performPerspectiveCrop();
-});
-
-function setConfirmWaiting(waiting) {
-    const btn = $('btn-confirm-adjust');
-    if (waiting) {
-        if (!btn.dataset.originalHtml) btn.dataset.originalHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Đang tải AI...';
-        btn.classList.add('opacity-70');
-    } else if (btn.dataset.originalHtml) {
-        btn.innerHTML = btn.dataset.originalHtml;
-        btn.classList.remove('opacity-70');
-    }
-}
-
-/* ============================== PERSPECTIVE WARP ============================== */
-const resultCanvas = $('result-canvas');
-const resultCtx = resultCanvas.getContext('2d');
-
-function performPerspectiveCrop() {
-    if (!isOpenCvReady) return; // guarded by the caller; safety net only
-    const c = adjustCorners; // TL, TR, BR, BL in sourceCanvas pixel space
-
-    const widthTop = Math.hypot(c[1].x - c[0].x, c[1].y - c[0].y);
-    const widthBottom = Math.hypot(c[2].x - c[3].x, c[2].y - c[3].y);
-    const targetWidth = Math.max(widthTop, widthBottom);
-
-    const heightLeft = Math.hypot(c[3].x - c[0].x, c[3].y - c[0].y);
-    const heightRight = Math.hypot(c[2].x - c[1].x, c[2].y - c[1].y);
-    const targetHeight = Math.max(heightLeft, heightRight);
-
-    const srcMat = cv.imread(sourceCanvas);
-    const dstMat = new cv.Mat();
-    const srcCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [c[0].x, c[0].y, c[1].x, c[1].y, c[2].x, c[2].y, c[3].x, c[3].y]);
-    const dstCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [0, 0, targetWidth, 0, targetWidth, targetHeight, 0, targetHeight]);
-    const M = cv.getPerspectiveTransform(srcCoords, dstCoords);
-    cv.warpPerspective(srcMat, dstMat, M, new cv.Size(targetWidth, targetHeight), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
-
-    cv.imshow(resultCanvas, dstMat);
-    cleanDocumentImage();
-    resultBaseImageData = resultCtx.getImageData(0, 0, resultCanvas.width, resultCanvas.height);
-    currentFilter = 'original';
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === 'original'));
-
-    srcMat.delete(); dstMat.delete(); M.delete(); srcCoords.delete(); dstCoords.delete();
-
-    $('ocr-result-box').classList.add('hidden');
-    showOnly('result-screen');
-}
-
-function cleanDocumentImage() {
-    const image = resultCtx.getImageData(0, 0, resultCanvas.width, resultCanvas.height);
-    const pixels = image.data;
-    for (let i = 0; i < pixels.length; i += 4) {
-        const luminance = 0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2];
-        const cleaned = Math.max(0, Math.min(255, (luminance - 18) * 1.14));
-        pixels[i] = cleaned;
-        pixels[i + 1] = cleaned;
-        pixels[i + 2] = cleaned;
-        pixels[i + 3] = 255;
-    }
-    resultCtx.putImageData(image, 0, 0);
-}
-
-/* ============================== RESULT: FILTERS ============================== */
-document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        currentFilter = btn.dataset.filter;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
-        applyFilter(currentFilter);
-    });
-});
-
-function applyFilter(mode) {
-    if (!resultBaseImageData) return;
-    const src = resultBaseImageData;
-    const out = resultCtx.createImageData(src.width, src.height);
-    const s = src.data, d = out.data;
-
-    for (let i = 0; i < s.length; i += 4) {
-        const r = s[i], g = s[i + 1], b = s[i + 2];
-        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-        let nr = r, ng = g, nb = b;
-
-        if (mode === 'gray') {
-            nr = ng = nb = gray;
-        } else if (mode === 'bw') {
-            const v = gray > 150 ? 255 : (gray < 90 ? 0 : gray);
-            nr = ng = nb = v;
-        } else if (mode === 'enhance') {
-            const adj = gray > 115 ? Math.min(255, gray * 1.28) : Math.max(0, gray * 0.72);
-            const mix = 0.6; // blend enhanced luminance back with a bit of original color
-            nr = r * (1 - mix) + adj * mix;
-            ng = g * (1 - mix) + adj * mix;
-            nb = b * (1 - mix) + adj * mix;
-        }
-        d[i] = nr; d[i + 1] = ng; d[i + 2] = nb; d[i + 3] = 255;
-    }
-    resultCtx.putImageData(out, 0, 0);
-}
-
-/* ============================== RESULT: NAV ============================== */
-$('btn-back-result').addEventListener('click', () => showOnly('capture-screen'));
-$('btn-rescan').addEventListener('click', () => showOnly('capture-screen'));
-
-/* ============================== EXPORT ============================== */
-$('btn-pdf').addEventListener('click', () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const imgData = resultCanvas.toDataURL('image/jpeg', 0.92);
-    const pageW = 210, margin = 8;
-    const ratio = resultCanvas.height / resultCanvas.width;
-    const w = pageW - margin * 2;
-    const h = w * ratio;
-    doc.addImage(imgData, 'JPEG', margin, margin, w, h);
-    doc.save('Aplus_Scan.pdf');
-});
-
-async function runOCR(formatType) {
-    const ocrBox = $('ocr-result-box');
-    const ocrText = $('ocr-text');
-    ocrText.value = 'Đang nhận diện chữ tiếng Việt...';
-    ocrBox.classList.remove('hidden');
-    try {
-        const worker = await Tesseract.createWorker('vie');
-        const ret = await worker.recognize(resultCanvas.toDataURL('image/jpeg'));
-        const text = ret.data.text;
-        await worker.terminate();
-        ocrText.value = text;
-        if (formatType === 'word') {
-            const blob = new Blob(['\ufeff' + text], { type: 'application/msword' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Aplus_Scan.doc'; a.click();
-        } else if (formatType === 'excel') {
-            const blob = new Blob(['\ufeff' + text], { type: 'text/csv;charset=utf-8;' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Aplus_Scan.csv'; a.click();
-        }
-    } catch (err) {
-        alert('Lỗi OCR: ' + err.message);
-    }
-}
-$('btn-word').addEventListener('click', () => runOCR('word'));
-$('btn-excel').addEventListener('click', () => runOCR('excel'));
-$('btn-copy').addEventListener('click', () => {
-    navigator.clipboard.writeText($('ocr-text').value);
-    alert('Đã sao chép văn bản!');
-});
-
-checkAuth();
+waitForOpenCv();
+loadApp();
 </script>
 </body>
 </html>
