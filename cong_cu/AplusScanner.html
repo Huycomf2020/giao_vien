@@ -1,209 +1,125 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <meta name="theme-color" content="#0d3b35">
-  <title>A+ Scanner</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230d3b35'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-size='45' font-family='Arial' font-weight='700' fill='%236ee7b7'%3EA+%3C/text%3E%3C/svg%3E">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://docs.opencv.org/4.7.0/opencv.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07110f">
+  <meta name="description" content="AplusScanner - quét, làm sạch và xuất tài liệu ngay trên thiết bị.">
+  <title>AplusScanner — Quét tài liệu</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23071311'/%3E%3Cpath d='M12 22v-7a3 3 0 0 1 3-3h8M41 12h8a3 3 0 0 1 3 3v7M52 42v7a3 3 0 0 1-3 3h-8M23 52h-8a3 3 0 0 1-3-3v-7' fill='none' stroke='%232ee6a6' stroke-width='4' stroke-linecap='round'/%3E%3Ctext x='32' y='39' text-anchor='middle' font-family='Arial' font-size='23' font-weight='700' fill='white'%3EA%2B%3C/text%3E%3C/svg%3E">
   <style>
-    :root { --forest:#0d3b35; --deep:#062722; --mint:#6ee7b7; --lime:#b8f7d4; --ink:#102c27; }
-    * { box-sizing:border-box; }
-    body { margin:0; background:#e7f1ed; color:var(--ink); font-family:Georgia, 'Times New Roman', serif; }
-    button, input { font:inherit; }
-    button { cursor:pointer; }
-    .app-shell { max-width:480px; min-height:100vh; margin:auto; background:#f8fcfa; box-shadow:0 0 35px #0d3b3520; }
-    .display-font { font-family:Georgia, 'Times New Roman', serif; letter-spacing:0; }
-    .sans { font-family:Arial, sans-serif; }
-    .camera-frame { position:relative; height:min(58vh,560px); min-height:340px; background:#07100e; overflow:hidden; }
-    #video, #preview { width:100%; height:100%; object-fit:cover; display:block; }
-    #overlay { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
-    .corner { position:absolute; width:18px; height:18px; border:3px solid var(--mint); border-radius:50%; transform:translate(-50%,-50%); box-shadow:0 0 0 4px #06272288; display:none; }
-    .status-pill { position:absolute; top:16px; left:50%; transform:translateX(-50%); padding:8px 13px; border:1px solid #a7f3d0aa; border-radius:99px; background:#062722cc; color:#d1fae5; font:600 12px Arial, sans-serif; white-space:nowrap; }
-    .shutter { width:76px; height:76px; border-radius:50%; border:5px solid #0d3b35; background:white; box-shadow:0 4px 15px #0d3b3540; display:grid; place-items:center; }
-    .shutter::after { content:''; width:57px; height:57px; border-radius:50%; background:var(--mint); display:block; }
-    .tab { border-bottom:2px solid transparent; color:#52716a; }
-    .tab.active { color:var(--forest); border-color:var(--forest); }
-    .modal { background:#f8fcfa; border:1px solid #c4dcd3; box-shadow:0 15px 45px #0d3b3530; }
-    .toast { animation:toast .25s ease-out; }
-    @keyframes toast { from { opacity:0; transform:translate(-50%,8px); } to { opacity:1; transform:translate(-50%,0); } }
+    :root{--ink:#f4fbf8;--muted:#9eb4ad;--panel:#0d1b18;--panel2:#132521;--line:rgba(255,255,255,.1);--green:#2ee6a6;--green2:#00b97b;--danger:#ff716c;--shadow:0 24px 60px rgba(0,0,0,.36)}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#06100e;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input{font:inherit}button{color:inherit}button:focus-visible,input:focus-visible{outline:3px solid rgba(46,230,166,.45);outline-offset:2px}
+    .app{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto;background:radial-gradient(circle at 88% 0,#17362e 0,transparent 30%),#06100e}
+    header{height:68px;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--line);background:rgba(6,16,14,.86);backdrop-filter:blur(18px);z-index:5}
+    .brand{display:flex;align-items:center;gap:11px;font-weight:760;letter-spacing:-.02em}.mark{width:38px;height:38px;border:1px solid rgba(46,230,166,.5);border-radius:12px;display:grid;place-items:center;color:var(--green);background:#0d211c;font-size:16px;font-weight:850}.brand small{display:block;color:var(--muted);font-weight:500;font-size:12px;letter-spacing:0;margin-top:1px}
+    .head-actions{margin-left:auto;display:flex;align-items:center;gap:8px}.icon-btn,.ghost{border:1px solid var(--line);background:rgba(255,255,255,.045);border-radius:12px;min-width:42px;height:42px;display:grid;place-items:center;cursor:pointer;transition:.2s}.icon-btn:hover,.ghost:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}.avatar{font-weight:750;font-size:14px;color:#07130f;background:var(--green)}
+    main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;padding:18px;max-width:1500px;width:100%;margin:auto}
+    .scanner{position:relative;min-height:620px;overflow:hidden;border:1px solid var(--line);border-radius:24px;background:#020807;box-shadow:var(--shadow)}video,.camera-placeholder{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.camera-placeholder{display:grid;place-items:center;text-align:center;color:var(--muted);background:radial-gradient(circle at center,#18352d,#07110f 58%)}.camera-placeholder svg{color:var(--green);margin-bottom:14px}.camera-placeholder p{max-width:290px;line-height:1.5;margin:0}
+    #overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.scanner-top{position:absolute;left:18px;right:18px;top:18px;display:flex;justify-content:space-between;align-items:center;z-index:2}.pill{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(4,12,10,.68);backdrop-filter:blur(12px);font-size:13px}.pill-button{color:var(--ink);cursor:pointer}.pill-button:hover{border-color:rgba(46,230,166,.5)}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 5px rgba(46,230,166,.14)}.dot.searching{background:#ffd166;box-shadow:0 0 0 5px rgba(255,209,102,.14)}
+    .scan-controls{position:absolute;z-index:3;left:0;right:0;bottom:0;padding:42px 22px 22px;background:linear-gradient(transparent,rgba(2,8,7,.94));display:grid;grid-template-columns:1fr auto 1fr;align-items:end}.control{justify-self:center;border:0;background:transparent;cursor:pointer;display:grid;gap:6px;place-items:center;color:#dbe8e4;font-size:13px}.control:first-child{justify-self:start}.control:last-child{justify-self:end}.control .circle{width:48px;height:48px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.09);display:grid;place-items:center}.shutter{width:84px;height:84px;border-radius:50%;border:5px solid rgba(255,255,255,.94);background:rgba(255,255,255,.12);box-shadow:0 0 0 8px rgba(255,255,255,.12);cursor:pointer;position:relative;transition:.15s}.shutter:active{transform:scale(.92)}.shutter:after{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--green)}
+    aside{background:rgba(13,27,24,.84);border:1px solid var(--line);border-radius:24px;min-height:0;padding:19px;display:flex;flex-direction:column;backdrop-filter:blur(18px)}.aside-head{display:flex;align-items:flex-start;justify-content:space-between}.aside-head h2{font-size:18px;margin:0 0 5px}.aside-head p{font-size:13px;color:var(--muted);margin:0}.count{background:rgba(46,230,166,.12);color:var(--green);border:1px solid rgba(46,230,166,.24);border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}
+    .pages{display:grid;gap:10px;margin:18px 0;overflow:auto;min-height:130px;max-height:calc(100vh - 330px)}.empty{border:1px dashed rgba(255,255,255,.16);border-radius:18px;min-height:190px;display:grid;place-items:center;text-align:center;color:var(--muted);padding:20px}.empty p{margin:8px 0 0;font-size:13px;line-height:1.5}.page{display:grid;grid-template-columns:72px 1fr auto;gap:11px;align-items:center;padding:9px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035)}.page img{width:72px;height:82px;object-fit:cover;border-radius:9px;background:white}.page h3{font-size:14px;margin:0 0 4px}.page span{color:var(--muted);font-size:12px}.check{appearance:none;width:22px;height:22px;border:1px solid #5d746c;border-radius:7px;cursor:pointer}.check:checked{background:var(--green) center/14px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5 12 4 4L19 6' fill='none' stroke='%2306100e' stroke-width='3'/%3E%3C/svg%3E");border-color:var(--green)}
+    .exports{margin-top:auto;border-top:1px solid var(--line);padding-top:16px}.exports-label{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:10px}.export-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.export-btn{border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:13px;padding:12px 5px;cursor:pointer;font-size:12px;display:grid;gap:7px;place-items:center;transition:.2s}.export-btn:hover:not(:disabled){border-color:rgba(46,230,166,.55);background:rgba(46,230,166,.08)}.export-btn:disabled{opacity:.35;cursor:not-allowed}.export-btn.primary{background:var(--green);color:#06100e;border-color:var(--green);font-weight:750}.ocr-box{width:100%;min-height:220px;resize:vertical;border:1px solid var(--line);border-radius:14px;background:#07120f;color:var(--ink);padding:14px;line-height:1.6}.progress{height:7px;background:#07120f;border-radius:99px;overflow:hidden;margin:12px 0}.progress i{display:block;height:100%;width:0;background:var(--green);transition:.25s}
+    footer{padding:9px 22px 14px;color:#6f8a81;font-size:12px;text-align:center}.modal-wrap{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.68);backdrop-filter:blur(12px);display:grid;place-items:center;padding:18px}.modal-wrap[hidden]{display:none}.modal{width:min(440px,100%);border:1px solid var(--line);background:#0d1b18;border-radius:26px;padding:26px;box-shadow:var(--shadow)}.modal h1,.modal h2{margin:0 0 8px;letter-spacing:-.025em}.modal .lead{color:var(--muted);line-height:1.5;font-size:14px;margin:0 0 22px}.tabs{display:grid;grid-template-columns:1fr 1fr;background:#07120f;padding:4px;border-radius:13px;margin-bottom:18px}.tab{border:0;border-radius:10px;background:transparent;padding:10px;cursor:pointer;color:var(--muted)}.tab.active{background:#183129;color:var(--ink)}label{display:block;font-size:13px;color:#c4d4cf;margin:13px 0 7px}.field{width:100%;border:1px solid var(--line);border-radius:13px;padding:13px 14px;background:#07120f;color:var(--ink)}.submit{width:100%;border:0;border-radius:14px;padding:13px;background:var(--green);color:#06100e;font-weight:800;margin-top:18px;cursor:pointer}.form-note{min-height:20px;color:var(--danger);font-size:12px;margin-top:10px}.close{float:right;margin:-8px -8px 0 0}.settings-list{display:grid;gap:12px;margin-top:20px}.setting-row{display:flex;justify-content:space-between;gap:15px;padding:13px 0;border-bottom:1px solid var(--line);font-size:14px}.setting-row span{color:var(--muted)}.about{font-size:13px;line-height:1.6;color:#c3d2cd}.about a{color:var(--green)}.danger{color:var(--danger);border-color:rgba(255,113,108,.2)}.toast{position:fixed;left:50%;bottom:28px;z-index:50;transform:translate(-50%,20px);background:#ecfff8;color:#07110f;border-radius:13px;padding:11px 16px;font-size:14px;font-weight:650;opacity:0;pointer-events:none;transition:.25s;box-shadow:var(--shadow)}.toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:840px){header{height:62px;padding:0 14px}.brand small{display:none}main{display:block;padding:0}.scanner{border:0;border-radius:0;min-height:calc(100svh - 62px)}aside{position:fixed;inset:auto 0 0;z-index:10;border-radius:24px 24px 0 0;max-height:78vh;transform:translateY(calc(100% - 64px));transition:.3s;padding-bottom:max(18px,env(safe-area-inset-bottom))}aside.open{transform:translateY(0)}.aside-head{cursor:pointer}.pages{max-height:38vh}.scanner-top{top:14px}.scan-controls{padding-bottom:max(24px,env(safe-area-inset-bottom))}footer{display:none}}
+    @media(max-width:430px){.scanner{min-height:calc(100svh - 62px)}.shutter{width:74px;height:74px}.control .circle{width:44px;height:44px}.scan-controls{padding-left:16px;padding-right:16px}.modal{padding:22px}.brand{font-size:15px}}
   </style>
 </head>
 <body>
-<div class="app-shell">
-  <header class="bg-[#0d3b35] text-white px-5 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-[#062722] border border-emerald-300/40 grid place-items-center text-[#6ee7b7] font-bold text-lg">A+</div>
-      <div><div class="display-font text-xl">A+ Scanner</div><div class="sans text-[10px] text-emerald-200">Document studio</div></div>
+<div class="app">
+  <header>
+    <div class="brand"><div class="mark" aria-hidden="true">A+</div><div>AplusScanner<small>Quét tài liệu thông minh</small></div></div>
+    <div class="head-actions">
+      <button class="icon-btn" id="flashBtn" title="Bật/tắt đèn" aria-label="Bật tắt đèn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m13 2-9 12h8l-1 8 9-12h-8z"/></svg></button>
+      <button class="icon-btn" id="settingsBtn" title="Cài đặt" aria-label="Cài đặt"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg></button>
+      <button class="icon-btn avatar" id="avatarBtn" title="Tài khoản" aria-label="Tài khoản">A</button>
     </div>
-    <button id="settingsButton" class="text-emerald-100 text-xl" title="Cài đặt">&#9881;</button>
   </header>
-
   <main>
-    <section id="authView" class="px-6 py-12 hidden">
-      <div class="text-center mb-8"><div class="inline-grid place-items-center w-20 h-20 rounded-3xl bg-[#0d3b35] text-[#6ee7b7] text-4xl font-bold">A+</div><h1 class="display-font text-3xl mt-4">Quét tài liệu sáng rõ</h1><p class="sans text-sm text-[#52716a] mt-2">Tự động nhận diện, làm sạch và lưu tài liệu.</p></div>
-      <form id="authForm" class="space-y-3">
-        <input id="nameInput" class="w-full rounded-xl border border-[#c4dcd3] bg-white px-4 py-3 outline-none focus:border-[#0d3b35]" placeholder="Tên của bạn" autocomplete="name">
-        <input id="emailInput" type="email" required class="w-full rounded-xl border border-[#c4dcd3] bg-white px-4 py-3 outline-none focus:border-[#0d3b35]" placeholder="Email" autocomplete="email">
-        <input id="passwordInput" type="password" required class="w-full rounded-xl border border-[#c4dcd3] bg-white px-4 py-3 outline-none focus:border-[#0d3b35]" placeholder="Mật khẩu" autocomplete="current-password">
-        <button class="w-full rounded-xl bg-[#0d3b35] py-3 text-white font-bold">Đăng nhập / Đăng ký</button>
-      </form>
-      <p class="sans text-center text-xs text-[#52716a] mt-4">Lần sau app sẽ tự nhớ tài khoản trên thiết bị này.</p>
-    </section>
-
-    <section id="scannerView" class="hidden">
-      <div class="px-5 py-3 flex items-center justify-between bg-[#eef7f2] border-b border-[#d5e7df]"><span id="userLabel" class="sans text-xs text-[#52716a]"></span><button id="logoutButton" class="sans text-xs text-red-700">Đăng xuất</button></div>
-      <div class="camera-frame">
-        <video id="video" autoplay muted playsinline></video>
-        <canvas id="overlay"></canvas>
-        <div id="status" class="status-pill">Đang mở camera...</div>
-        <div id="corners"><i class="corner"></i><i class="corner"></i><i class="corner"></i><i class="corner"></i></div>
-        <div id="cameraError" class="absolute inset-0 hidden items-center justify-center p-8 text-center text-white sans"><div><div class="text-4xl mb-3">&#128247;</div><p>Không thể mở camera. Hãy cho phép trình duyệt truy cập camera.</p></div></div>
+    <section class="scanner" aria-label="Camera quét tài liệu">
+      <video id="video" autoplay playsinline muted></video>
+      <div class="camera-placeholder" id="placeholder"><div><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"/><circle cx="12" cy="13" r="4"/></svg><p>Đang mở camera… Nếu camera không khả dụng, hãy chọn ảnh từ thiết bị.</p></div></div>
+      <canvas id="overlay"></canvas>
+      <div class="scanner-top"><div class="pill"><i class="dot searching" id="detectDot"></i><span id="detectLabel">Đang tìm tài liệu</span></div><button class="pill pill-button" id="modeBtn" type="button"><span id="modeLabel">Tài liệu</span><span aria-hidden="true">▾</span></button></div>
+      <div class="scan-controls">
+        <button class="control" id="uploadBtn"><span class="circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h5l2-2h4l2 2h5v12H3z"/><circle cx="12" cy="13" r="3.2"/></svg></span><span>Chọn ảnh</span></button>
+        <button class="shutter" id="captureBtn" aria-label="Chụp tài liệu"></button>
+        <button class="control" id="libraryBtn"><span class="circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h6l2 2h10v10H3z"/><path d="M3 7V5h7l2 2"/></svg></span><span>Thư viện <b id="mobileCount"></b></span></button>
       </div>
-      <div class="bg-white px-5 py-4 flex items-center justify-between border-b border-[#d5e7df]">
-        <button id="galleryButton" class="sans text-sm text-[#0d3b35] font-bold">&#128444; Ảnh có sẵn</button>
-        <button id="shutter" class="shutter" title="Chụp tài liệu"></button>
-        <button id="flashButton" class="sans text-sm text-[#52716a]" title="Bật đèn flash">&#9889; Đèn</button>
-      </div>
-      <input id="fileInput" type="file" accept="image/*" class="hidden">
-      <div class="px-5 py-5"><div class="flex items-center justify-between mb-3"><h2 class="display-font text-xl">Tài liệu đã lưu</h2><span id="scanCount" class="sans text-xs text-[#52716a]"></span></div><div id="scanList" class="space-y-2"></div></div>
+      <input id="fileInput" type="file" accept="image/*" multiple capture="environment" hidden>
     </section>
-
-    <section id="settingsView" class="hidden px-5 py-6">
-      <div class="flex items-center gap-3 mb-6"><button id="backButton" class="text-2xl">&#8592;</button><h2 class="display-font text-2xl">Cài đặt</h2></div>
-      <div class="rounded-2xl bg-[#eef7f2] p-5 space-y-4"><div class="flex justify-between"><span class="sans text-sm text-[#52716a]">Tên app</span><strong>A+ Scanner</strong></div><div class="flex justify-between"><span class="sans text-sm text-[#52716a]">Phiên bản</span><strong>1.0.0</strong></div><hr class="border-[#c4dcd3]"><p class="text-[#0d3b35] font-bold">App Quét tài liệu miễn phí</p><p class="sans text-sm leading-6 text-[#52716a]">Made by Huycomf<br>Zalo: <a class="text-[#0d3b35] font-bold" href="https://zalo.me/0907218089" target="_blank">0907218089</a><br>Website: <a class="text-[#0d3b35] font-bold break-all" href="https://huycomf2020.github.io/giao_vien/index.html" target="_blank">huycomf2020.github.io/giao_vien/index.html</a></p></div>
-    </section>
+    <aside id="libraryPanel">
+      <div class="aside-head" id="libraryHead"><div><h2>Tài liệu đã quét</h2><p>Chọn trang để xuất tệp</p></div><span class="count" id="pageCount">0 trang</span></div>
+      <div class="pages" id="pages"><div class="empty"><div><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="m4 15 4-4 4 4 3-3 5 5"/></svg><p>Chưa có trang nào.<br>Chụp hoặc chọn ảnh để bắt đầu.</p></div></div></div>
+      <div class="exports"><div class="exports-label"><span>Xuất các trang đã chọn</span><button class="control" id="selectAll" style="font-size:12px;color:var(--green)">Chọn tất cả</button></div><div class="export-grid"><button class="export-btn primary" data-export="pdf" disabled><b>PDF</b><span>Tài liệu</span></button><button class="export-btn" data-export="word" disabled><b>WORD</b><span>Hình ảnh</span></button><button class="export-btn" data-export="excel" disabled><b>EXCEL</b><span>Danh mục</span></button><button class="export-btn" id="ocrBtn" disabled><b>OCR</b><span>Lấy chữ</span></button></div></div>
+    </aside>
   </main>
+  <footer>AplusScanner · Dữ liệu được xử lý ngay trên thiết bị của bạn</footer>
 </div>
 
-<div id="resultModal" class="fixed inset-0 bg-[#062722cc] hidden items-end sm:items-center justify-center p-3 z-20">
-  <div class="modal w-full max-w-[460px] rounded-3xl p-4"><div class="flex items-center justify-between mb-3"><h2 class="display-font text-xl">Tài liệu đã quét</h2><button id="closeResult" class="text-2xl">&times;</button></div><div class="bg-[#e7f1ed] rounded-2xl p-2"><canvas id="resultCanvas" class="w-full max-h-[55vh] object-contain"></canvas></div><input id="documentName" class="w-full mt-3 rounded-xl border border-[#c4dcd3] px-3 py-2" value="Aplus_Scan"><div class="grid grid-cols-3 gap-2 mt-3"><button id="saveButton" class="rounded-xl bg-[#0d3b35] text-white py-3 font-bold">Lưu ảnh</button><button id="pdfButton" class="rounded-xl bg-[#b8f7d4] text-[#0d3b35] py-3 font-bold">PDF</button><button id="wordButton" class="rounded-xl border border-[#c4dcd3] py-3 font-bold">Word</button></div><button id="excelButton" class="w-full mt-2 rounded-xl border border-[#c4dcd3] py-3 font-bold">Xuất Excel / CSV</button></div>
-</div>
-<div id="toast" class="fixed bottom-7 left-1/2 hidden toast bg-[#062722] text-white sans text-sm px-4 py-3 rounded-xl z-30"></div>
+<div class="modal-wrap" id="authModal" hidden><div class="modal">
+  <div class="mark" style="margin-bottom:18px">A+</div><h1>Chào mừng đến AplusScanner</h1><p class="lead">Đăng nhập để bắt đầu quét. Tài khoản được ghi nhớ riêng trên thiết bị này.</p>
+  <div class="tabs"><button class="tab active" data-auth="login">Đăng nhập</button><button class="tab" data-auth="register">Đăng ký</button></div>
+  <form id="authForm"><label for="email">Email</label><input class="field" id="email" type="email" autocomplete="email" required placeholder="ten@email.com"><label for="password">Mật khẩu</label><input class="field" id="password" type="password" minlength="6" autocomplete="current-password" required placeholder="Tối thiểu 6 ký tự"><button class="submit" id="authSubmit">Đăng nhập</button><div class="form-note" id="authNote"></div></form>
+</div></div>
 
+<div class="modal-wrap" id="settingsModal" hidden><div class="modal"><button class="icon-btn close" id="closeSettings" aria-label="Đóng">×</button><h2>Cài đặt</h2><p class="lead">Thông tin ứng dụng và tài khoản.</p><div class="settings-list"><div class="setting-row"><span>Tên ứng dụng</span><b>AplusScanner</b></div><div class="setting-row"><span>Phiên bản</span><b>1.1.0</b></div><div class="setting-row"><span>Nhận diện</span><b>Bám biên thời gian thực</b></div><div class="setting-row"><span>Tài khoản</span><b id="accountEmail">—</b></div></div><p class="about"><b>App Quét tài liệu miễn phí.</b><br>Made by Huycomf · Zalo: 0907218089<br><a href="https://huycomf2020.github.io/giao_vien/index.html" target="_blank" rel="noopener">Website Huycomf</a></p><button class="submit danger" id="logoutBtn" style="background:transparent;border:1px solid rgba(255,113,108,.3)">Đăng xuất</button></div></div>
+<div class="modal-wrap" id="ocrModal" hidden><div class="modal"><button class="icon-btn close" id="closeOcr" aria-label="Đóng">×</button><h2>Nhận dạng văn bản</h2><p class="lead" id="ocrStatus">Đang chuẩn bị nhận dạng tiếng Việt và tiếng Anh…</p><div class="progress"><i id="ocrProgress"></i></div><textarea class="ocr-box" id="ocrText" placeholder="Văn bản nhận dạng sẽ xuất hiện tại đây"></textarea><button class="submit" id="copyOcr">Sao chép văn bản</button></div></div>
+<canvas id="workCanvas" hidden></canvas><div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
-const $ = id => document.getElementById(id);
-const state = { stream:null, corners:null, source:null, result:null, scans:JSON.parse(localStorage.getItem('aplus_scans') || '[]'), cvReady:false };
-const video = $('video'), overlay = $('overlay'), overlayCtx = overlay.getContext('2d');
-
-function toast(message) { const el=$('toast'); el.textContent=message; el.classList.remove('hidden'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.add('hidden'),2400); }
-function show(view) { ['authView','scannerView','settingsView'].forEach(id => $(id).classList.toggle('hidden', id !== view)); }
-function setStatus(text, good=false) { $('status').textContent=text; $('status').style.color=good ? '#b8f7d4' : '#d1fae5'; }
-function saveScans() { localStorage.setItem('aplus_scans', JSON.stringify(state.scans.slice(0,12))); }
-function filename() { return ($('documentName').value || 'Aplus_Scan').replace(/[^a-z0-9_-]/gi,'_'); }
-
-function loadApp() {
-  const user=JSON.parse(localStorage.getItem('aplus_user') || 'null');
-  if (!user) { show('authView'); return; }
-  $('userLabel').textContent='Xin chào, ' + (user.name || user.email);
-  show('scannerView'); renderScans(); startCamera();
-}
-$('authForm').addEventListener('submit', event => { event.preventDefault(); localStorage.setItem('aplus_user', JSON.stringify({name:$('nameInput').value.trim(),email:$('emailInput').value.trim()})); loadApp(); });
-$('logoutButton').addEventListener('click', () => { stopCamera(); localStorage.removeItem('aplus_user'); show('authView'); });
-$('settingsButton').addEventListener('click', () => { stopCamera(); show('settingsView'); });
-$('backButton').addEventListener('click', () => { show('scannerView'); startCamera(); });
-$('galleryButton').addEventListener('click', () => $('fileInput').click());
-$('fileInput').addEventListener('change', event => { const file=event.target.files[0]; if(file) readImage(file); event.target.value=''; });
-$('shutter').addEventListener('click', captureCamera);
-$('flashButton').addEventListener('click', async () => { const track=state.stream && state.stream.getVideoTracks()[0]; if(!track) return; const caps=track.getCapabilities(); if(!caps.torch) { toast('Đèn flash không được hỗ trợ trên thiết bị này'); return; } await track.applyConstraints({advanced:[{torch:!state.torch}]}); state.torch=!state.torch; });
-
-async function startCamera() {
-  stopCamera();
-  try {
-    state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
-    video.srcObject=state.stream; video.onloadedmetadata=()=>{ overlay.width=video.videoWidth; overlay.height=video.videoHeight; detectLoop(); };
-    setStatus('Đang nhận diện tài liệu...');
-  } catch (error) { $('cameraError').classList.remove('hidden'); $('cameraError').classList.add('flex'); setStatus('Camera chưa sẵn sàng'); }
-}
-function stopCamera() { if(state.stream) state.stream.getTracks().forEach(track=>track.stop()); state.stream=null; }
-function detectLoop() {
-  if(!state.stream || video.readyState < 2) { requestAnimationFrame(detectLoop); return; }
-  let points=null;
-  if(state.cvReady) { const mat=cv.imread(video); points=detectDocument(mat); }
-  drawOverlay(points); requestAnimationFrame(detectLoop);
-}
-function detectDocument(mat) {
-  let small=null, gray=null, edges=null, mask=null, contours=null, hierarchy=null, best=null;
-  try {
-    const scale=Math.min(1,600/Math.max(mat.cols,mat.rows)); small=new cv.Mat();
-    if(scale<1) cv.resize(mat,small,new cv.Size(Math.round(mat.cols*scale),Math.round(mat.rows*scale))); else mat.copyTo(small);
-    gray=new cv.Mat();
-    cv.cvtColor(small,gray,small.channels()===4 ? cv.COLOR_RGBA2GRAY : cv.COLOR_RGB2GRAY);
-    cv.GaussianBlur(gray,gray,new cv.Size(5,5),0);
-    const frameArea=small.cols*small.rows;
-    let bestArea=frameArea*0.08;
-
-    // First use edges so dark tables and colored backgrounds still work.
-    edges=new cv.Mat(); cv.Canny(gray,edges,35,150);
-    const edgeKernel=cv.Mat.ones(5,5,cv.CV_8U); cv.dilate(edges,edges,edgeKernel); edgeKernel.delete();
-    best=largestDocumentQuad(edges,bestArea,scale,false);
-
-    // A bright sheet often has weak edges; threshold it as a second strategy.
-    if(!best) {
-      mask=new cv.Mat(); cv.threshold(gray,mask,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);
-      const maskKernel=cv.Mat.ones(9,9,cv.CV_8U); cv.morphologyEx(mask,mask,cv.MORPH_CLOSE,maskKernel); maskKernel.delete();
-      best=largestDocumentQuad(mask,bestArea,scale,true);
-    }
-    return best ? orderCorners(best) : null;
-  } catch(error) { return null; } finally { mat.delete(); if(small)small.delete(); if(gray)gray.delete(); if(edges)edges.delete(); if(mask)mask.delete(); if(contours)contours.delete(); if(hierarchy)hierarchy.delete(); }
-}
-function largestDocumentQuad(binary, minimumArea, scale, useRectangleFallback) {
-  let contours=null, hierarchy=null, best=null;
-  try {
-    contours=new cv.MatVector(); hierarchy=new cv.Mat(); cv.findContours(binary,contours,hierarchy,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
-    let bestArea=minimumArea;
-    for(let i=0;i<contours.size();i++) {
-      const contour=contours.get(i), area=cv.contourArea(contour);
-      if(area>bestArea) {
-        const perimeter=cv.arcLength(contour,true), approx=new cv.Mat();
-        cv.approxPolyDP(contour,approx,0.04*perimeter,true);
-        if(approx.rows===4 && cv.isContourConvex(approx)) {
-          bestArea=area; best=[];
-          for(let j=0;j<4;j++) best.push({x:approx.data32S[j*2]/scale,y:approx.data32S[j*2+1]/scale});
-        } else if(useRectangleFallback) {
-          const rect=cv.minAreaRect(contour), angle=rect.angle*Math.PI/180, a=Math.sin(angle)*0.5, b=Math.cos(angle)*0.5;
-          const cx=rect.center.x, cy=rect.center.y, w=rect.size.width, h=rect.size.height;
-          bestArea=area; best=[{x:(cx-a*h-b*w)/scale,y:(cy+b*h-a*w)/scale},{x:(cx+a*h-b*w)/scale,y:(cy-b*h-a*w)/scale},{x:(cx+a*h+b*w)/scale,y:(cy-b*h+a*w)/scale},{x:(cx-a*h+b*w)/scale,y:(cy+b*h+a*w)/scale}];
-        }
-        approx.delete();
-      }
-      contour.delete();
-    }
-    return best;
-  } finally { if(contours)contours.delete(); if(hierarchy)hierarchy.delete(); }
-}
-function orderCorners(points) { const sum=p=>p.x+p.y, diff=p=>p.x-p.y; return [points.reduce((a,b)=>sum(a)<sum(b)?a:b),points.reduce((a,b)=>diff(a)>diff(b)?a:b),points.reduce((a,b)=>sum(a)>sum(b)?a:b),points.reduce((a,b)=>diff(a)<diff(b)?a:b)]; }
-function drawOverlay(points) { overlayCtx.clearRect(0,0,overlay.width,overlay.height); document.querySelectorAll('.corner').forEach(el=>el.style.display='none'); state.corners=points; if(!points) { setStatus('Đưa tài liệu vào khung hình'); return; } setStatus('Đã nhận diện tài liệu',true); overlayCtx.beginPath(); overlayCtx.moveTo(points[0].x,points[0].y); points.slice(1).forEach(p=>overlayCtx.lineTo(p.x,p.y)); overlayCtx.closePath(); overlayCtx.fillStyle='#34d39955'; overlayCtx.fill(); overlayCtx.strokeStyle='#6ee7b7'; overlayCtx.lineWidth=6; overlayCtx.stroke(); points.forEach((p,i)=>{ const el=document.querySelectorAll('.corner')[i]; el.style.display='block'; el.style.left=(p.x/overlay.width*100)+'%'; el.style.top=(p.y/overlay.height*100)+'%'; }); }
-
-function captureCamera() { if(!video.videoWidth) return toast('Camera chưa sẵn sàng'); const canvas=document.createElement('canvas'); canvas.width=video.videoWidth; canvas.height=video.videoHeight; canvas.getContext('2d').drawImage(video,0,0); processImage(canvas,state.corners || defaultCorners(canvas.width,canvas.height)); }
-function readImage(file) { const image=new Image(); image.onload=()=>{ const canvas=document.createElement('canvas'); canvas.width=image.width; canvas.height=image.height; canvas.getContext('2d').drawImage(image,0,0); processImage(canvas,null); }; image.src=URL.createObjectURL(file); }
-function defaultCorners(w,h) { return [{x:w*.04,y:h*.04},{x:w*.96,y:h*.04},{x:w*.96,y:h*.96},{x:w*.04,y:h*.96}]; }
-function processImage(canvas,points) { stopCamera(); $('resultModal').classList.remove('hidden'); $('resultModal').classList.add('flex'); $('resultCanvas').width=canvas.width; $('resultCanvas').height=canvas.height; const ctx=$('resultCanvas').getContext('2d'); ctx.drawImage(canvas,0,0); if(points && state.cvReady) warpAndClean(canvas,points); else cleanCanvas(); state.result=$('resultCanvas'); }
-function warpAndClean(canvas,p) { const src=cv.imread(canvas), dst=new cv.Mat(); const width=Math.max(Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y),Math.hypot(p[2].x-p[3].x,p[2].y-p[3].y)), height=Math.max(Math.hypot(p[3].x-p[0].x,p[3].y-p[0].y),Math.hypot(p[2].x-p[1].x,p[2].y-p[1].y)); const from=cv.matFromArray(4,1,cv.CV_32FC2,p.flatMap(q=>[q.x,q.y])), to=cv.matFromArray(4,1,cv.CV_32FC2,[0,0,width,0,width,height,0,height]), matrix=cv.getPerspectiveTransform(from,to); cv.warpPerspective(src,dst,matrix,new cv.Size(width,height)); cv.imshow($('resultCanvas'),dst); [src,dst,from,to,matrix].forEach(x=>x.delete()); cleanCanvas(); }
-function cleanCanvas() { const canvas=$('resultCanvas'),ctx=canvas.getContext('2d'),data=ctx.getImageData(0,0,canvas.width,canvas.height),p=data.data; for(let i=0;i<p.length;i+=4){ const gray=.299*p[i]+.587*p[i+1]+.114*p[i+2]; const value=Math.max(0,Math.min(255,(gray-12)*1.13)); p[i]=p[i+1]=p[i+2]=value; p[i+3]=255; } ctx.putImageData(data,0,0); }
-
-$('saveButton').addEventListener('click',()=>{ const data=$('resultCanvas').toDataURL('image/jpeg',.94); state.scans.unshift({name:filename(),data,date:new Date().toLocaleDateString('vi-VN')}); saveScans(); renderScans(); download(data,filename()+'.jpg'); toast('Đã lưu tài liệu vào máy'); });
-$('pdfButton').addEventListener('click',()=>{ const {jsPDF}=window.jspdf, canvas=$('resultCanvas'),doc=new jsPDF({unit:'px',format:[canvas.width,canvas.height]}); doc.addImage(canvas.toDataURL('image/jpeg',.94),'JPEG',0,0,canvas.width,canvas.height); doc.save(filename()+'.pdf'); });
-$('wordButton').addEventListener('click',()=>{ const html='<html><body><h1>'+filename()+'</h1><img src="'+$('resultCanvas').toDataURL('image/jpeg',.94)+'" style="max-width:100%"></body></html>'; download('data:application/msword;charset=utf-8,'+encodeURIComponent(html),filename()+'.doc'); });
-$('excelButton').addEventListener('click',()=>{ const csv='Tên tài liệu,Ngày tạo\n'+filename()+','+new Date().toLocaleDateString('vi-VN'); download('data:text/csv;charset=utf-8,\ufeff'+encodeURIComponent(csv),filename()+'.csv'); });
-$('closeResult').addEventListener('click',()=>{ $('resultModal').classList.add('hidden'); $('resultModal').classList.remove('flex'); show('scannerView'); startCamera(); });
-function download(data,name) { const a=document.createElement('a'); a.href=data; a.download=name; a.click(); }
-function renderScans() { const list=$('scanList'); $('scanCount').textContent=state.scans.length+' tài liệu'; list.innerHTML=state.scans.length ? state.scans.map((scan,i)=>'<button class="w-full flex items-center gap-3 bg-white border border-[#d5e7df] rounded-xl p-2 text-left" data-index="'+i+'"><img src="'+scan.data+'" class="w-12 h-14 object-cover rounded-lg"><span><strong class="display-font">'+scan.name+'</strong><small class="sans block text-xs text-[#52716a]">'+scan.date+'</small></span></button>').join('') : '<p class="sans text-sm text-[#52716a] py-8 text-center">Chưa có tài liệu. Camera đã sẵn sàng.</p>'; list.querySelectorAll('[data-index]').forEach(btn=>btn.addEventListener('click',()=>{ const scan=state.scans[btn.dataset.index]; $('resultCanvas').width=1; const img=new Image(); img.onload=()=>{ $('resultCanvas').width=img.width; $('resultCanvas').height=img.height; $('resultCanvas').getContext('2d').drawImage(img,0,0); $('documentName').value=scan.name; $('resultModal').classList.remove('hidden'); $('resultModal').classList.add('flex'); }; img.src=scan.data; })); }
-function waitForOpenCv() {
-  if (typeof cv !== 'undefined' && typeof cv.Mat === 'function' && typeof cv.imread === 'function') {
-    try {
-      const probe=new cv.Mat(1,1,cv.CV_8UC4); probe.delete(); state.cvReady=true; return;
-    } catch(error) {
-      state.cvReady=false;
-    }
+(() => {
+  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+  const video=$('#video'), overlay=$('#overlay'), ctx=overlay.getContext('2d'), work=$('#workCanvas'), wctx=work.getContext('2d',{willReadFrequently:true});
+  const state={stream:null,pages:[],authMode:'login',flash:false,detectTimer:null,poly:null,misses:0,mode:'document',ocrWorker:null};
+  const detectCanvas=document.createElement('canvas'), detectCtx=detectCanvas.getContext('2d',{willReadFrequently:true});
+  const iconTrash='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"/></svg>';
+  const toast=(msg)=>{const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2400)};
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  async function hash(text){const b=new TextEncoder().encode(text),h=await crypto.subtle.digest('SHA-256',b);return [...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  function currentUser(){try{return JSON.parse(localStorage.getItem('aplus_session'))}catch{return null}}
+  function syncUser(){const u=currentUser();$('#avatarBtn').textContent=u?.email?.[0]?.toUpperCase()||'A';$('#accountEmail').textContent=u?.email||'—'}
+  function showAuth(){state.authMode='login';$('#authModal').hidden=false}
+  $$('.tab').forEach(b=>b.onclick=()=>{state.authMode=b.dataset.auth;$$('.tab').forEach(x=>x.classList.toggle('active',x===b));$('#authSubmit').textContent=state.authMode==='login'?'Đăng nhập':'Tạo tài khoản';$('#password').autocomplete=state.authMode==='login'?'current-password':'new-password';$('#authNote').textContent='' });
+  $('#authForm').onsubmit=async e=>{e.preventDefault();const email=$('#email').value.trim().toLowerCase(), password=$('#password').value, key='aplus_user_'+email, pass=await hash(password);if(state.authMode==='register'){if(localStorage.getItem(key)){ $('#authNote').textContent='Email này đã được đăng ký trên thiết bị.';return }localStorage.setItem(key,JSON.stringify({email,pass}));localStorage.setItem('aplus_session',JSON.stringify({email}));toast('Tạo tài khoản thành công')}else{let u;try{u=JSON.parse(localStorage.getItem(key))}catch{}if(!u||u.pass!==pass){$('#authNote').textContent='Email hoặc mật khẩu chưa đúng.';return}localStorage.setItem('aplus_session',JSON.stringify({email}));toast('Đăng nhập thành công')}$('#authModal').hidden=true;syncUser();startCamera()};
+  async function startCamera(){
+    if(!navigator.mediaDevices?.getUserMedia){$('#placeholder').querySelector('p').textContent='Trình duyệt này không hỗ trợ camera. Hãy chọn ảnh từ thiết bị.';return}
+    try{state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});video.srcObject=state.stream;await video.play();$('#placeholder').style.display='none';resizeOverlay();clearInterval(state.detectTimer);state.detectTimer=setInterval(detectDocument,110)}catch(err){$('#placeholder').querySelector('p').textContent='Không thể mở camera. Hãy cho phép truy cập camera hoặc chọn ảnh từ thiết bị.';$('#detectLabel').textContent='Camera chưa sẵn sàng'}
   }
-  setTimeout(waitForOpenCv, 250);
-}
-waitForOpenCv();
-loadApp();
+  function resizeOverlay(){const r=overlay.getBoundingClientRect(),d=devicePixelRatio||1;overlay.width=r.width*d;overlay.height=r.height*d;ctx.setTransform(d,0,0,d,0,0)}
+  function drawCameraToDetection(){const vr=overlay.getBoundingClientRect(),dw=Math.max(128,Math.round(Math.min(260,vr.width/3))),dh=Math.max(180,Math.round(dw*vr.height/vr.width));detectCanvas.width=dw;detectCanvas.height=dh;const vw=video.videoWidth,vh=video.videoHeight,scale=Math.max(dw/vw,dh/vh),sw=dw/scale,sh=dh/scale,sx=(vw-sw)/2,sy=(vh-sh)/2;detectCtx.drawImage(video,sx,sy,sw,sh,0,0,dw,dh);return {w:dw,h:dh}}
+  function intersection(v,h){const den=1-v.m*h.m;if(Math.abs(den)<.1)return null;const x=(v.b+v.m*h.b)/den;return[x,h.b+h.m*x]}
+  function findLine(gray,w,h,side,vertical){let best={score:0,m:0,b:0};const start=vertical?(side==='low'?w*.04:w*.52):(side==='low'?h*.05:h*.52),end=vertical?(side==='low'?w*.48:w*.96):(side==='low'?h*.48:h*.94),stepB=2, slopes=[-.34,-.27,-.2,-.13,-.06,0,.06,.13,.2,.27,.34];for(const m of slopes)for(let b=start;b<=end;b+=stepB){let score=0,n=0;if(vertical){for(let y=Math.round(h*.08);y<h*.92;y+=2){const x=Math.round(b+m*(y-h/2));if(x>2&&x<w-3){score+=Math.abs(gray[y*w+x+2]-gray[y*w+x-2]);n++}}}else{for(let x=Math.round(w*.06);x<w*.94;x+=2){const y=Math.round(b+m*(x-w/2));if(y>2&&y<h-3){score+=Math.abs(gray[(y+2)*w+x]-gray[(y-2)*w+x]);n++}}}score=n?score/n:0;if(score>best.score)best={score,m,b:vertical?b-m*h/2:b-m*w/2}}return best}
+  function validQuad(p,w,h){if(p.some(x=>!x||!isFinite(x[0])||!isFinite(x[1])))return false;const area=Math.abs(p.reduce((s,a,i)=>{const b=p[(i+1)%p.length];return s+a[0]*b[1]-b[0]*a[1]},0))/2;return area>w*h*.13&&area<w*h*.94&&p.every(([x,y])=>x>-w*.08&&x<w*1.08&&y>-h*.08&&y<h*1.08)}
+  function renderPoly(found){const r=overlay.getBoundingClientRect(),w=r.width,h=r.height;ctx.clearRect(0,0,w,h);if(!state.poly)return;ctx.fillStyle=found?'rgba(46,230,166,.16)':'rgba(255,209,102,.08)';ctx.strokeStyle=found?'#2ee6a6':'rgba(255,209,102,.7)';ctx.lineWidth=2.2;ctx.shadowColor=ctx.strokeStyle;ctx.shadowBlur=12;ctx.beginPath();state.poly.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;if(state.mode==='book'){const top=[(state.poly[0][0]+state.poly[1][0])/2,(state.poly[0][1]+state.poly[1][1])/2],bottom=[(state.poly[3][0]+state.poly[2][0])/2,(state.poly[3][1]+state.poly[2][1])/2];ctx.setLineDash([7,7]);ctx.beginPath();ctx.moveTo(...top);ctx.quadraticCurveTo(top[0]-8,(top[1]+bottom[1])/2,...bottom);ctx.stroke();ctx.setLineDash([])}state.poly.forEach(p=>{ctx.fillStyle='#f7fffc';ctx.beginPath();ctx.arc(...p,5,0,Math.PI*2);ctx.fill()})}
+  function detectDocument(){if(!video.videoWidth)return;const {w,h}=drawCameraToDetection(),data=detectCtx.getImageData(0,0,w,h).data,gray=new Uint8Array(w*h);for(let i=0,j=0;i<data.length;i+=4,j++)gray[j]=(data[i]*3+data[i+1]*6+data[i+2])/10;const left=findLine(gray,w,h,'low',true),right=findLine(gray,w,h,'high',true),top=findLine(gray,w,h,'low',false),bottom=findLine(gray,w,h,'high',false),raw=[intersection(left,top),intersection(right,top),intersection(right,bottom),intersection(left,bottom)],edge=Math.min(left.score,right.score,top.score,bottom.score),ok=edge>12&&validQuad(raw,w,h),vr=overlay.getBoundingClientRect();if(ok){const next=raw.map(([x,y])=>[x/w*vr.width,y/h*vr.height]);if(state.poly)state.poly=next.map((p,i)=>{const d=Math.hypot(p[0]-state.poly[i][0],p[1]-state.poly[i][1]),a=d>45?.52:.28;return[state.poly[i][0]*(1-a)+p[0]*a,state.poly[i][1]*(1-a)+p[1]*a]});else state.poly=next;state.misses=0;$('#detectLabel').textContent=state.mode==='book'?'Đã nhận diện trang sách':'Đã nhận diện tài liệu';$('#detectDot').classList.remove('searching')}else{state.misses++;if(state.misses>10)state.poly=null;$('#detectLabel').textContent='Đưa trọn trang giấy vào khung';$('#detectDot').classList.add('searching')}renderPoly(ok)}
+  window.addEventListener('resize',resizeOverlay);
+  function polyToSource(sw,sh){const vr=video.getBoundingClientRect(),ratio=Math.max(vr.width/sw,vr.height/sh),offX=(sw*ratio-vr.width)/2,offY=(sh*ratio-vr.height)/2;return state.poly.map(([x,y])=>[(x+offX)/ratio,(y+offY)/ratio])}
+  function cleanPixels(im){const d=im.data;for(let i=0;i<d.length;i+=4){const lum=.299*d[i]+.587*d[i+1]+.114*d[i+2],contrast=1.18,mix=.2;d[i]=Math.max(0,Math.min(255,(d[i]-128)*contrast+128));d[i+1]=Math.max(0,Math.min(255,(d[i+1]-128)*contrast+128));d[i+2]=Math.max(0,Math.min(255,(d[i+2]-128)*contrast+128));d[i]=d[i]*(1-mix)+lum*mix;d[i+1]=d[i+1]*(1-mix)+lum*mix;d[i+2]=d[i+2]*(1-mix)+lum*mix}return im}
+  function sourceToCleanCanvas(source,crop=true){const sw=source.videoWidth||source.naturalWidth||source.width,sh=source.videoHeight||source.naturalHeight||source.height;if(!sw||!sh)throw Error('Ảnh không hợp lệ');if(!crop||!state.poly){const scale=Math.min(1,1800/Math.max(sw,sh));work.width=Math.round(sw*scale);work.height=Math.round(sh*scale);wctx.drawImage(source,0,0,work.width,work.height);wctx.putImageData(cleanPixels(wctx.getImageData(0,0,work.width,work.height)),0,0);return work.toDataURL('image/jpeg',.9)}const p=polyToSource(sw,sh),dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]),ow=Math.max(320,Math.round((dist(p[0],p[1])+dist(p[3],p[2]))/2)),oh=Math.max(420,Math.round((dist(p[0],p[3])+dist(p[1],p[2]))/2)),scale=Math.min(1,1600/Math.max(ow,oh)),W=Math.round(ow*scale),H=Math.round(oh*scale),src=document.createElement('canvas');src.width=sw;src.height=sh;const sc=src.getContext('2d',{willReadFrequently:true});sc.drawImage(source,0,0);const sd=sc.getImageData(0,0,sw,sh).data,out=wctx.createImageData(W,H),od=out.data;work.width=W;work.height=H;for(let y=0;y<H;y++){const v=y/(H-1),lx=p[0][0]*(1-v)+p[3][0]*v,ly=p[0][1]*(1-v)+p[3][1]*v,rx=p[1][0]*(1-v)+p[2][0]*v,ry=p[1][1]*(1-v)+p[2][1]*v;for(let x=0;x<W;x++){const u=x/(W-1),sx=Math.max(0,Math.min(sw-1,Math.round(lx*(1-u)+rx*u))),sy=Math.max(0,Math.min(sh-1,Math.round(ly*(1-u)+ry*u))),si=(sy*sw+sx)*4,di=(y*W+x)*4;od[di]=sd[si];od[di+1]=sd[si+1];od[di+2]=sd[si+2];od[di+3]=255}}wctx.putImageData(cleanPixels(out),0,0);return work.toDataURL('image/jpeg',.91)}
+  function addPage(data,name){state.pages.push({id:crypto.randomUUID?.()||Date.now()+Math.random(),data,name:name||`Trang ${state.pages.length+1}`,selected:true,created:new Date()});renderPages();toast('Đã làm sạch và lưu trang quét')}
+  function splitBook(data){return new Promise(resolve=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),cc=c.getContext('2d'),half=Math.floor(im.width/2);c.width=half;c.height=im.height;cc.drawImage(im,0,0,half,im.height,0,0,half,im.height);const left=c.toDataURL('image/jpeg',.9);cc.clearRect(0,0,half,im.height);cc.drawImage(im,half,0,im.width-half,im.height,0,0,half,im.height);resolve([left,c.toDataURL('image/jpeg',.9)])};im.src=data})}
+  $('#captureBtn').onclick=async()=>{if(!video.videoWidth){$('#fileInput').click();return}if(!state.poly){toast('Chưa nhận diện rõ trang giấy');return}try{const data=sourceToCleanCanvas(video,true);if(state.mode==='book'){const [left,right]=await splitBook(data);addPage(left,'Trang trái');addPage(right,'Trang phải')}else addPage(data)}catch{toast('Chưa thể chụp ảnh')}};
+  $('#uploadBtn').onclick=()=>$('#fileInput').click();
+  $('#fileInput').onchange=async e=>{for(const file of e.target.files){await new Promise(resolve=>{const img=new Image();img.onload=()=>{try{addPage(sourceToCleanCanvas(img,false),file.name.replace(/\.[^.]+$/,''))}finally{URL.revokeObjectURL(img.src);resolve()}};img.onerror=resolve;img.src=URL.createObjectURL(file)})}e.target.value=''};
+  function renderPages(){const p=$('#pages');if(!state.pages.length)p.innerHTML='<div class="empty"><div><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="m4 15 4-4 4 4 3-3 5 5"/></svg><p>Chưa có trang nào.<br>Chụp hoặc chọn ảnh để bắt đầu.</p></div></div>';else p.innerHTML=state.pages.map((x,i)=>`<div class="page"><img src="${x.data}" alt="${esc(x.name)}"><div><h3>${esc(x.name||'Trang '+(i+1))}</h3><span>${x.text?'Đã nhận dạng văn bản':'Ảnh đã làm sạch'}</span></div><div style="display:grid;gap:10px;justify-items:center"><input class="check" type="checkbox" data-check="${x.id}" ${x.selected?'checked':''} aria-label="Chọn ${esc(x.name)}"><button class="control" data-delete="${x.id}" aria-label="Xóa trang" style="color:var(--danger)">${iconTrash}</button></div></div>`).join('');$('#pageCount').textContent=state.pages.length+' trang';$('#mobileCount').textContent=state.pages.length?'('+state.pages.length+')':'';$$('[data-export]').forEach(b=>b.disabled=!state.pages.some(x=>x.selected));$('#ocrBtn').disabled=!state.pages.some(x=>x.selected);$$('[data-check]').forEach(c=>c.onchange=()=>{state.pages.find(x=>x.id===c.dataset.check).selected=c.checked;renderPages()});$$('[data-delete]').forEach(b=>b.onclick=()=>{state.pages=state.pages.filter(x=>x.id!==b.dataset.delete);renderPages()})}
+  $('#selectAll').onclick=()=>{const all=state.pages.every(x=>x.selected);state.pages.forEach(x=>x.selected=!all);renderPages()};
+  const download=(blob,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
+  function dataBytes(url){const bin=atob(url.split(',')[1]),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return arr}
+  function makePDF(items){const enc=new TextEncoder(),parts=[],offsets=[0];let pos=0;const push=x=>{const b=typeof x==='string'?enc.encode(x):x;parts.push(b);pos+=b.length};push('%PDF-1.4\n%âãÏÓ\n');const total=2+items.length*3;const obj=(n,content)=>{offsets[n]=pos;push(`${n} 0 obj\n${content}\nendobj\n`)};obj(1,'<< /Type /Catalog /Pages 2 0 R >>');obj(2,`<< /Type /Pages /Kids [${items.map((_,i)=>`${3+i*3} 0 R`).join(' ')}] /Count ${items.length} >>`);items.forEach((it,i)=>{const page=3+i*3,imgN=page+1,contentN=page+2,bytes=dataBytes(it.data),im=new Image(),iw=it.width||1240,ih=it.height||1754,pw=595,ph=842,s=Math.min(pw/iw,ph/ih),dw=iw*s,dh=ih*s,x=(pw-dw)/2,y=(ph-dh)/2,stream=`q ${dw.toFixed(2)} 0 0 ${dh.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)} cm /Im${i} Do Q`;obj(page,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pw} ${ph}] /Resources << /XObject << /Im${i} ${imgN} 0 R >> >> /Contents ${contentN} 0 R >>`);offsets[imgN]=pos;push(`${imgN} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${iw} /Height ${ih} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${bytes.length} >>\nstream\n`);push(bytes);push('\nendstream\nendobj\n');obj(contentN,`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`)});const xref=pos;push(`xref\n0 ${total+1}\n0000000000 65535 f \n`);for(let i=1;i<=total;i++)push(String(offsets[i]).padStart(10,'0')+' 00000 n \n');push(`trailer\n<< /Size ${total+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);return new Blob(parts,{type:'application/pdf'})}
+  async function imageDims(item){return new Promise(r=>{const im=new Image();im.onload=()=>r({...item,width:im.naturalWidth,height:im.naturalHeight});im.src=item.data})}
+  async function doExport(type){const selected=state.pages.filter(x=>x.selected);if(!selected.length)return;const stamp=new Date().toISOString().slice(0,10);if(type==='pdf'){download(makePDF(await Promise.all(selected.map(imageDims))),`AplusScanner-${stamp}.pdf`)}else if(type==='word'){const body=selected.map((x,i)=>`<h2>Trang ${i+1}</h2><img src="${x.data}" style="max-width:100%;page-break-after:always">`).join('');download(new Blob([`<html><meta charset="utf-8"><body>${body}</body></html>`],{type:'application/msword'}),`AplusScanner-${stamp}.doc`)}else{const rows=selected.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)}</td><td>${x.created.toLocaleString('vi-VN')}</td><td>Đã làm sạch</td></tr>`).join('');download(new Blob([`<html><meta charset="utf-8"><table><tr><th>STT</th><th>Tên trang</th><th>Thời gian quét</th><th>Trạng thái</th></tr>${rows}</table></html>`],{type:'application/vnd.ms-excel'}),`AplusScanner-${stamp}.xls`)}toast('Đã tạo tệp '+type.toUpperCase())}
+  $$('[data-export]').forEach(b=>b.onclick=()=>doExport(b.dataset.export));
+  $('#modeBtn').onclick=()=>{state.mode=state.mode==='document'?'book':'document';$('#modeLabel').textContent=state.mode==='book'?'Sách · tách 2 trang':'Tài liệu';toast(state.mode==='book'?'Chế độ sách: tự tách trang trái và phải':'Chế độ tài liệu một trang');if(state.poly)renderPoly(true)};
+  async function runOCR(){const selected=state.pages.filter(x=>x.selected);if(!selected.length)return;$('#ocrModal').hidden=false;$('#ocrText').value=selected.map(x=>x.text||'').filter(Boolean).join('\n\n');if(!window.Tesseract){$('#ocrStatus').textContent='Không tải được bộ OCR. Hãy kiểm tra kết nối Internet.';return}try{if(!state.ocrWorker)state.ocrWorker=await Tesseract.createWorker('vie+eng',1,{logger:m=>{if(m.progress!=null){$('#ocrProgress').style.width=Math.round(m.progress*100)+'%';$('#ocrStatus').textContent=m.status==='recognizing text'?`Đang nhận dạng… ${Math.round(m.progress*100)}%`:'Đang chuẩn bị bộ nhận dạng…'}}});for(let i=0;i<selected.length;i++){if(!selected[i].text){$('#ocrStatus').textContent=`Đang đọc trang ${i+1}/${selected.length}…`;const result=await state.ocrWorker.recognize(selected[i].data);selected[i].text=result.data.text.trim()}$('#ocrText').value=selected.map(x=>x.text||'').join('\n\n')}$('#ocrProgress').style.width='100%';$('#ocrStatus').textContent='Đã nhận dạng xong. Bạn có thể sửa hoặc sao chép văn bản.';renderPages()}catch(err){$('#ocrStatus').textContent='OCR chưa hoàn tất. Vui lòng thử lại với ảnh rõ hơn.'}}
+  $('#ocrBtn').onclick=runOCR;$('#closeOcr').onclick=()=>$('#ocrModal').hidden=true;$('#ocrModal').onclick=e=>{if(e.target===$('#ocrModal'))$('#ocrModal').hidden=true};$('#copyOcr').onclick=async()=>{try{await navigator.clipboard.writeText($('#ocrText').value);toast('Đã sao chép văn bản')}catch{$('#ocrText').select();document.execCommand('copy');toast('Đã sao chép văn bản')}};
+  $('#settingsBtn').onclick=$('#avatarBtn').onclick=()=>{$('#settingsModal').hidden=false;syncUser()};$('#closeSettings').onclick=()=>$('#settingsModal').hidden=true;$('#settingsModal').onclick=e=>{if(e.target===$('#settingsModal'))$('#settingsModal').hidden=true};
+  $('#logoutBtn').onclick=()=>{localStorage.removeItem('aplus_session');$('#settingsModal').hidden=true;if(state.stream)state.stream.getTracks().forEach(t=>t.stop());showAuth()};
+  $('#libraryBtn').onclick=()=>$('#libraryPanel').classList.toggle('open');$('#libraryHead').onclick=()=>{if(innerWidth<=840)$('#libraryPanel').classList.toggle('open')};
+  $('#flashBtn').onclick=async()=>{const track=state.stream?.getVideoTracks?.()[0],caps=track?.getCapabilities?.();if(!caps?.torch){toast('Thiết bị không hỗ trợ bật đèn từ trình duyệt');return}state.flash=!state.flash;try{await track.applyConstraints({advanced:[{torch:state.flash}]});toast(state.flash?'Đã bật đèn':'Đã tắt đèn')}catch{toast('Không thể điều khiển đèn')}};
+  if(currentUser()){syncUser();startCamera()}else showAuth();
+})();
 </script>
 </body>
 </html>
