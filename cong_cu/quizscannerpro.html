@@ -362,7 +362,7 @@
       box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
     }
 
-    #cameraVideo { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #cameraVideo { width: 100%; height: 100%; object-fit: fill; display: block; }
     #overlayCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 
     .camera-status-overlay {
@@ -780,6 +780,7 @@
               </div>
             </div>
 
+            <p id="scanStatus" role="status" aria-live="polite" style="margin-top:10px;color:var(--text-muted)">Sẵn sàng quét. Bản v2: vui lòng in lại thẻ 17, 20, 38.</p>
             <div class="camera-controls-bar" style="margin-top: 12px;">
               <select id="cameraSelect" class="select-styled" style="flex: 1; min-width: 140px;">
                 <option value="">Đang tìm camera...</option>
@@ -1011,138 +1012,742 @@ D. 6
       }
     }
 
-    /* CV Engine */
-    var CV = {};
-    CV.grayscale = function (imageSrc, imageDst) {
-      var src = imageSrc.data, dst = imageDst.data, len = src.length, i = 0, j = 0;
-      while (i < len) {
-        dst[j++] = (src[i] * 77 + src[i + 1] * 151 + src[i + 2] * 28) >> 8;
-        i += 4;
+/*
+Copyright (c) 2011 Juan Mellado
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+/*
+References:
+- "OpenCV: Open Computer Vision Library"
+  http://sourceforge.net/projects/opencvlibrary/
+- "Stack Blur: Fast But Goodlooking"
+  http://incubator.quasimondo.com/processing/fast_blur_deluxe.php
+*/
+
+var CV = CV || {};
+
+CV.Image = function(width, height, data){
+  this.width = width || 0;
+  this.height = height || 0;
+  this.data = data || [];
+};
+
+CV.grayscale = function(imageSrc, imageDst){
+  var src = imageSrc.data, dst = imageDst.data, len = src.length,
+      i = 0, j = 0;
+
+  for (; i < len; i += 4){
+    dst[j ++] =
+      (src[i] * 0.299 + src[i + 1] * 0.587 + src[i + 2] * 0.114 + 0.5) & 0xff;
+  }
+
+  imageDst.width = imageSrc.width;
+  imageDst.height = imageSrc.height;
+
+  return imageDst;
+};
+
+CV.threshold = function(imageSrc, imageDst, threshold){
+  var src = imageSrc.data, dst = imageDst.data,
+      len = src.length, tab = [], i;
+
+  for (i = 0; i < 256; ++ i){
+    tab[i] = i <= threshold? 0: 255;
+  }
+
+  for (i = 0; i < len; ++ i){
+    dst[i] = tab[ src[i] ];
+  }
+
+  imageDst.width = imageSrc.width;
+  imageDst.height = imageSrc.height;
+
+  return imageDst;
+};
+
+CV.adaptiveThreshold = function(imageSrc, imageDst, kernelSize, threshold){
+  var src = imageSrc.data, dst = imageDst.data, len = src.length, tab = [], i;
+
+  CV.stackBoxBlur(imageSrc, imageDst, kernelSize);
+
+  for (i = 0; i < 768; ++ i){
+    tab[i] = (i - 255 <= -threshold)? 255: 0;
+  }
+
+  for (i = 0; i < len; ++ i){
+    dst[i] = tab[ src[i] - dst[i] + 255 ];
+  }
+
+  imageDst.width = imageSrc.width;
+  imageDst.height = imageSrc.height;
+
+  return imageDst;
+};
+
+CV.otsu = function(imageSrc){
+  var src = imageSrc.data, len = src.length, hist = [],
+      threshold = 0, sum = 0, sumB = 0, wB = 0, wF = 0, max = 0,
+      mu, between, i;
+
+  for (i = 0; i < 256; ++ i){
+    hist[i] = 0;
+  }
+
+  for (i = 0; i < len; ++ i){
+    hist[ src[i] ] ++;
+  }
+
+  for (i = 0; i < 256; ++ i){
+    sum += hist[i] * i;
+  }
+
+  for (i = 0; i < 256; ++ i){
+    wB += hist[i];
+    if (0 !== wB){
+
+      wF = len - wB;
+      if (0 === wF){
+        break;
       }
-      imageDst.width = imageSrc.width; imageDst.height = imageSrc.height;
-      return imageDst;
-    };
-    CV.adaptiveThreshold = function (imageSrc, imageDst, kernelSize, threshold) {
-      var src = imageSrc.data, dst = imageDst.data, width = imageSrc.width, height = imageSrc.height, size = Math.max(3, kernelSize >> 1);
-      var integral = new Int32Array((width + 1) * (height + 1)), intWidth = width + 1;
-      for (var y = 0; y < height; ++y) {
-        var rowSum = 0, yOffset = y * width, intYOffset = (y + 1) * intWidth, prevIntYOffset = y * intWidth;
-        for (var x = 0; x < width; ++x) {
-          rowSum += src[yOffset + x];
-          integral[intYOffset + x + 1] = integral[prevIntYOffset + x + 1] + rowSum;
-        }
+
+      sumB += hist[i] * i;
+
+      mu = (sumB / wB) - ( (sum - sumB) / wF );
+
+      between = wB * wF * mu * mu;
+
+      if (between > max){
+        max = between;
+        threshold = i;
       }
-      for (var y = 0; y < height; ++y) {
-        var y1 = Math.max(0, y - size), y2 = Math.min(height, y + size + 1), count = (y2 - y1), yOffset = y * width;
-        for (var x = 0; x < width; ++x) {
-          var x1 = Math.max(0, x - size), x2 = Math.min(width, x + size + 1), area = count * (x2 - x1);
-          var sum = integral[y2 * intWidth + x2] - integral[y1 * intWidth + x2] - integral[y2 * intWidth + x1] + integral[y1 * intWidth + x1];
-          var avg = sum / area;
-          dst[yOffset + x] = (src[yOffset + x] <= avg - threshold) ? 0 : 255;
-        }
-      }
-      imageDst.width = width; imageDst.height = height;
-      return imageDst;
-    };
-    CV.findContours = function (imageSrc) {
-      var width = imageSrc.width, height = imageSrc.height, src = imageSrc.data, contours = [], visited = new Uint8Array(width * height);
-      var dx = [1, 1, 0, -1, -1, -1, 0, 1], dy = [0, 1, 1, 1, 0, -1, -1, -1];
-      for (var y = 1; y < height - 1; y += 2) {
-        for (var x = 1; x < width - 1; x += 2) {
-          var pos = y * width + x;
-          if (src[pos] === 0 && !visited[pos]) {
-            var contour = [], cur = { x: x, y: y }, start = { x: x, y: y }, dir = 0;
-            while (true) {
-              contour.push({ x: cur.x, y: cur.y });
-              visited[cur.y * width + cur.x] = 1;
-              var next = null;
-              for (var i = 0; i < 8; ++i) {
-                var nextDir = (dir + i) % 8, nx = cur.x + dx[nextDir], ny = cur.y + dy[nextDir];
-                if (nx >= 0 && nx < width && ny >= 0 && ny < height && src[ny * width + nx] === 0) {
-                  next = { x: nx, y: ny }; dir = (nextDir + 6) % 8; break;
-                }
-              }
-              if (!next || (next.x === start.x && next.y === start.y)) break;
-              cur = next;
-              if (contour.length > 1500) break;
-            }
-            if (contour.length >= 24) contours.push(contour);
+    }
+  }
+
+  return threshold;
+};
+
+CV.stackBoxBlurMult =
+  [1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265];
+
+CV.stackBoxBlurShift =
+  [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13];
+
+CV.BlurStack = function(){
+  this.color = 0;
+  this.next = null;
+};
+
+CV.stackBoxBlur = function(imageSrc, imageDst, kernelSize){
+  var src = imageSrc.data, dst = imageDst.data,
+      height = imageSrc.height, width = imageSrc.width,
+      heightMinus1 = height - 1, widthMinus1 = width - 1,
+      size = kernelSize + kernelSize + 1, radius = kernelSize + 1,
+      mult = CV.stackBoxBlurMult[kernelSize],
+      shift = CV.stackBoxBlurShift[kernelSize],
+      stack, stackStart, color, sum, pos, start, p, x, y, i;
+
+  stack = stackStart = new CV.BlurStack();
+  for (i = 1; i < size; ++ i){
+    stack = stack.next = new CV.BlurStack();
+  }
+  stack.next = stackStart;
+
+  pos = 0;
+
+  for (y = 0; y < height; ++ y){
+    start = pos;
+
+    color = src[pos];
+    sum = radius * color;
+
+    stack = stackStart;
+    for (i = 0; i < radius; ++ i){
+      stack.color = color;
+      stack = stack.next;
+    }
+    for (i = 1; i < radius; ++ i){
+      stack.color = src[pos + i];
+      sum += stack.color;
+      stack = stack.next;
+    }
+
+    stack = stackStart;
+    for (x = 0; x < width; ++ x){
+      dst[pos ++] = (sum * mult) >>> shift;
+
+      p = x + radius;
+      p = start + (p < widthMinus1? p: widthMinus1);
+      sum -= stack.color - src[p];
+
+      stack.color = src[p];
+      stack = stack.next;
+    }
+  }
+
+  for (x = 0; x < width; ++ x){
+    pos = x;
+    start = pos + width;
+
+    color = dst[pos];
+    sum = radius * color;
+
+    stack = stackStart;
+    for (i = 0; i < radius; ++ i){
+      stack.color = color;
+      stack = stack.next;
+    }
+    for (i = 1; i < radius; ++ i){
+      stack.color = dst[start];
+      sum += stack.color;
+      stack = stack.next;
+
+      start += width;
+    }
+
+    stack = stackStart;
+    for (y = 0; y < height; ++ y){
+      dst[pos] = (sum * mult) >>> shift;
+
+      p = y + radius;
+      p = x + ( (p < heightMinus1? p: heightMinus1) * width );
+      sum -= stack.color - dst[p];
+
+      stack.color = dst[p];
+      stack = stack.next;
+
+      pos += width;
+    }
+  }
+
+  return imageDst;
+};
+
+CV.gaussianBlur = function(imageSrc, imageDst, imageMean, kernelSize){
+  var kernel = CV.gaussianKernel(kernelSize);
+
+  imageDst.width = imageSrc.width;
+  imageDst.height = imageSrc.height;
+
+  imageMean.width = imageSrc.width;
+  imageMean.height = imageSrc.height;
+
+  CV.gaussianBlurFilter(imageSrc, imageMean, kernel, true);
+  CV.gaussianBlurFilter(imageMean, imageDst, kernel, false);
+
+  return imageDst;
+};
+
+CV.gaussianBlurFilter = function(imageSrc, imageDst, kernel, horizontal){
+  var src = imageSrc.data, dst = imageDst.data,
+      height = imageSrc.height, width = imageSrc.width,
+      pos = 0, limit = kernel.length >> 1,
+      cur, value, i, j, k;
+
+  for (i = 0; i < height; ++ i){
+
+    for (j = 0; j < width; ++ j){
+      value = 0.0;
+
+      for (k = -limit; k <= limit; ++ k){
+
+        if (horizontal){
+          cur = pos + k;
+          if (j + k < 0){
+            cur = pos;
+          }
+          else if (j + k >= width){
+            cur = pos;
+          }
+        }else{
+          cur = pos + (k * width);
+          if (i + k < 0){
+            cur = pos;
+          }
+          else if (i + k >= height){
+            cur = pos;
           }
         }
+
+        value += kernel[limit + k] * src[cur];
       }
-      return contours;
-    };
-    CV.approxPolyDP = function (contour, epsilon) {
-      if (contour.length <= 2) return contour;
-      var first = contour[0], last = contour[contour.length - 1], maxDist = 0, index = 0;
-      for (var i = 1; i < contour.length - 1; ++i) {
-        var dx = last.x - first.x, dy = last.y - first.y;
-        var num = Math.abs(dy * contour[i].x - dx * contour[i].y + last.x * first.y - last.y * first.x);
-        var d = num / (Math.sqrt(dx * dx + dy * dy) || 1);
-        if (d > maxDist) { maxDist = d; index = i; }
-      }
-      if (maxDist > epsilon) {
-        var left = CV.approxPolyDP(contour.slice(0, index + 1), epsilon);
-        var right = CV.approxPolyDP(contour.slice(index), epsilon);
-        return left.slice(0, left.length - 1).concat(right);
-      }
-      return [first, last];
-    };
-    CV.isContourConvex = function (contour) {
-      var len = contour.length; if (len < 3) return false;
-      var prev = 0;
-      for (var i = 0; i < len; ++i) {
-        var p1 = contour[i], p2 = contour[(i + 1) % len], p3 = contour[(i + 2) % len];
-        var cross = (p2.x - p1.x) * (p3.y - p2.y) - (p2.y - p1.y) * (p3.x - p2.x);
-        if (cross !== 0) {
-          if (prev === 0) prev = cross > 0 ? 1 : -1;
-          else if ((cross > 0 ? 1 : -1) !== prev) return false;
+
+      dst[pos ++] = horizontal? value: (value + 0.5) & 0xff;
+    }
+  }
+
+  return imageDst;
+};
+
+CV.gaussianKernel = function(kernelSize){
+  var tab =
+    [ [1],
+      [0.25, 0.5, 0.25],
+      [0.0625, 0.25, 0.375, 0.25, 0.0625],
+      [0.03125, 0.109375, 0.21875, 0.28125, 0.21875, 0.109375, 0.03125] ],
+    kernel = [], center, sigma, scale2X, sum, x, i;
+
+  if ( (kernelSize <= 7) && (kernelSize % 2 === 1) ){
+    kernel = tab[kernelSize >> 1];
+  }else{
+    center = (kernelSize - 1.0) * 0.5;
+    sigma = 0.8 + (0.3 * (center - 1.0) );
+    scale2X = -0.5 / (sigma * sigma);
+    sum = 0.0;
+    for (i = 0; i < kernelSize; ++ i){
+      x = i - center;
+      sum += kernel[i] = Math.exp(scale2X * x * x);
+    }
+    sum = 1 / sum;
+    for (i = 0; i < kernelSize; ++ i){
+      kernel[i] *= sum;
+    }
+  }
+
+  return kernel;
+};
+
+CV.findContours = function(imageSrc, binary){
+  var width = imageSrc.width, height = imageSrc.height, contours = [],
+      src, deltas, pos, pix, nbd, outer, hole, i, j;
+
+  src = CV.binaryBorder(imageSrc, binary);
+
+  deltas = CV.neighborhoodDeltas(width + 2);
+
+  pos = width + 3;
+  nbd = 1;
+
+  for (i = 0; i < height; ++ i, pos += 2){
+
+    for (j = 0; j < width; ++ j, ++ pos){
+      pix = src[pos];
+
+      if (0 !== pix){
+        outer = hole = false;
+
+        if (1 === pix && 0 === src[pos - 1]){
+          outer = true;
+        }
+        else if (pix >= 1 && 0 === src[pos + 1]){
+          hole = true;
+        }
+
+        if (outer || hole){
+          ++ nbd;
+
+          contours.push( CV.borderFollowing(src, pos, nbd, {x: j, y: i}, hole, deltas) );
         }
       }
-      return true;
-    };
-    CV.warp = function (imageSrc, imageDst, contour, warpSize) {
-      var src = imageSrc.data, dst = imageDst.data, width = imageSrc.width, height = imageSrc.height;
-      var srcPts = contour, dstPts = [{x:0,y:0},{x:warpSize-1,y:0},{x:warpSize-1,y:warpSize-1},{x:0,y:warpSize-1}];
-      var a = [], b = [];
-      for (var i = 0; i < 4; ++i) {
-        a.push([dstPts[i].x, dstPts[i].y, 1, 0, 0, 0, -dstPts[i].x * srcPts[i].x, -dstPts[i].y * srcPts[i].x]);
-        b.push(srcPts[i].x);
-        a.push([0, 0, 0, dstPts[i].x, dstPts[i].y, 1, -dstPts[i].x * srcPts[i].y, -dstPts[i].y * srcPts[i].y]);
-        b.push(srcPts[i].y);
+    }
+  }
+
+  return contours;
+};
+
+CV.borderFollowing = function(src, pos, nbd, point, hole, deltas){
+  var contour = [], pos1, pos3, pos4, s, s_end, s_prev;
+
+  contour.hole = hole;
+
+  s = s_end = hole? 0: 4;
+  do{
+    s = (s - 1) & 7;
+    pos1 = pos + deltas[s];
+    if (src[pos1] !== 0){
+      break;
+    }
+  }while(s !== s_end);
+
+  if (s === s_end){
+    src[pos] = -nbd;
+    contour.push( {x: point.x, y: point.y} );
+
+  }else{
+    pos3 = pos;
+    s_prev = s ^ 4;
+
+    while(true){
+      s_end = s;
+
+      do{
+        pos4 = pos3 + deltas[++ s];
+      }while(src[pos4] === 0);
+
+      s &= 7;
+
+      if ( ( (s - 1) >>> 0) < (s_end >>> 0) ){
+        src[pos3] = -nbd;
       }
-      var n = 8;
-      for (var i = 0; i < n; ++i) {
-        var maxEl = Math.abs(a[i][i]), maxRow = i;
-        for (var k = i + 1; k < n; ++k) if (Math.abs(a[k][i]) > maxEl) { maxEl = Math.abs(a[k][i]); maxRow = k; }
-        var tmp = a[maxRow]; a[maxRow] = a[i]; a[i] = tmp;
-        var tmpB = b[maxRow]; b[maxRow] = b[i]; b[i] = tmpB;
-        for (var k = i + 1; k < n; ++k) {
-          var c = -a[k][i] / (a[i][i] || 1e-10);
-          for (var j = i; j < n; ++j) a[k][j] = (i === j) ? 0 : a[k][j] + c * a[i][j];
-          b[k] += c * b[i];
+      else if (src[pos3] === 1){
+        src[pos3] = nbd;
+      }
+
+      contour.push( {x: point.x, y: point.y} );
+
+      s_prev = s;
+
+      point.x += CV.neighborhood[s][0];
+      point.y += CV.neighborhood[s][1];
+
+      if ( (pos4 === pos) && (pos3 === pos1) ){
+        break;
+      }
+
+      pos3 = pos4;
+      s = (s + 4) & 7;
+    }
+  }
+
+  return contour;
+};
+
+CV.neighborhood =
+  [ [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1] ];
+
+CV.neighborhoodDeltas = function(width){
+  var deltas = [], len = CV.neighborhood.length, i = 0;
+
+  for (; i < len; ++ i){
+    deltas[i] = CV.neighborhood[i][0] + (CV.neighborhood[i][1] * width);
+  }
+
+  return deltas.concat(deltas);
+};
+
+CV.approxPolyDP = function(contour, epsilon){
+  var slice = {start_index: 0, end_index: 0},
+      right_slice = {start_index: 0, end_index: 0},
+      poly = [], stack = [], len = contour.length,
+      pt, start_pt, end_pt, dist, max_dist, le_eps,
+      dx, dy, i, j, k;
+
+  epsilon *= epsilon;
+
+  k = 0;
+
+  for (i = 0; i < 3; ++ i){
+    max_dist = 0;
+
+    k = (k + right_slice.start_index) % len;
+    start_pt = contour[k];
+    if (++ k === len) {k = 0;}
+
+    for (j = 1; j < len; ++ j){
+      pt = contour[k];
+      if (++ k === len) {k = 0;}
+
+      dx = pt.x - start_pt.x;
+      dy = pt.y - start_pt.y;
+      dist = dx * dx + dy * dy;
+
+      if (dist > max_dist){
+        max_dist = dist;
+        right_slice.start_index = j;
+      }
+    }
+  }
+
+  if (max_dist <= epsilon){
+    poly.push( {x: start_pt.x, y: start_pt.y} );
+
+  }else{
+    slice.start_index = k;
+    slice.end_index = (right_slice.start_index += slice.start_index);
+
+    right_slice.start_index -= right_slice.start_index >= len? len: 0;
+    right_slice.end_index = slice.start_index;
+    if (right_slice.end_index < right_slice.start_index){
+      right_slice.end_index += len;
+    }
+
+    stack.push( {start_index: right_slice.start_index, end_index: right_slice.end_index} );
+    stack.push( {start_index: slice.start_index, end_index: slice.end_index} );
+  }
+
+  while(stack.length !== 0){
+    slice = stack.pop();
+
+    end_pt = contour[slice.end_index % len];
+    start_pt = contour[k = slice.start_index % len];
+    if (++ k === len) {k = 0;}
+
+    if (slice.end_index <= slice.start_index + 1){
+      le_eps = true;
+
+    }else{
+      max_dist = 0;
+
+      dx = end_pt.x - start_pt.x;
+      dy = end_pt.y - start_pt.y;
+
+      for (i = slice.start_index + 1; i < slice.end_index; ++ i){
+        pt = contour[k];
+        if (++ k === len) {k = 0;}
+
+        dist = Math.abs( (pt.y - start_pt.y) * dx - (pt.x - start_pt.x) * dy);
+
+        if (dist > max_dist){
+          max_dist = dist;
+          right_slice.start_index = i;
         }
       }
-      var m = new Array(8);
-      for (var i = n - 1; i >= 0; --i) {
-        var sum = 0;
-        for (var j = i + 1; j < n; ++j) sum += a[i][j] * m[j];
-        m[i] = (b[i] - sum) / (a[i][i] || 1e-10);
+
+      le_eps = max_dist * max_dist <= epsilon * (dx * dx + dy * dy);
+    }
+
+    if (le_eps){
+      poly.push( {x: start_pt.x, y: start_pt.y} );
+
+    }else{
+      right_slice.end_index = slice.end_index;
+      slice.end_index = right_slice.start_index;
+
+      stack.push( {start_index: right_slice.start_index, end_index: right_slice.end_index} );
+      stack.push( {start_index: slice.start_index, end_index: slice.end_index} );
+    }
+  }
+
+  return poly;
+};
+
+CV.warp = function(imageSrc, imageDst, contour, warpSize){
+  var src = imageSrc.data, dst = imageDst.data,
+      width = imageSrc.width, height = imageSrc.height,
+      pos = 0,
+      sx1, sx2, dx1, dx2, sy1, sy2, dy1, dy2, p1, p2, p3, p4,
+      m, r, s, t, u, v, w, x, y, i, j;
+
+  m = CV.getPerspectiveTransform(contour, warpSize - 1);
+
+  r = m[8];
+  s = m[2];
+  t = m[5];
+
+  for (i = 0; i < warpSize; ++ i){
+    r += m[7];
+    s += m[1];
+    t += m[4];
+
+    u = r;
+    v = s;
+    w = t;
+
+    for (j = 0; j < warpSize; ++ j){
+      u += m[6];
+      v += m[0];
+      w += m[3];
+
+      x = v / u;
+      y = w / u;
+
+      sx1 = x >>> 0;
+      sx2 = (sx1 === width - 1)? sx1: sx1 + 1;
+      dx1 = x - sx1;
+      dx2 = 1.0 - dx1;
+
+      sy1 = y >>> 0;
+      sy2 = (sy1 === height - 1)? sy1: sy1 + 1;
+      dy1 = y - sy1;
+      dy2 = 1.0 - dy1;
+
+      p1 = p2 = sy1 * width;
+      p3 = p4 = sy2 * width;
+
+      dst[pos ++] =
+        (dy2 * (dx2 * src[p1 + sx1] + dx1 * src[p2 + sx2]) +
+         dy1 * (dx2 * src[p3 + sx1] + dx1 * src[p4 + sx2]) ) & 0xff;
+
+    }
+  }
+
+  imageDst.width = warpSize;
+  imageDst.height = warpSize;
+
+  return imageDst;
+};
+
+CV.getPerspectiveTransform = function(src, size){
+  var rq = CV.square2quad(src);
+
+  rq[0] /= size;
+  rq[1] /= size;
+  rq[3] /= size;
+  rq[4] /= size;
+  rq[6] /= size;
+  rq[7] /= size;
+
+  return rq;
+};
+
+CV.square2quad = function(src){
+  var sq = [], px, py, dx1, dx2, dy1, dy2, den;
+
+  px = src[0].x - src[1].x + src[2].x - src[3].x;
+  py = src[0].y - src[1].y + src[2].y - src[3].y;
+
+  if (0 === px && 0 === py){
+    sq[0] = src[1].x - src[0].x;
+    sq[1] = src[2].x - src[1].x;
+    sq[2] = src[0].x;
+    sq[3] = src[1].y - src[0].y;
+    sq[4] = src[2].y - src[1].y;
+    sq[5] = src[0].y;
+    sq[6] = 0;
+    sq[7] = 0;
+    sq[8] = 1;
+
+  }else{
+    dx1 = src[1].x - src[2].x;
+    dx2 = src[3].x - src[2].x;
+    dy1 = src[1].y - src[2].y;
+    dy2 = src[3].y - src[2].y;
+    den = dx1 * dy2 - dx2 * dy1;
+
+    sq[6] = (px * dy2 - dx2 * py) / den;
+    sq[7] = (dx1 * py - px * dy1) / den;
+    sq[8] = 1;
+    sq[0] = src[1].x - src[0].x + sq[6] * src[1].x;
+    sq[1] = src[3].x - src[0].x + sq[7] * src[3].x;
+    sq[2] = src[0].x;
+    sq[3] = src[1].y - src[0].y + sq[6] * src[1].y;
+    sq[4] = src[3].y - src[0].y + sq[7] * src[3].y;
+    sq[5] = src[0].y;
+  }
+
+  return sq;
+};
+
+CV.isContourConvex = function(contour){
+  var orientation = 0, convex = true,
+      len = contour.length, i = 0, j = 0,
+      cur_pt, prev_pt, dxdy0, dydx0, dx0, dy0, dx, dy;
+
+  prev_pt = contour[len - 1];
+  cur_pt = contour[0];
+
+  dx0 = cur_pt.x - prev_pt.x;
+  dy0 = cur_pt.y - prev_pt.y;
+
+  for (; i < len; ++ i){
+    if (++ j === len) {j = 0;}
+
+    prev_pt = cur_pt;
+    cur_pt = contour[j];
+
+    dx = cur_pt.x - prev_pt.x;
+    dy = cur_pt.y - prev_pt.y;
+    dxdy0 = dx * dy0;
+    dydx0 = dy * dx0;
+
+    orientation |= dydx0 > dxdy0? 1: (dydx0 < dxdy0? 2: 3);
+
+    if (3 === orientation){
+        convex = false;
+        break;
+    }
+
+    dx0 = dx;
+    dy0 = dy;
+  }
+
+  return convex;
+};
+
+CV.perimeter = function(poly){
+  var len = poly.length, i = 0, j = len - 1,
+      p = 0.0, dx, dy;
+
+  for (; i < len; j = i ++){
+    dx = poly[i].x - poly[j].x;
+    dy = poly[i].y - poly[j].y;
+
+    p += Math.sqrt(dx * dx + dy * dy) ;
+  }
+
+  return p;
+};
+
+CV.minEdgeLength = function(poly){
+  var len = poly.length, i = 0, j = len - 1,
+      min = Infinity, d, dx, dy;
+
+  for (; i < len; j = i ++){
+    dx = poly[i].x - poly[j].x;
+    dy = poly[i].y - poly[j].y;
+
+    d = dx * dx + dy * dy;
+
+    if (d < min){
+      min = d;
+    }
+  }
+
+  return Math.sqrt(min);
+};
+
+CV.countNonZero = function(imageSrc, square){
+  var src = imageSrc.data, height = square.height, width = square.width,
+      pos = square.x + (square.y * imageSrc.width),
+      span = imageSrc.width - width,
+      nz = 0, i, j;
+
+  for (i = 0; i < height; ++ i){
+
+    for (j = 0; j < width; ++ j){
+
+      if ( 0 !== src[pos ++] ){
+        ++ nz;
       }
-      m.push(1.0);
-      for (var v = 0; v < warpSize; ++v) {
-        for (var u = 0; u < warpSize; ++u) {
-          var w = m[6] * u + m[7] * v + m[8];
-          if (w !== 0) {
-            var x = Math.round((m[0] * u + m[1] * v + m[2]) / w);
-            var y = Math.round((m[3] * u + m[4] * v + m[5]) / w);
-            dst[v * warpSize + u] = (x >= 0 && x < width && y >= 0 && y < height) ? src[y * width + x] : 255;
-          }
-        }
-      }
-      imageDst.width = warpSize; imageDst.height = warpSize;
-      return imageDst;
-    };
+    }
+
+    pos += span;
+  }
+
+  return nz;
+};
+
+CV.binaryBorder = function(imageSrc, dst){
+  var src = imageSrc.data, height = imageSrc.height, width = imageSrc.width,
+      posSrc = 0, posDst = 0, i, j;
+
+  for (j = -2; j < width; ++ j){
+    dst[posDst ++] = 0;
+  }
+
+  for (i = 0; i < height; ++ i){
+    dst[posDst ++] = 0;
+
+    for (j = 0; j < width; ++ j){
+      dst[posDst ++] = (0 === src[posSrc ++]? 0: 1);
+    }
+
+    dst[posDst ++] = 0;
+  }
+
+  for (j = -2; j < width; ++ j){
+    dst[posDst ++] = 0;
+  }
+
+  return dst;
+};
 
     /* ArUco Decoder */
     var AR = {
@@ -1162,6 +1767,11 @@ D. 6
         this.warpSize = 48;
       }
     };
+    // v2: asymmetric replacements, minimum distance 4 from all dictionary rotations.
+    // Other printed cards remain compatible.
+    AR.DICTIONARY_4X4[16] = [0,0,0,3];
+    AR.DICTIONARY_4X4[19] = [0,0,1,13];
+    AR.DICTIONARY_4X4[37] = [0,0,2,4];
     AR.Detector.prototype.detect = function (image) {
       var width = image.width, height = image.height;
       if (!this.grey.data || this.grey.data.length !== width * height) {
@@ -1170,8 +1780,8 @@ D. 6
         this.homography.data = new Uint8Array(this.warpSize * this.warpSize);
       }
       CV.grayscale(image, this.grey);
-      CV.adaptiveThreshold(this.grey, this.thres, 31, 7);
-      var contours = CV.findContours(this.thres);
+      CV.adaptiveThreshold(this.grey, this.thres, 2, 7);
+      var contours = CV.findContours(this.thres, []);
       var candidates = [];
       for (var i = 0; i < contours.length; ++i) {
         var approx = CV.approxPolyDP(contours[i], contours[i].length * 0.05);
@@ -1180,13 +1790,19 @@ D. 6
           var d1 = Math.hypot(p1.x - p0.x, p1.y - p0.y), d2 = Math.hypot(p2.x - p1.x, p2.y - p1.y);
           var d3 = Math.hypot(p3.x - p2.x, p3.y - p2.y), d4 = Math.hypot(p0.x - p3.x, p0.y - p3.y);
           var minSide = Math.min(d1, d2, d3, d4), maxSide = Math.max(d1, d2, d3, d4);
-          if (minSide > width * 0.03 && maxSide / (minSide || 1) < 2.5) {
+          if (minSide >= 18 && maxSide / (minSide || 1) < 2.5) {
             var cross = (p1.x - p0.x) * (p2.y - p1.y) - (p1.y - p0.y) * (p2.x - p1.x);
             if (cross > 0) candidates.push([approx[0], approx[1], approx[2], approx[3]]);
             else candidates.push([approx[0], approx[3], approx[2], approx[1]]);
           }
         }
       }
+      // Normalize corner origin so answers depend on card orientation, not contour tracing.
+      candidates = candidates.map(function (pts) {
+        var first = 0;
+        for (var k = 1; k < 4; k++) if (pts[k].x + pts[k].y < pts[first].x + pts[first].y) first = k;
+        return pts.slice(first).concat(pts.slice(0, first));
+      });
       var markers = [];
       for (var i = 0; i < candidates.length; ++i) {
         CV.warp(this.grey, this.homography, candidates[i], this.warpSize);
@@ -1198,13 +1814,13 @@ D. 6
             y: (candidates[i][0].y + candidates[i][1].y + candidates[i][2].y + candidates[i][3].y) / 4
           };
           marker.choice = AR.ROTATION_MAP[marker.rotation];
-          markers.push(marker);
+          if (!markers.some(function (m) { return m.id === marker.id; })) markers.push(marker);
         }
       }
       return markers;
     };
     AR.Detector.prototype.decodeMarker = function (warpImg) {
-      var size = this.warpSize, cellSize = size / 6, grid = [];
+      var size = this.warpSize, cellSize = size / 6, grid = [], threshold = CV.otsu(warpImg);
       for (var r = 0; r < 6; ++r) {
         for (var c = 0; c < 6; ++c) {
           var sum = 0, samples = 0;
@@ -1213,7 +1829,7 @@ D. 6
               sum += warpImg.data[y * size + x]; samples++;
             }
           }
-          var isWhite = (sum / (samples || 1)) > 125 ? 1 : 0;
+          var isWhite = (sum / (samples || 1)) > threshold ? 1 : 0;
           if ((r === 0 || r === 5 || c === 0 || c === 5) && isWhite === 1) return null;
           if (r >= 1 && r <= 4 && c >= 1 && c <= 4) {
             if (!grid[r - 1]) grid[r - 1] = [];
@@ -1221,7 +1837,7 @@ D. 6
           }
         }
       }
-      var bestMatch = null, minDistance = 2;
+      var bestMatch = null, minDistance = 1;
       for (var rotation = 0; rotation < 4; ++rotation) {
         var rotated = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
         for (var r = 0; r < 4; ++r) {
@@ -1416,7 +2032,12 @@ D. 6
         });
       } catch (e) {}
 
+      var frameRequest = null, pendingAnswers = {}, frameNumber = 0;
+      var scanStatus = document.getElementById('scanStatus');
       async function startCam() {
+        toggleCamBtn.disabled = true;
+        try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('Trình duyệt không hỗ trợ camera. Hãy mở bằng Chrome hoặc Safari qua HTTPS.');
         var devId = camSelect.value, res = document.getElementById('resolutionSelect').value;
         var w = res === '1080p' ? 1920 : (res === '480p' ? 640 : 1280), h = res === '1080p' ? 1080 : (res === '480p' ? 480 : 720);
         var constraints = { video: { width: { ideal: w }, height: { ideal: h } }, audio: false };
@@ -1427,11 +2048,21 @@ D. 6
         isCamRunning = true;
         statusOverlay.classList.add('hidden');
         toggleCamBtn.textContent = '⏹ Tắt Camera'; toggleCamBtn.className = 'btn btn-danger';
+        scanStatus.textContent = 'Camera đã bật. Đưa toàn bộ mã thẻ vào hình, giữ yên để nhận diện.';
         processFrame();
+        } catch (error) {
+          stopCam();
+          var reasons = { NotAllowedError: 'Chưa được cấp quyền camera. Hãy cho phép camera trong trình duyệt.', NotFoundError: 'Không tìm thấy camera.', NotReadableError: 'Camera đang bị ứng dụng khác sử dụng.', OverconstrainedError: 'Camera đã chọn không còn khả dụng. Hãy chọn camera khác.' };
+          scanStatus.textContent = reasons[error.name] || ('Không bật được camera: ' + error.message);
+          showToast(scanStatus.textContent);
+        } finally { toggleCamBtn.disabled = false; }
       }
 
       function stopCam() {
         isCamRunning = false;
+        if (frameRequest !== null) cancelAnimationFrame(frameRequest);
+        frameRequest = null; pendingAnswers = {};
+        scanStatus.textContent = 'Camera đang tắt.';
         if (scannerStream) { scannerStream.getTracks().forEach(function (t) { t.stop(); }); scannerStream = null; }
         video.srcObject = null;
         ctx.clearRect(0, 0, overlay.width, overlay.height);
@@ -1442,19 +2073,29 @@ D. 6
       toggleCamBtn.addEventListener('click', function () { if (isCamRunning) stopCam(); else startCam(); });
       camSelect.addEventListener('change', function () { if (isCamRunning) { stopCam(); startCam(); } });
 
+      document.getElementById('resolutionSelect').addEventListener('change', function () { if (isCamRunning) { stopCam(); startCam(); } });
+      window.addEventListener('pagehide', stopCam);
       var hiddenCanvas = document.createElement('canvas'), hiddenCtx = hiddenCanvas.getContext('2d', { willReadFrequently: true });
       function processFrame() {
         if (!isCamRunning) return;
-        var vw = video.videoWidth, vh = video.videoHeight;
+        try {
+        var scale = Math.min(1, 1280 / (video.videoWidth || 1280));
+        var vw = Math.round(video.videoWidth * scale), vh = Math.round(video.videoHeight * scale);
         if (vw > 0 && vh > 0) {
           hiddenCanvas.width = vw; hiddenCanvas.height = vh; overlay.width = vw; overlay.height = vh;
           hiddenCtx.drawImage(video, 0, 0, vw, vh);
           var img = hiddenCtx.getImageData(0, 0, vw, vh);
           var markers = detector.detect(img);
           ctx.clearRect(0, 0, vw, vh);
+          frameNumber++;
+          scanStatus.textContent = markers.length ? ('Nhận diện ' + markers.length + ' thẻ trong hình • ' + vw + '×' + vh) : ('Đang quét • ' + vw + '×' + vh + ' • Chưa thấy mã: đưa gần hơn, đủ sáng, không che viền đen.');
           var newAns = false;
           markers.forEach(function (m) {
-            if (!activeAnswers[m.id] || activeAnswers[m.id].choice !== m.choice) {
+            if (!studentsList.some(function (s) { return s.id === m.id; })) return;
+            var prior = pendingAnswers[m.id];
+            var stable = prior && prior.choice === m.choice && prior.frame === frameNumber - 1;
+            pendingAnswers[m.id] = { choice: m.choice, frame: frameNumber };
+            if (stable && !quizManager.isAnswerRevealed && (!activeAnswers[m.id] || activeAnswers[m.id].choice !== m.choice)) {
               activeAnswers[m.id] = { id: m.id, choice: m.choice, time: Date.now() };
               newAns = true;
             }
@@ -1474,7 +2115,12 @@ D. 6
           });
           if (newAns) updateStats();
         }
-        requestAnimationFrame(processFrame);
+        } catch (error) {
+          console.error('Scanner frame:', error);
+          scanStatus.textContent = 'Lỗi xử lý hình: ' + error.message + '. Đang thử lại.';
+        } finally {
+          if (isCamRunning) frameRequest = requestAnimationFrame(processFrame);
+        }
       }
 
       function updateStats() {
@@ -1509,14 +2155,14 @@ D. 6
         } else { expBox.classList.remove('show'); }
       }
 
-      document.getElementById('prevQBtn').addEventListener('click', function () { if (quizManager.prevQuestion()) { activeAnswers = {}; updateStats(); renderQuestion(); } });
-      document.getElementById('nextQBtn').addEventListener('click', function () { if (quizManager.nextQuestion()) { activeAnswers = {}; updateStats(); renderQuestion(); } });
+      document.getElementById('prevQBtn').addEventListener('click', function () { if (quizManager.prevQuestion()) { activeAnswers = {}; pendingAnswers = {}; updateStats(); renderQuestion(); } });
+      document.getElementById('nextQBtn').addEventListener('click', function () { if (quizManager.nextQuestion()) { activeAnswers = {}; pendingAnswers = {}; updateStats(); renderQuestion(); } });
       document.getElementById('revealAnsBtn').addEventListener('click', function () { quizManager.revealAnswer(activeAnswers); renderQuestion(); });
-      document.getElementById('resetAnsBtn').addEventListener('click', function () { activeAnswers = {}; updateStats(); renderQuestion(); showToast('Đã làm mới lượt quét câu này!'); });
+      document.getElementById('resetAnsBtn').addEventListener('click', function () { quizManager.isAnswerRevealed = false; activeAnswers = {}; pendingAnswers = {}; updateStats(); renderQuestion(); showToast('Đã làm mới lượt quét câu này!'); });
 
       // Cards setup
       document.getElementById('applyStudentsBtn').addEventListener('click', function () {
-        var count = parseInt(document.getElementById('studentCountInput').value, 10) || 43;
+        var count = Math.max(1, Math.min(60, parseInt(document.getElementById('studentCountInput').value, 10) || 43));
         var lines = document.getElementById('studentNamesTextarea').value.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
         studentsList = [];
         for (var i = 1; i <= count; ++i) studentsList.push({ id: i, name: lines[i-1] || ('Học sinh ' + (i<10?'0':'')+i) });
