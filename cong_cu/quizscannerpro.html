@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="quiz-assets/golden-bell.css?v=20261015-1">
+  <script src="quiz-assets/golden-bell.js?v=20261015-1"></script>
   <style>
     /* ============================================================
        THEME: GREEN & DARK GREEN SCIENTIFIC CLASSROOM
@@ -701,6 +703,7 @@
       </a>
 
       <nav class="nav-tabs">
+        <button class="nav-tab-btn" data-tab="bell">🔔 Rung Chuông Vàng</button>
         <button class="nav-tab-btn" data-tab="game">🏁 Đấu Trường Theo Đội</button>
         <button class="nav-tab-btn active" data-tab="live">🎯 Trình Chiếu & Quét</button>
         <button class="nav-tab-btn" data-tab="cards">🖨️ In Thẻ Học Sinh</button>
@@ -860,6 +863,41 @@
  <div id="gameScores" class="game-scorecards"></div>
  <div id="gameQuizSlot"></div>
 </section>
+
+    <section id="tab-bell" class="tab-view" aria-label="Rung Chuông Vàng">
+      <header class="bell-masthead">
+        <div class="bell-brand"><span class="bell-brand-icon" data-golden-bell></span><div><small>ĐẤU TRƯỜNG TRI THỨC · QUIZSCANNER</small><h2>RUNG CHUÔNG VÀNG</h2></div></div>
+        <div class="bell-masthead-actions"><button id="bellOpenSetup" class="bell-small-btn">⚙ Thiết lập</button><button id="bellSound" class="bell-small-btn" aria-pressed="true">♫ Nhạc: Bật</button><button id="bellFullscreen" class="bell-small-btn">⛶ Toàn màn hình</button><button id="bellStop" class="bell-small-btn" hidden>Dừng game</button></div>
+      </header>
+      <div class="bell-score-strip"><span id="bellRoundBadge" class="bell-round-pill">SẴN SÀNG</span><p id="bellMessage" role="status" aria-live="polite">Giữ vững vị trí trên sàn thi đấu và chinh phục chiếc chuông vàng.</p><div id="bellTimer" class="bell-timer" aria-label="Thời gian suy nghĩ">—</div></div>
+      <div id="bellQuizSlot"></div>
+      <dialog id="bellSetup" class="bell-dialog" aria-labelledby="bellSetupTitle">
+        <small style="letter-spacing:3px;color:#d8c390">SÀN ĐẤU ĐÃ SẴN SÀNG</small><h3 id="bellSetupTitle">Chinh phục chuông vàng</h3>
+        <p>Tất cả học sinh cùng thi. Trả lời đúng để ở lại sàn; sai hoặc chưa nộp thẻ khi chốt sẽ rời sàn. Còn một người, chuông vàng sẽ rung!</p>
+        <div class="bell-config-grid">
+          <label>Số câu hỏi<input id="bellQuestionCount" type="number" min="1" value="5"></label>
+          <label>Thời gian suy nghĩ / câu (giây)<input id="bellDuration" type="number" min="5" max="300" value="20"></label>
+          <label>Thứ tự câu hỏi<select id="bellOrder"><option value="original">Theo thứ tự trong đề</option><option value="shuffle">Xáo trộn</option></select></label>
+          <label class="bell-check"><input id="bellAutoFullscreen" type="checkbox" checked>Vào toàn màn hình khi bắt đầu</label>
+        </div>
+        <p id="bellBankInfo"></p><p>Hết giờ vẫn tiếp tục quét thẻ. Thầy kiểm tra số thẻ đã nhận rồi bấm <b>Chốt &amp; loại</b>. Hết số câu mà còn nhiều người: đồng chiến thắng. Nếu không còn ai: có thể hoàn tác vòng, không công nhận người thắng.</p>
+        <p id="bellSettingsHint" role="alert"></p>
+        <div class="bell-dialog-actions"><button id="bellCloseSetup" class="btn btn-secondary">Đóng</button><button id="bellStart" class="btn btn-primary">Bắt đầu cuộc thi →</button></div>
+      </dialog>
+      <div id="bellWin" class="bell-win" hidden role="dialog" aria-modal="true" aria-labelledby="bellWinTitle">
+        <canvas id="bellConfetti" aria-hidden="true"></canvas><div class="bell-win-eyebrow">RUNG CHUÔNG VÀNG · GIÂY PHÚT VINH QUANG</div>
+        <div class="bell-win-bell" data-golden-bell></div><h3 id="bellWinTitle">NGƯỜI CHIẾN THẮNG</h3><div id="bellWinnerNames"></div><p id="bellWinDetail"></p>
+        <div class="bell-win-actions"><button id="bellWinSound" class="btn">♫ Tắt nhạc</button><button id="bellWinUndo" class="btn">Hoàn tác vòng</button><button id="bellPlayAgain" class="btn btn-primary">Cuộc thi mới →</button></div>
+      </div>
+      <div id="bellParking" hidden>
+        <div id="bellStage" class="bell-stage" hidden>
+          <div class="bell-stage-top"><strong>SÀN THI ĐẤU</strong><small id="bellFloorCount"></small></div><div id="bellFloor" class="bell-floor"></div>
+          <div class="bell-stage-bottom"><div class="bell-legend"><span><i></i>Đã quét</span><span><i></i>Đã rời sàn</span></div><span id="bellAudioStatus">4 bản nhạc · Sẵn sàng</span></div>
+        </div>
+        <div id="bellScanHud" hidden><div class="bell-metric"><strong id="bellAlive">0</strong><small>CÒN TRÊN SÀN</small></div><div class="bell-metric"><strong id="bellSubmitted">0</strong><small>ĐÃ QUÉT THẺ</small></div><div class="bell-metric"><strong id="bellOut">0</strong><small>ĐÃ RỜI SÀN</small></div></div>
+        <div id="bellTimerControls" hidden><button id="bellTimerStart" class="btn btn-secondary">▶ Bắt đầu 20s</button><button id="bellPause" class="btn btn-secondary" disabled aria-label="Tạm dừng thời gian">Ⅱ</button><button id="bellUndo" class="btn btn-secondary" disabled title="Khôi phục thí sinh và quét lại câu vừa chốt">↶ Hoàn tác</button></div>
+      </div>
+    </section>
 
     <!-- TAB 2: IN THẺ HỌC SINH (A5 / A4) -->
     <section id="tab-cards" class="tab-view">
@@ -2120,7 +2158,7 @@ function createTeamGame(ui) {
 }
 
     /* App Controller */
-    var teamGame;
+    var teamGame, bellGame;
     var studentsList = [], quizManager = null, scannerStream = null, isCamRunning = false, activeAnswers = {}, detector = new AR.Detector();
 
     function initStudents() {
@@ -2137,9 +2175,12 @@ function createTeamGame(ui) {
     }
 
     function switchTab(tId) {
+      if (bellGame && bellGame.running && tId !== 'bell') { showToast('Hãy dừng cuộc thi Rung Chuông Vàng trước khi chuyển chế độ.'); return; }
+      if (teamGame && teamGame.running && tId === 'bell') { showToast('Hãy kết thúc đường đua theo đội trước.'); return; }
       document.querySelectorAll('.nav-tab-btn').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === tId); });
       document.querySelectorAll('.tab-view').forEach(function (v) { v.classList.toggle('active', v.id === 'tab-' + tId); });
       if (typeof teamGame !== 'undefined' && teamGame) teamGame.onTab(tId);
+      if (bellGame) bellGame.onTab(tId);
 
     }
 
@@ -2165,7 +2206,7 @@ function createTeamGame(ui) {
         });
       } catch (e) {}
 
-      var frameRequest = null, pendingAnswers = {}, frameNumber = 0;
+      var frameRequest = null, pendingAnswers = {}, frameNumber = 0, lastBellFrameTime = -Infinity;
       var scanStatus = document.getElementById('scanStatus');
       async function startCam() {
         toggleCamBtn.disabled = true;
@@ -2212,6 +2253,13 @@ function createTeamGame(ui) {
       function processFrame() {
         if (!isCamRunning) return;
         try {
+        // Keep the stage and celebration smooth: no detection after locking, max 10 scans/s in Bell mode.
+        if (bellGame && bellGame.running) {
+          if (!bellGame.accepting()) { ctx.clearRect(0, 0, overlay.width, overlay.height); return; }
+          var frameTime = performance.now();
+          if (frameTime - lastBellFrameTime < 100) return;
+          lastBellFrameTime = frameTime;
+        }
         var scale = Math.min(1, 1280 / (video.videoWidth || 1280));
         var vw = Math.round(video.videoWidth * scale), vh = Math.round(video.videoHeight * scale);
         if (vw > 0 && vh > 0) {
@@ -2225,6 +2273,7 @@ function createTeamGame(ui) {
           var newAns = false;
           markers.forEach(function (m) {
             if (!studentsList.some(function (s) { return s.id === m.id; })) return;
+            if (bellGame && !bellGame.canRecord(m.id)) return;
             var prior = pendingAnswers[m.id];
             var stable = prior && prior.choice === m.choice && prior.frame === frameNumber - 1;
             pendingAnswers[m.id] = { choice: m.choice, frame: frameNumber };
@@ -2273,11 +2322,12 @@ function createTeamGame(ui) {
             else { p.classList.remove('answered'); p.querySelector('.pill-choice').textContent = ''; }
           }
         });
+        if (bellGame) bellGame.onAnswers();
       }
 
       function renderQuestion() {
         var q = quizManager.getCurrentQuestion(); if (!q) return;
-        document.getElementById('qIndexBadge').textContent = teamGame && teamGame.running ? ('CHƯỚNG NGẠI ' + (teamGame.round + 1) + ' / ' + teamGame.order.length) : ('CÂU HỎI ' + (quizManager.currentIndex + 1) + ' / ' + quizManager.questions.length);
+        document.getElementById('qIndexBadge').textContent = bellGame && bellGame.running ? bellGame.badge() : teamGame && teamGame.running ? ('CHƯỚNG NGẠI ' + (teamGame.round + 1) + ' / ' + teamGame.order.length) : ('CÂU HỎI ' + (quizManager.currentIndex + 1) + ' / ' + quizManager.questions.length);
         document.getElementById('qText').textContent = q.text;
         ['A','B','C','D'].forEach(function(c){ document.getElementById('optText' + c).textContent = q.options[c] || '(Trống)'; });
         document.querySelectorAll('.option-box').forEach(function (box) { box.classList.remove('revealed-correct'); });
@@ -2288,14 +2338,14 @@ function createTeamGame(ui) {
         } else { expBox.classList.remove('show'); }
       }
 
-      document.getElementById('prevQBtn').addEventListener('click', function () { if (teamGame.running) { showToast('Game theo đội chỉ đi tiến. Hãy chốt câu hiện tại.'); return; } if (quizManager.prevQuestion()) { activeAnswers = {}; pendingAnswers = {}; updateStats(); renderQuestion(); } });
-      document.getElementById('nextQBtn').addEventListener('click', function () { if (teamGame.running) { teamGame.next(); return; } if (quizManager.nextQuestion()) { activeAnswers = {}; pendingAnswers = {}; updateStats(); renderQuestion(); } });
-      document.getElementById('revealAnsBtn').addEventListener('click', function () { quizManager.revealAnswer(activeAnswers); renderQuestion(); if (teamGame.running) teamGame.scoreRound(); });
-      document.getElementById('resetAnsBtn').addEventListener('click', function () { if (teamGame.running && teamGame.scored[teamGame.round]) { showToast('Câu đã chốt điểm. Hãy chuyển chướng ngại tiếp.'); return; } quizManager.isAnswerRevealed = false; activeAnswers = {}; pendingAnswers = {}; updateStats(); renderQuestion(); showToast('Đã làm mới lượt quét câu này!'); });
+      document.getElementById('prevQBtn').addEventListener('click', function () { if (bellGame && bellGame.running) { showToast('Rung Chuông Vàng chỉ đi tiến. Dùng Hoàn tác để sửa vòng vừa chốt.'); return; } if (teamGame.running) { showToast('Game theo đội chỉ đi tiến. Hãy chốt câu hiện tại.'); return; } if (quizManager.prevQuestion()) { activeAnswers = {}; pendingAnswers = {}; updateStats(); renderQuestion(); } });
+      document.getElementById('nextQBtn').addEventListener('click', function () { if (bellGame && bellGame.running) { bellGame.next(); return; } if (teamGame.running) { teamGame.next(); return; } if (quizManager.nextQuestion()) { activeAnswers = {}; pendingAnswers = {}; updateStats(); renderQuestion(); } });
+      document.getElementById('revealAnsBtn').addEventListener('click', function () { if (bellGame && bellGame.running) { bellGame.lock(); return; } quizManager.revealAnswer(activeAnswers); renderQuestion(); if (teamGame.running) teamGame.scoreRound(); });
+      document.getElementById('resetAnsBtn').addEventListener('click', function () { if (bellGame && bellGame.running) { bellGame.resetScan(); return; } if (teamGame.running && teamGame.scored[teamGame.round]) { showToast('Câu đã chốt điểm. Hãy chuyển chướng ngại tiếp.'); return; } quizManager.isAnswerRevealed = false; activeAnswers = {}; pendingAnswers = {}; updateStats(); renderQuestion(); showToast('Đã làm mới lượt quét câu này!'); });
 
       // Cards setup
       document.getElementById('applyStudentsBtn').addEventListener('click', function () {
-        if (teamGame.running) { showToast('Kết thúc game trước khi thay đổi danh sách.'); return; }
+        if (teamGame.running || (bellGame && bellGame.running)) { showToast('Kết thúc game trước khi thay đổi danh sách.'); return; }
         var count = Math.max(1, Math.min(60, parseInt(document.getElementById('studentCountInput').value, 10) || 43));
         var lines = document.getElementById('studentNamesTextarea').value.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
         studentsList = [];
@@ -2321,7 +2371,7 @@ function createTeamGame(ui) {
 
       // Question Manager
       document.getElementById('parseImportBtn').addEventListener('click', function () {
-        if (teamGame.running) { showToast('Kết thúc game trước khi đổi đề.'); return; }
+        if (teamGame.running || (bellGame && bellGame.running)) { showToast('Kết thúc game trước khi đổi đề.'); return; }
         var txt = document.getElementById('importTextarea').value.trim();
         var parsed = quizManager.parseTextQuestions(txt);
         if (parsed.length === 0) { alert('Không nhận diện được câu hỏi nào.'); return; }
@@ -2332,7 +2382,7 @@ function createTeamGame(ui) {
       });
 
       document.getElementById('loadSampleBtn').addEventListener('click', function () {
-        if (teamGame.running) { showToast('Kết thúc game trước khi đổi đề.'); return; }
+        if (teamGame.running || (bellGame && bellGame.running)) { showToast('Kết thúc game trước khi đổi đề.'); return; }
         quizManager.questions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS)); quizManager.currentIndex = 0;
         localStorage.setItem('qr_quiz_questions', JSON.stringify(quizManager.questions));
         renderQuestionList(); renderQuestion();
@@ -2340,7 +2390,7 @@ function createTeamGame(ui) {
       });
 
       document.getElementById('clearQuestionsBtn').addEventListener('click', function () {
-        if (teamGame.running) { showToast('Kết thúc game trước khi đổi đề.'); return; }
+        if (teamGame.running || (bellGame && bellGame.running)) { showToast('Kết thúc game trước khi đổi đề.'); return; }
         if (confirm('Xóa hết câu hỏi?')) { quizManager.questions = []; quizManager.currentIndex = 0; renderQuestionList(); renderQuestion(); }
       });
 
@@ -2401,6 +2451,13 @@ function createTeamGame(ui) {
       }
 
       teamGame = createTeamGame({ renderQuestion: renderQuestion, updateStats: updateStats, resetPending: function () { pendingAnswers = {}; } });
+      bellGame = GoldenBell.create({
+        students: function () { return studentsList; }, manager: function () { return quizManager; },
+        answers: function () { return activeAnswers; }, otherGameRunning: function () { return teamGame.running; },
+        resetAnswers: function () { activeAnswers = {}; pendingAnswers = {}; updateStats(); },
+        restoreAnswers: function (answers) { activeAnswers = answers; pendingAnswers = {}; },
+        renderQuestion: renderQuestion, updateStats: updateStats, toast: showToast
+      });
       renderRoster();
       renderQuestion();
       renderCardGeneratorPreview();
