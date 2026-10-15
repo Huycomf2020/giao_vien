@@ -2277,7 +2277,7 @@ function createTeamGame(ui) {
 
       function renderQuestion() {
         var q = quizManager.getCurrentQuestion(); if (!q) return;
-        document.getElementById('qIndexBadge').textContent = 'CÂU HỎI ' + (quizManager.currentIndex + 1) + ' / ' + quizManager.questions.length;
+        document.getElementById('qIndexBadge').textContent = teamGame && teamGame.running ? ('CHƯỚNG NGẠI ' + (teamGame.round + 1) + ' / ' + teamGame.order.length) : ('CÂU HỎI ' + (quizManager.currentIndex + 1) + ' / ' + quizManager.questions.length);
         document.getElementById('qText').textContent = q.text;
         ['A','B','C','D'].forEach(function(c){ document.getElementById('optText' + c).textContent = q.options[c] || '(Trống)'; });
         document.querySelectorAll('.option-box').forEach(function (box) { box.classList.remove('revealed-correct'); });
