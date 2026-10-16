@@ -155,9 +155,10 @@
     }
     function fitText() {
       if (!state.visible) return;
-      var text = $('qText'), box = text.parentElement; text.style.fontSize = ''; var size = parseFloat(getComputedStyle(text).fontSize);
-      while (size > 11 && (text.scrollHeight > box.clientHeight - 14 || text.scrollWidth > box.clientWidth - 20)) { size -= 1; text.style.fontSize = size+'px'; }
-      ['A','B','C','D'].forEach(function (letter) { var node = $('optText'+letter); node.style.fontSize = ''; var n = parseFloat(getComputedStyle(node).fontSize); while (n > 9 && (node.scrollHeight > node.parentElement.clientHeight - 10 || node.scrollWidth > node.clientWidth+1)) { n -= .5; node.style.fontSize = n+'px'; } });
+      // Preserve the doubled TV type sizes. Long content scrolls inside its box;
+      // never shrink classroom text back to tiny inline fonts.
+      $('qText').style.fontSize = '';
+      ['A','B','C','D'].forEach(function (letter) { $('optText'+letter).style.fontSize = ''; });
     }
     function fit() {
       if (!state.visible) return;
