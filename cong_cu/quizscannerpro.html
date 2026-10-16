@@ -807,7 +807,7 @@
           <div class="glass-panel">
             <div class="stats-summary-row">
               <span style="color:#ffffff;">📊 Thống Kê Phản Hồi</span>
-              <span style="color:var(--emerald-400);" id="answeredRatio">0 / 43 em</span>
+              <span style="color:var(--emerald-400);" id="answeredRatio">0 / 45 em</span>
             </div>
 
             <div class="chart-bars-container">
@@ -908,7 +908,7 @@
           <div>
             <div class="form-group">
               <label class="form-label">Số lượng học sinh trong lớp:</label>
-              <input type="number" id="studentCountInput" class="input-styled" min="1" max="60" value="43">
+              <input type="number" id="studentCountInput" class="input-styled" min="1" max="60" value="45">
             </div>
 
             <div class="form-group">
@@ -2161,11 +2161,214 @@ function createTeamGame(ui) {
     var teamGame, bellGame;
     var studentsList = [], quizManager = null, scannerStream = null, isCamRunning = false, activeAnswers = {}, detector = new AR.Detector();
 
+    // Official roster approved by the teacher on 16 Oct 2026. IDs are printed card numbers.
+    var STUDENT_ROSTER_VERSION = '20261016-official-45-v1';
+    var DEFAULT_STUDENTS = [
+  {
+    "id": 1,
+    "name": "Thái Thị Lan Anh"
+  },
+  {
+    "id": 2,
+    "name": "Trần Đặng Ngọc Ánh"
+  },
+  {
+    "id": 3,
+    "name": "Phan Thành Đạt"
+  },
+  {
+    "id": 4,
+    "name": "Nguyễn Thị Hà"
+  },
+  {
+    "id": 5,
+    "name": "Nguyễn Thị Ngọc Hảo"
+  },
+  {
+    "id": 6,
+    "name": "Võ Thị Thanh Hằng"
+  },
+  {
+    "id": 7,
+    "name": "Nguyễn Hoàng Gia Hân"
+  },
+  {
+    "id": 8,
+    "name": "Nguyễn Ngọc Gia Hân"
+  },
+  {
+    "id": 9,
+    "name": "Lê Phạm Ngọc Khánh"
+  },
+  {
+    "id": 10,
+    "name": "Phạm Hoàng Long"
+  },
+  {
+    "id": 11,
+    "name": "Nguyễn Kim Nga"
+  },
+  {
+    "id": 12,
+    "name": "Trần Tuyết Ngân"
+  },
+  {
+    "id": 13,
+    "name": "Nguyễn Thiện Nhân"
+  },
+  {
+    "id": 14,
+    "name": "Vũ Thị Uyên Nhi"
+  },
+  {
+    "id": 15,
+    "name": "Hồ Quỳnh Như"
+  },
+  {
+    "id": 16,
+    "name": "Trương Thành Pháp"
+  },
+  {
+    "id": 17,
+    "name": "Trần Chí Phong"
+  },
+  {
+    "id": 18,
+    "name": "Nguyễn Hoàng Phúc"
+  },
+  {
+    "id": 19,
+    "name": "Nguyễn Hữu Phúc"
+  },
+  {
+    "id": 20,
+    "name": "Phan Bình Phước"
+  },
+  {
+    "id": 21,
+    "name": "Trương Yến Phương"
+  },
+  {
+    "id": 22,
+    "name": "Nguyễn Văn Quân"
+  },
+  {
+    "id": 23,
+    "name": "Võ Thúy Quân"
+  },
+  {
+    "id": 24,
+    "name": "Phan Thị Thúy Quyên"
+  },
+  {
+    "id": 25,
+    "name": "Bùi Trúc Quỳnh"
+  },
+  {
+    "id": 26,
+    "name": "Lê Diễm Quỳnh"
+  },
+  {
+    "id": 27,
+    "name": "Lê Thị Mỹ Thảo"
+  },
+  {
+    "id": 28,
+    "name": "Lê Nguyễn Bảo Thi"
+  },
+  {
+    "id": 29,
+    "name": "Nguyễn Thị Minh Thi"
+  },
+  {
+    "id": 30,
+    "name": "Nguyễn Đức Thọ"
+  },
+  {
+    "id": 31,
+    "name": "Trần Minh Thư"
+  },
+  {
+    "id": 32,
+    "name": "Trần Thị Nghi Thường"
+  },
+  {
+    "id": 33,
+    "name": "Phạm Bảo Thy"
+  },
+  {
+    "id": 34,
+    "name": "Hồ Thị Yến Trang"
+  },
+  {
+    "id": 35,
+    "name": "Phùng Thị Quỳnh Trang"
+  },
+  {
+    "id": 36,
+    "name": "Nguyễn Thị Bảo Trâm"
+  },
+  {
+    "id": 37,
+    "name": "Võ Thùy Trâm"
+  },
+  {
+    "id": 38,
+    "name": "Lê Thảo Trân"
+  },
+  {
+    "id": 39,
+    "name": "Nguyễn Ngọc Trinh"
+  },
+  {
+    "id": 40,
+    "name": "Võ Đức Trọng"
+  },
+  {
+    "id": 41,
+    "name": "Nguyễn Duy Trường"
+  },
+  {
+    "id": 42,
+    "name": "Đồng Thị Hồng Tuyết"
+  },
+  {
+    "id": 43,
+    "name": "Lê Thị Ngọc Vy"
+  },
+  {
+    "id": 44,
+    "name": "Mai Thị Tường Vy"
+  },
+  {
+    "id": 45,
+    "name": "Trần Ngọc Như Ý"
+  }
+];
+
     function initStudents() {
-      var saved = localStorage.getItem('qr_quiz_students');
-      if (saved) { try { studentsList = JSON.parse(saved); return; } catch (e) {} }
-      studentsList = [];
-      for (var i = 1; i <= 43; ++i) studentsList.push({ id: i, name: 'Học sinh ' + (i < 10 ? '0' : '') + i });
+      var saved = null, savedVersion = null;
+      try {
+        saved = localStorage.getItem('qr_quiz_students');
+        savedVersion = localStorage.getItem('qr_quiz_roster_version');
+        if (savedVersion === STUDENT_ROSTER_VERSION && saved) {
+          var parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length >= 1 && parsed.length <= 60 &&
+              parsed.every(function (s) { return Number.isInteger(s.id) && s.id >= 1 && s.id <= 60 && typeof s.name === 'string' && s.name.trim(); }) &&
+              new Set(parsed.map(function (s) { return s.id; })).size === parsed.length) {
+            studentsList = parsed; return;
+          }
+        }
+      } catch (e) {}
+      studentsList = DEFAULT_STUDENTS.map(function (s) { return { id: s.id, name: s.name }; });
+      try {
+        // Keep the preceding browser roster before the one-time official update.
+        if (saved && savedVersion !== STUDENT_ROSTER_VERSION) {
+          localStorage.setItem('qr_quiz_students_before_' + STUDENT_ROSTER_VERSION, saved);
+        }
+        localStorage.setItem('qr_quiz_students', JSON.stringify(studentsList));
+        localStorage.setItem('qr_quiz_roster_version', STUDENT_ROSTER_VERSION);
+      } catch (e) {}
     }
 
     function showToast(msg) {
@@ -2346,7 +2549,7 @@ function createTeamGame(ui) {
       // Cards setup
       document.getElementById('applyStudentsBtn').addEventListener('click', function () {
         if (teamGame.running || (bellGame && bellGame.running)) { showToast('Kết thúc game trước khi thay đổi danh sách.'); return; }
-        var count = Math.max(1, Math.min(60, parseInt(document.getElementById('studentCountInput').value, 10) || 43));
+        var count = Math.max(1, Math.min(60, parseInt(document.getElementById('studentCountInput').value, 10) || DEFAULT_STUDENTS.length));
         var lines = document.getElementById('studentNamesTextarea').value.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
         studentsList = [];
         for (var i = 1; i <= count; ++i) studentsList.push({ id: i, name: lines[i-1] || ('Học sinh ' + (i<10?'0':'')+i) });
