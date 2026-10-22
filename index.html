@@ -212,7 +212,7 @@
             <span style="font-size: 1.2rem;">➡</span>
           </div>
           <div class="mirror-desc">
-            Bộ công cụ trợ giảng đỉnh cao: <strong>QuizScanner Pro</strong> (Quét thẻ A5 camera 60 FPS), <strong>MathType & Sinh Đề Toán AI</strong>, <strong>Tool Trợ Lý AI</strong>, <strong>Game Học Tập</strong> tương tác lớp học.
+            Bộ công cụ trợ giảng đỉnh cao: <strong>QuizScanner Pro</strong> (Quét thẻ A5 camera 60 FPS), <strong>MathType & Sinh Đề Toán AI</strong>, <strong>Tool Trợ Lý AI</strong>, <strong>Game Học Tập</strong> tương tác lớp học và <strong>Sổ tay giáo viên</strong> quản lý lịch dạy, nhắc việc.
           </div>
         </a>
 
@@ -431,11 +431,31 @@
         <!-- Search Bar -->
         <div class="search-box-wrapper">
           <span class="search-icon-inside">🔍</span>
-          <input type="text" id="hotroSearchInput" class="search-input-styled" placeholder="Tìm kiếm công cụ: Quizscanner, Mathtype, Game, Vòng quay, Trợ lý AI...">
+          <input type="text" id="hotroSearchInput" class="search-input-styled" placeholder="Tìm kiếm công cụ: Sổ tay giáo viên, Quizscanner, Mathtype, Game, Trợ lý AI...">
         </div>
 
         <!-- Apps Grid -->
         <div class="apps-grid" id="hotroAppsGrid">
+
+          <!-- Sổ tay giáo viên: web và APK Android -->
+          <div class="app-item-card" id="so-tay-giao-vien-card" style="border-color: var(--emerald-400); background: rgba(8, 64, 44, 0.85);" data-title="Sổ tay giáo viên so tay giao vien lịch dạy thời khóa biểu nhắc việc công việc chủ nhiệm ghi chú Android APK" data-desc="Quản lý lịch giảng dạy theo tiết 1–10, soạn giáo án, chấm bài, họp chuyên môn, công việc chủ nhiệm, ghi chú và tìm tên trong lịch tuần">
+            <div class="app-item-header">
+              <div class="app-item-icon" style="background: linear-gradient(135deg, var(--emerald-400), var(--emerald-700));">📒</div>
+              <div>
+                <div class="app-item-title" style="color: #34d399;">Sổ tay giáo viên</div>
+                <div class="app-tag" style="background: var(--emerald-700); color: #fff;">WEB &amp; ANDROID</div>
+              </div>
+            </div>
+            <div class="app-item-desc">
+              Sắp xếp lịch dạy theo tiết 1–10 và quản lý việc soạn giáo án, chấm bài, chủ nhiệm, họp chuyên môn trong một ứng dụng. Ghi chú nhanh, đính kèm tài liệu và tìm các dòng có tên thầy cô trong lịch tuần. Giao diện Neumorphism nổi–lõm, dễ dùng trên điện thoại và máy tính.
+              <p style="font-size: 0.78rem; color: var(--text-dim); margin-top: 12px; line-height: 1.6;">Dữ liệu lưu riêng trên thiết bị, hỗ trợ sao lưu JSON. Nhắc việc khi ứng dụng đang mở; chưa đồng bộ dữ liệu tự động giữa web và APK.</p>
+            </div>
+            <div class="app-item-footer" style="gap: 10px; flex-wrap: wrap;">
+              <a href="cong_cu/so-tay-giao-vien/web/" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.88rem;">📒 Mở Sổ tay giáo viên</a>
+              <a href="cong_cu/so-tay-giao-vien/So-tay-Giao-vien-2.0.apk" download class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.82rem;">⬇ Tải APK Android</a>
+            </div>
+          </div>
+
           
           <!-- App 1: QuizScanner Pro -->
           <div class="app-item-card" style="border-color: var(--emerald-400); background: rgba(8, 64, 44, 0.85);" data-title="Quizscanner Pro quét thẻ đáp án camera trắc nghiệm lớp học plickers A B C D" data-desc="Hệ thống quét câu trả lời A B C D bằng camera thời gian thực">
