@@ -1,4 +1,5 @@
-const CACHE='teacher-neu-v2';const FILES=['./','./index.html','./style.css','./neumorphism.css','./app.js','./interface.js','./manifest.json','./icon.svg'];
+const CACHE='teacher-v3-20261023';const FILES=['./','./index.html','./style.css','./neumorphism.css','./v3.css','./app.js','./interface.js','./reminder-core.js','./reminders.js','./integrations.js','./schedule-parser.js','./ocr.js','./upgrade.js','./manifest.json','./icon.svg','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)))});
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([self.clients.claim(),caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('teacher-')&&k!==CACHE).map(k=>caches.delete(k))))])));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;e.respondWith(fetch(e.request).then(r=>{if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy))}return r}).catch(()=>caches.match(e.request)))});
+self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(async windows=>{if(windows.length)return windows[0].focus();return self.clients.openWindow(self.registration.scope)}))});

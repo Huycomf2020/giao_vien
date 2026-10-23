@@ -1,0 +1,16 @@
+const test=require('node:test'),assert=require('node:assert/strict'),core=require('../web/reminder-core.js');
+const at=s=>new Date(s).getTime(),now=at('2026-10-23T06:00:00+07:00');
+test('school times exactly match school notice',()=>{assert.deepEqual(core.DEFAULT_TIMES.slice(0,8),['07:00','08:00','08:50','09:40','10:30','14:00','14:55','15:45']);assert.equal(core.END_TIMES[7],'16:30')});
+test('pending task has lead-time and due reminders',()=>{const list=core.build({tasks:[{id:'a',title:'Test',date:'2026-10-23',time:'08:00',rem:60}]},now);assert.deepEqual(list.map(x=>x.at),[at('2026-10-23T07:00:00+07:00'),at('2026-10-23T08:00:00+07:00')])});
+test('completed and deleted tasks cancel all their reminders',()=>{assert.equal(core.build({tasks:[{id:'a',done:true,date:'2026-10-23',time:'08:00'}]},now).length,0);assert.equal(core.build({tasks:[]},now).length,0)});
+test('global disabled reminders do not schedule',()=>assert.equal(core.build({remindersEnabled:false,tasks:[{id:'a',date:'2026-10-23',time:'08:00'}]},now).length,0));
+test('school timezone stays Vietnam even when device runs elsewhere',()=>{assert.equal(core.schoolDate(at('2026-10-22T18:00:00Z')),'2026-10-23');assert.equal(core.when('2026-10-23','14:00'),at('2026-10-23T07:00:00Z'))});
+test('weekly lesson repeats and afternoon period 6 starts at 14h',()=>{const list=core.build({lessons:[{id:'l',day:5,period:6,class:'12A11',subject:'Toán'}]},now);assert.equal(list.length,2);assert.equal(list[1].at,at('2026-10-23T14:00:00+07:00'));assert.equal(list[0].repeatMs,604800000)});
+test('passed lesson advances to next week rather than duplicate today',()=>{const list=core.build({lessons:[{id:'l',day:5,period:1,class:'A'}]},at('2026-10-23T08:00:00+07:00'));assert.equal(list[1].at,at('2026-10-30T07:00:00+07:00'))});
+test('unused periods do not schedule a false midnight reminder',()=>assert.equal(core.build({lessons:[{id:'l',day:5,period:9,class:'A'}]},now).length,0));
+test('daily repeating task rolls forward while retaining offset',()=>{const list=core.build({tasks:[{id:'a',title:'A',date:'2026-10-20',time:'08:00',repeat:'daily',rem:60}]},now);assert.equal(list[0].at,at('2026-10-23T07:00:00+07:00'));assert.equal(list[0].repeatMs,86400000)});
+test('zero-minute reminder does not schedule twice',()=>assert.equal(core.build({tasks:[{id:'a',date:'2026-10-23',time:'08:00',rem:0}]},now).length,1));
+test('catch-up reminder has stable timestamp across page reloads',()=>{const task={id:'a',title:'A',date:'2026-10-23',time:'08:00',rem:0},first=core.build({tasks:[task]},at('2026-10-23T08:00:10+07:00')),next=core.build({tasks:[task]},at('2026-10-23T08:00:20+07:00'));assert.equal(first[0].at,next[0].at)});
+test('malformed/ambiguous AI output is rejected before modifying data',()=>{assert.throws(()=>core.validateRows([{day:5,period:0,class:'A'}],'timetable'));assert.throws(()=>core.validateRows([{title:'A',date:'unknown',time:'08:00'}],'weekly'));assert.throws(()=>core.validateRows(new Array(201).fill({}),'weekly'))});
+test('timetable import normalizes numeric fields and preserves school day',()=>assert.deepEqual(core.validateRows([{day:'5',period:'6',class:'12A11',subject:'Toán',room:'201'}],'timetable')[0],{day:5,period:6,class:'12A11',subject:'Toán',room:'201'}));
+

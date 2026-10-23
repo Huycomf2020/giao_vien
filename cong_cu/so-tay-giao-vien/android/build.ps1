@@ -12,7 +12,7 @@ $buildRoot = Join-Path $androidRoot 'build'
 $toolsRoot = Join-Path $SdkRoot "build-tools/$BuildToolsVersion"
 $platformJar = Join-Path $SdkRoot 'platforms/android-35/android.jar'
 $javaBin = Join-Path $JdkRoot 'bin'
-if (!$OutputApk) { $OutputApk = Join-Path $androidRoot '../So-tay-Giao-vien-2.0.apk' }
+if (!$OutputApk) { $OutputApk = Join-Path $androidRoot '../So-tay-Giao-vien-3.0.apk' }
 if (!$SigningStore) { $SigningStore = Join-Path $buildRoot 'debug.keystore' }
 function CheckExit { if ($LASTEXITCODE -ne 0) { throw "Build command failed: $LASTEXITCODE" } }
 New-Item -ItemType Directory -Force "$buildRoot/classes","$buildRoot/dex","$buildRoot/assets" | Out-Null
@@ -47,6 +47,7 @@ CheckExit
 & "$toolsRoot/zipalign.exe" -c -v 4 $OutputApk | Select-Object -Last 1
 CheckExit
 Get-FileHash $OutputApk -Algorithm SHA256
+
 
 
 
