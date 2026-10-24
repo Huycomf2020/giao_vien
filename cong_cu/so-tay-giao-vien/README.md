@@ -1,17 +1,17 @@
-# Sổ tay Giáo viên 3.0
+# Sổ tay Giáo viên 3.1
 
 **Thầy Phan Ngọc Huy — Trường THPT Lộc Ninh, TP. Đồng Nai**  
 Made by Huycomf · Tiện ích giáo viên
 
 - [Mở bản web](web/)
-- [Tải APK 3.0](So-tay-Giao-vien-3.0.apk) — Android 8.0 trở lên, bản cài thử đã ký.
+- [Tải APK 3.1](So-tay-Giao-vien-3.1.apk) — Android 8.0 trở lên, bản cài thử đã ký.
 - [Website Tiện ích giáo viên](https://huycomf2020.github.io/giao_vien/index.html)
 
 ## Nhắc việc Android
 
-Phiên bản 2.0 chỉ kiểm tra nhắc việc khi WebView đang chạy. Phiên bản 3.0 lưu lịch báo vào **AlarmManager Android** và dùng BroadcastReceiver để hiện thông báo dù màn hình ứng dụng đã đóng. Lịch được lưu trên thiết bị và khôi phục khi khởi động điện thoại, cập nhật APK hoặc cấp quyền Báo thức.
+Phiên bản 2.0 chỉ kiểm tra nhắc việc khi WebView đang chạy. Phiên bản 3.1 lưu lịch báo vào **AlarmManager Android** và dùng BroadcastReceiver để hiện thông báo dù màn hình ứng dụng đã đóng. Lịch được lưu trên thiết bị và khôi phục khi khởi động điện thoại, cập nhật APK hoặc cấp quyền Báo thức.
 
-Sau khi cài đè APK 3.0:
+Sau khi cài đè APK 3.1:
 
 1. Mở ứng dụng, bấm **biểu tượng chuông** ở góc trên.
 2. Bật **quyền thông báo**, cho phép **Báo thức và lời nhắc**. Android 12 trở lên có thể yêu cầu mở cài đặt này riêng.
@@ -28,16 +28,16 @@ Web có popup và thông báo trình duyệt khi trang đang chạy. Để nhắ
 
 | Tiết trong app | Thời gian |
 | --- | --- |
-| 1 | 07:00–07:45 |
-| 2 | 08:00–08:45 |
-| 3 | 08:50–09:35 |
-| 4 | 09:40–10:25 |
-| 5 | 10:30–11:15 |
-| 6 (chiều 1) | 14:00–14:45 |
-| 7 (chiều 2) | 14:55–15:40 |
-| 8 (chiều 3) | 15:45–16:30 |
+| 1 S | 07:00–07:45 |
+| 2 S | 08:00–08:45 |
+| 3 S | 08:50–09:35 |
+| 4 S | 09:40–10:25 |
+| 5 S | 10:30–11:15 |
+| 1 C | 14:00–14:45 |
+| 2 C | 14:55–15:40 |
+| 3 C | 15:45–16:30 |
 
-Vào lớp lúc 06:55 và 13:55. Tiết 9–10 không dùng mặc định, có thể đặt giờ riêng nếu cần. Giờ mặc định cũ được chuyển sang giờ trường; giờ do người dùng tùy chỉnh được giữ lại. Có nút áp dụng lại giờ THPT Lộc Ninh trong cài đặt giờ.
+Vào lớp lúc 06:55 và 13:55. Ứng dụng chỉ có Tiết 1 S–5 S và Tiết 1 C–3 C; không tạo hoặc nhắc tiết 9–10. Dữ liệu tiết 9–10 cũ được giữ trong bản sao để không mất thông tin nhưng không còn hiển thị/lên lịch. Giờ mặc định cũ được chuyển sang giờ trường; giờ do người dùng tùy chỉnh được giữ lại. Có nút áp dụng lại giờ THPT Lộc Ninh trong cài đặt giờ.
 
 ## Nhập ảnh và PDF — không cần API key
 
@@ -64,7 +64,7 @@ Logo bo bốn góc, chuông vàng nền xanh đậm; favicon và icon Android/we
 
 ## Dữ liệu & cập nhật
 
-APK 3.0 có cùng applicationId và chứng chỉ phát triển với APK 2.0 đã bàn giao trong dự án, có thể cài đè để giữ dữ liệu. Nên xuất bản sao JSON trước khi cập nhật. Không gỡ bản cũ nếu cần giữ dữ liệu chưa sao lưu.
+APK 3.1 có cùng applicationId và chứng chỉ phát triển với APK 2.0 đã bàn giao trong dự án, có thể cài đè để giữ dữ liệu. Nên xuất bản sao JSON trước khi cập nhật. Không gỡ bản cũ nếu cần giữ dữ liệu chưa sao lưu.
 
 GitHub chứa mã nguồn và gói cài đặt; dữ liệu công việc cá nhân chưa đồng bộ tự động giữa web và APK. Kết nối KPI chỉ đọc dữ liệu KPI trường. Dữ liệu công việc, lịch, avatar và tệp đính kèm lưu riêng trên từng thiết bị.
 
@@ -80,3 +80,10 @@ node --test tests/*.test.cjs
 Giữ khóa ký ở nơi riêng; không đưa lên GitHub. Script build đóng gói `web/`, biên dịch, tạo DEX, căn chỉnh và kiểm tra chữ ký APK. Không cần tải dependency Java để build wrapper.
 
 Đã kiểm tra logic lên lịch, hủy việc đã hoàn thành, việc lặp, múi giờ Việt Nam, giờ trường, đối chiếu tên và đọc ngày/giờ; kiểm thử UI thực tế PDF có chữ, OCR ảnh lịch tuần và ảnh bảng 15 tiết; kiểm tra backend KPI public và từ chối khi chưa xác thực; build APK và xác minh chữ ký. Chưa có kiểm thử giao báo thức trên điện thoại Android thật; dùng nút thử nhắc sau một phút trên thiết bị để kiểm chứng quyền và cấu hình máy. Chưa đăng nhập KPI bằng tài khoản thật trong quá trình phát triển.
+
+## Nâng cấp 3.1
+
+- Nút Vi/En nằm cạnh chuông, nhớ lựa chọn trên thiết bị; ngôn ngữ giao diện không dịch tên, môn học hoặc nội dung tài liệu người dùng.
+- Đọc bảng bằng đường kẻ, nhóm toàn bộ chữ nhiều dòng trong mỗi ô; tách tiêu đề hai buổi. Hỗ trợ bảng có tiêu đề màu ngay cả khi OCR đọc sai chữ Thứ hoặc số tiết. Với bảng tiêu chuẩn, các cột từ Thứ 2 đến Thứ 7/Chủ nhật. Chọn bảng đầu là sáng hoặc chỉ chiều.
+- Ô hoạt động không ghi lớp (BD HSG) vẫn được lưu và nhắc. Chỉ nhập TKB không có tên khi người dùng xác nhận là TKB riêng.
+- Đã kiểm thử ảnh TKB thực tế do người dùng cung cấp: 14 tiết (10 sáng, 4 chiều), đúng thứ/tiết/lớp; chữ OCR vẫn có thể dính khoảng trắng, cần kiểm tra trước khi lưu. Không đưa ảnh tài liệu cá nhân lên kho mã nguồn.

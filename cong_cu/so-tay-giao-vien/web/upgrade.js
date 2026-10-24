@@ -1,3 +1,4 @@
+if(!db.periodsVersion31){db.times=TeacherReminder.DEFAULT_TIMES.map((t,i)=>db.times?.[i]||t);db.periodsVersion31=true;save();}
 const oldSchoolTimes=['07:00','07:50','08:50','09:40','10:30','13:00','13:50','14:50','15:40','16:30'];
 if(!db.hoursVersion){if(!db.times||JSON.stringify(db.times)===JSON.stringify(oldSchoolTimes))db.times=[...TeacherReminder.DEFAULT_TIMES];db.hoursVersion=3;save();}
 function applyAvatar(){const avatar=/^data:image\/(png|jpeg|webp);base64,/.test(db.avatar||'')?db.avatar:'',initials=db.name?db.name.split(/\s+/).filter(Boolean).slice(-2).map(s=>s[0]).join(''):'GV';const header=$('.avatar'),side=$('#profile>i:first-child');if(header)header.innerHTML=avatar?`<img src="${avatar}" alt="Ảnh đại diện">`:esc(initials);if(side&&avatar){side.removeAttribute('data-icon');side.innerHTML=`<img src="${avatar}" alt="">`;}else if(side){side.setAttribute('data-icon','user');side.innerHTML=svg('user');}}
