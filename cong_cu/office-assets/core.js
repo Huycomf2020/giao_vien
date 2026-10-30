@@ -34,3 +34,4 @@ validateState=function(s){
 };
 const api={catalogs,templates,empty,money,cashTotals,validateCash,validateState,csv,today,templateText};root.OfficeCore=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
+
