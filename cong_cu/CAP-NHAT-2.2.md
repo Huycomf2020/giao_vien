@@ -1,0 +1,1 @@
+Phiên bản 2.2: tách thể thức hành chính Nghị định 30 và văn bản Đảng Hướng dẫn 05-HD/VPTW. Phần Công tác Đảng tự chọn thể thức Đảng. Cập nhật Code.gs và triển khai phiên bản mới để file email dùng cùng bộ định dạng; giữ nguyên Thuộc tính tập lệnh. Không bao gồm tích hợp ký số hoặc xác nhận thẩm quyền.
