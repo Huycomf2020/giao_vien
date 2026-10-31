@@ -1,0 +1,2 @@
+Phiên bản 3.0: hai cửa soạn hành chính và Đảng độc lập. Không chuyển nhóm trên dự thảo. Mẫu, biểu mẫu, bản nháp và lịch sử riêng. AI có vai trò riêng từng nhóm và kiểm tra chủ thể/khối ký trước khi xuất hoặc gửi email. Ghi chú rà soát tách khỏi văn bản. Bản cũ chưa có phân loại được để riêng, không tự gán nhóm.
+BẮT BUỘC cập nhật Code.gs rồi triển khai phiên bản mới, giữ nguyên Thuộc tính tập lệnh và API key. Máy chủ cũ sẽ bị chặn gọi AI từ giao diện 3.0 để tránh tiếp tục gửi kết quả lẫn nhóm. Không cần chạy lại setupOffice. Các sổ cũ không bị xóa hoặc đổi số.
