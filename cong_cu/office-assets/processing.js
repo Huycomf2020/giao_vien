@@ -1,5 +1,5 @@
 (function(root){'use strict';
-const version='4.1.0',maxFiles=12,maxFileBytes=8*1024*1024,maxTotalBytes=20*1024*1024;
+const version='4.1.1',maxFiles=12,maxFileBytes=8*1024*1024,maxTotalBytes=20*1024*1024;
 const types={pdf:'application/pdf',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',doc:'application/msword',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',xls:'application/vnd.ms-excel',csv:'text/csv',tsv:'text/tab-separated-values',txt:'text/plain',md:'text/markdown',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp'};
 function fileInfo(name,size){const ext=String(name||'').split('.').pop().toLowerCase();if(!types[ext])throw Error('Không hỗ trợ '+name+'. Dùng PDF, Word, Excel, CSV, TXT hoặc ảnh PNG/JPG/WebP.');if(!Number.isSafeInteger(size)||size<1||size>maxFileBytes)throw Error(name+': tệp cần lớn hơn 0 và tối đa 8 MB.');return {name:String(name).replace(/[\x00-\x1f\/\\]/g,'_').slice(0,180),ext,mime:types[ext],size,image:['png','jpg','jpeg','webp'].includes(ext)};}
 function validateFiles(files){if(!Array.isArray(files)||files.length>maxFiles)throw Error('Chọn tối đa 12 tệp mỗi lần.');const infos=files.map(f=>fileInfo(f.name,f.size));if(infos.reduce((s,f)=>s+f.size,0)>maxTotalBytes)throw Error('Tổng tệp vượt 20 MB.');return infos;}
