@@ -24,7 +24,7 @@ function parse(text,hint={}){
  for(let i=0;i<Math.min(titleIndex>=0?titleIndex:10,lines.length);i++){const n=norm(lines[i]);if(removed.has(i))continue;if(/^(SO |BO |UBND |UY BAN |DANG BO |DANG UY |HUYEN UY |TINH UY )/.test(n)){if(!hint.agency)model.agency=clean(lines[i]);removed.add(i);}else if(/^(TRUONG |CHI BO |PHONG |BAN )/.test(n)){if(!hint.unit)model.unit=clean(lines[i]);removed.add(i);}}
  const vv=lines.findIndex((s,i)=>i<28&&/^V\/V\b/i.test(clean(s)));
  if(vv>=0&&titleIndex<0){model.type='';model.subject=clean(lines[vv]).replace(/^V\/v\s*/i,'');removed.add(vv);subjectIndex=vv;}
- else if(titleIndex>=0){let j=titleIndex+1;if(j<lines.length&&!removed.has(j)&&roleFor(clean(lines[j]))==='body'&&!/^NOI NHAN|^KINH GUI/.test(norm(lines[j]))){if(!model.subject)model.subject=clean(lines[j]);removed.add(j);subjectIndex=j;}}
+ else if(titleIndex>=0){let j=titleIndex+1;if(j<lines.length&&!removed.has(j)&&roleFor(clean(lines[j]))==='body'&&!/^NOI NHAN|^KINH GUI/.test(norm(lines[j]))){if(!hint.title||norm(lines[j])===norm(hint.title)){if(!model.subject)model.subject=clean(lines[j]);removed.add(j);subjectIndex=j;}}}
  if(hint.title){for(let i=0;i<Math.min(30,lines.length);i++)if(norm(lines[i])===norm(hint.title))removed.add(i);}
  // Join wrapped subject lines only before the body/salutation starts.
  if(subjectIndex>=0)for(let j=subjectIndex+1;j<Math.min(subjectIndex+4,lines.length);j++){if(removed.has(j))continue;const s=clean(lines[j]);if(roleFor(s)!=='body'||/^[A-ZÀ-Ỹ\[]/.test(s)||/^NOI NHAN/.test(norm(s)))break;model.subject+=' '+s;removed.add(j);}

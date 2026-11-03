@@ -1,0 +1,5 @@
+BẢN 4.0
+1. Đăng nhập ghi nhớ máy cá nhân, tối đa 90 ngày không hoạt động; đăng xuất thu hồi phiên, không xóa key. Máy chung có thể bỏ ghi nhớ (phiên tối đa 12 giờ). Key cũ giữ nguyên trong Thuộc tính tập lệnh, vẫn gắn với email. Không nhập lại nếu app báo ĐÃ CÓ API KEY. Không xóa thuộc tính hoặc chuyển dự án khi cập nhật.
+2. Tối đa 12 tệp, 8 MB/tệp, tổng 20 MB: PDF, DOC/DOCX, XLS/XLSX, CSV/TSV, TXT/MD, PNG/JPG/WebP. Excel có thể chỉ đọc 1.000 dòng/sheet; Word/Excel không đảm bảo đọc hình nhúng. Chia nhỏ bảng lớn hoặc gửi PDF/ảnh bổ sung.
+3. Kết quả gồm dự thảo và biên bản chi tiết riêng, tải Word/TXT và lưu lịch sử, đính kèm email. Báo rõ phạm vi từng tệp; không gửi tự động hoặc xuất như bản hoàn chỉnh nếu phản hồi bị cắt, thiếu cấu trúc, không đọc được tệp hoặc lẫn nhóm. Không tự gọi lại API để tránh trừ tiền hai lần.
+CẬP NHẬT: Chỉ thay toàn bộ Code.gs, lưu, Triển khai > Quản lý triển khai > Chỉnh sửa > Phiên bản mới > Triển khai. Giữ nguyên URL /exec và các Thuộc tính tập lệnh. Không phải tạo thêm tệp processing.js trong Apps Script vì đã gộp trong Code.gs. Ctrl+F5 trang GitHub. Đăng nhập xác thực email một lần và chọn Ghi nhớ máy này.
