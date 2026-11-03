@@ -13,8 +13,8 @@ function parse(text,hint={}){
  for(let i=0;i<Math.min(35,lines.length);i++){const s=clean(lines[i]),n=norm(s);
   if(n==='DANG CONG SAN VIET NAM'){if(!hint.kind)model.kind='party';removed.add(i);continue;}
   if(n.startsWith('CONG HOA XA HOI CHU NGHIA VIET NAM')||n.startsWith('DOC LAP - TU DO - HANH PHUC')||n==='DU THAO'){removed.add(i);continue;}
-  if(/^SO(?:\s*:|\s+\d|\s+\[)/.test(n)){if(!hint.number)model.number=s;removed.add(i);continue;}
-  if(/NGAY\s+.+\s+THANG\s+.+\s+NAM\s+/.test(n)&&i<18){model.date=s;removed.add(i);continue;}
+  if(titleIndex<0&&/^SO(?:\s*:|\s+\d|\s+\[)/.test(n)){if(!hint.number)model.number=s;removed.add(i);continue;}
+  if(titleIndex<0&&i<18&&/^[^,;:]{1,65},\s*NGAY\s+(?:\d{1,2}|\[[^\]]*\])\s+THANG\s+(?:\d{1,2}|\[[^\]]*\])\s+NAM\s+(?:\d{4}|\[[^\]]*\])\s*$/.test(n)&&! /^(CAN CU|THUC HIEN|XET|THEO)\b/.test(n)){model.date=s;removed.add(i);continue;}
   if((n===norm(model.agency)||n===norm(model.unit))&&i<18){removed.add(i);continue;}
   if(TYPES.some(t=>n===norm(t)||n.startsWith(norm(t)+' '))&&i<22&&!/^BAO CAO\s+VIEN/.test(n)){
    if(titleIndex<0){model.type=TYPES.find(t=>n===norm(t)||n.startsWith(norm(t)+' '));if(n==='BIEN BAN BAN GIAO')model.type='BIÊN BẢN BÀN GIAO';titleIndex=i;removed.add(i);const suffix=s.slice(model.type.length).trim();if(suffix&&!model.subject)model.subject=suffix;}
